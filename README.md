@@ -6,8 +6,8 @@ Alpha Wash Store Server is in development stage.
 
 #### Specs
 
-Languague: Java 17 (17.0.6)
-Build-tool: Gradle 8.14.2
+Languague: Java 17 (17.0.6)\
+Build-tool: Gradle 8.14.2\
 Framework: Spring Framework 3.4.7
 
 #### Guildline chạy server
