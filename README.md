@@ -1,20 +1,22 @@
 # Alpha Wash Store
+> ✨ Alpha Wash – Không chỉ là rửa xe, mà là chăm xe đúng cách.
 
-### Alpha Wash Store Server
+### About Alpha Wash Store
+Alpha Wash Store là xưởng chăm sóc xe hơi hiện đại, nơi mang đến trải nghiệm làm đẹp, bảo vệ và nâng tầm giá trị cho xế yêu của bạn.
+Đây là repository chính thức cho hệ thống webserver vận hành nền tảng số của Alpha Wash — nơi công nghệ gặp gỡ đam mê detailing.
+Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch vụ sang mảng bảo trì – bảo dưỡng định kỳ, tích hợp tính năng đăng ký hội viên, hệ thống ưu đãi cá nhân hóa, cùng nhiều tiện ích thông minh giúp khách hàng chăm xe dễ dàng và hiệu quả hơn bao giờ hết.
 
-Alpha Wash Store Server is in development stage.
+### Specs
 
-#### Specs
+**Languague**:  Java 17 (17.0.6)\
+**Build-tool**: Gradle 8.14.2\
+**Framework**:  Spring Framework 3.4.7
 
-Languague: Java 17 (17.0.6)\
-Build-tool: Gradle 8.14.2\
-Framework: Spring Framework 3.4.7
-
-#### Guildline chạy server
+### Guildline chạy server
 
 1. Cài đặt Java 17 (https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 2. Chạy lệnh `./gradlew :bootRun` ( Không cần tải gradle nếu chỉ chạy server )
 
-#### Build file jar 
+### Build file jar
 1. Build file jar `./gradlew :bootJar`
 2. Using Java 17 and run cmd `java -jar build/libs/alphawash-0.0.1-SNAPSHOT.jar`
