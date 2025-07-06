@@ -11,5 +11,4 @@ class AlphawashApplicationTests {
     void contextLoads() {
         Assertions.assertEquals("Hello", "Hello");
     }
-
 }

@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Test Endpoint For Early Stage of Development", description = "None")
@@ -20,11 +19,11 @@ public class TestController {
 
     private final TestService testService;
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "return \"Hello world\" value"),
-            @ApiResponse(responseCode = "400", description = "Not found")
-        }
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "201", description = "return \"Hello world\" value"),
+                @ApiResponse(responseCode = "400", description = "Not found")
+            })
     @Operation(summary = "Just Hello World")
     @GetMapping(Constant.EARLY_STAGE_ENDPOINT)
     public String earlyStage() {
