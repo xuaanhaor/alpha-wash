@@ -19,4 +19,4 @@ Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch v�
 
 ### Build file jar
 1. Build file jar `./gradlew :bootJar`
-2. Using Java 17 and run cmd `java -jar build/libs/alphawash-0.0.1-SNAPSHOT.jar`
+2. Using Java 17 and run cmd `java -jar build/libs/alphawash-x.x.x-SNAPSHOT.jar` với `x.x.x` là version sau khi build xong file jar, có thể copy tên file ở thư mục `build/libs`
