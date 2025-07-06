@@ -3,14 +3,15 @@ plugins {
 	id 'org.springframework.boot' version '3.4.7'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'application'
+	id 'com.diffplug.spotless' version '6.25.0'
 }
 
 application {
 	mainClass = 'com.alphawash.AlphawashApplication'
 }
 
-group = 'com.alphawash'
-version = '0.0.1-SNAPSHOT'
+group = project.group
+version = project.version
 
 java {
 	toolchain {
@@ -30,10 +31,13 @@ repositories {
 
 dependencies {
 	// Open this two when we have database, for now we leave it comment
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+	implementation 'org.postgresql:postgresql:42.7.2'
+	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	implementation 'org.glassfish:jakarta.el:4.0.2'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -55,4 +59,21 @@ jar {
 		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+spotless {
+	java {
+		target 'src/**/*.java'
+		indentWithSpaces(4)
+		palantirJavaFormat()
+		importOrder()
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+
+	format 'misc', {
+		target '*.gradle', '*.md', '.gitignore'
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
 }

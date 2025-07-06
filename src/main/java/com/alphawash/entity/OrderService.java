@@ -1,9 +1,9 @@
 package com.alphawash.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
 import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "order_service")

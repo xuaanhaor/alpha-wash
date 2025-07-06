@@ -14,10 +14,8 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public TestResponse getMessageVer2(TestRequest request) {
-        TestResponse resp = TestResponse.builder()
-                .code("200")
-                .message(request.name())
-                .build();
+        TestResponse resp =
+                TestResponse.builder().code("200").message(request.name()).build();
         return resp;
     }
 }

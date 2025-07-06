@@ -3,7 +3,4 @@ package com.alphawash.request;
 import lombok.Builder;
 
 @Builder
-public record TestRequest(
-        String name
-) {
-}
+public record TestRequest(String name) {}
