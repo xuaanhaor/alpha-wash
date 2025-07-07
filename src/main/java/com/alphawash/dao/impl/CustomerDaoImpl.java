@@ -4,9 +4,8 @@ import com.alphawash.dao.CustomerDao;
 import com.alphawash.entity.Customer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
-
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class CustomerDaoImpl implements CustomerDao {

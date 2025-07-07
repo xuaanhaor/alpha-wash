@@ -1,7 +1,6 @@
 package com.alphawash.dao;
 
 import com.alphawash.entity.Customer;
-
 import java.util.UUID;
 
 public interface CustomerDao {
