@@ -18,7 +18,7 @@ CREATE TABLE vehicle_catalog (
 
 CREATE TABLE vehicle (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  customer_id UUID NOT NULL REFERENCES customer(id),
+  customer_id UUID NULL ,
   licence_plate VARCHAR(20) UNIQUE NOT NULL,
   catalog_id INT REFERENCES vehicle_catalog(id),
   image_url TEXT
@@ -38,7 +38,7 @@ CREATE TABLE employee (
 CREATE TABLE order_service (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   vehicle_id UUID NOT NULL REFERENCES vehicle(id),
-  service_id INT NOT NULL REFERENCES service(id),
+  service_id INT NULL,
   check_in_time TIMESTAMP NOT NULL,
   check_out_time TIMESTAMP,
   status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
@@ -47,7 +47,7 @@ CREATE TABLE order_service (
 CREATE TABLE order_service_detail (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_service_id UUID NOT NULL REFERENCES order_service(id),
-  employee_id UUID NOT NULL REFERENCES employee(id)
+  employee_id UUID NULL
 );
 
 INSERT INTO customer (id, name, phone) VALUES
