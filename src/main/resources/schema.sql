@@ -3,18 +3,17 @@ CREATE DATABASE alphawash_db;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE production(
-    id SERIAL PRIMARY KEY,
-    date_in timestamp NOT NULL,
-    date_out timestamp,
-    plate VARCHAR(20) NOT NULL,
-    customer_name varchar(100) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    car_brand VARCHAR(100) NOT NULL,
-    car_model VARCHAR(100) NOT NULL,
-    car_service VARCHAR(100) NOT NULL,
-    employee VARCHAR(100),
-    note text,
-    update_time timestamp NOT NULL DEFAULT NOW()
+    stt varchar(20),
+    date varchar(20),
+    timeIn varchar(20),
+    timeOut varchar(20),
+    plateNumber varchar(20),
+    user varchar(20),
+    sdt varchar(20),
+    carCompany varchar(20),
+    vehicleLine varchar(20),
+    service varchar(20),
+    status varchar(20)
 );
 
 CREATE TABLE customer (

@@ -15,26 +15,15 @@ public class Production {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private LocalDateTime dateIn;
-
-    private LocalDateTime dateOut;
-
-    private String plate;
-
-    private String customerName;
-
-    private String phone;
-
-    private String carBrand;
-
-    private String carModel;
-
-    private String carService;
-
-    private String employee;
-
-    private String note;
-
-    private LocalDateTime updateTime;
+    private String stt;
+    private String date;
+    private String timeIn;
+    private String timeOut;
+    private String plateNumber;
+    private String user;
+    private String sdt;
+    private String carCompany;
+    private String vehicleLine;
+    private String service;
+    private String status;
 }
