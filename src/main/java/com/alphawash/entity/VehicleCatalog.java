@@ -19,7 +19,5 @@ public class VehicleCatalog {
 
     private String model;
 
-    private Integer year;
-
     private String size;
 }
