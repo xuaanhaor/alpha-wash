@@ -2,19 +2,25 @@ CREATE DATABASE alphawash_db;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+DROP TABLE production;
+
 CREATE TABLE production(
-    stt varchar(20),
-    date varchar(20),
-    timeIn varchar(20),
-    timeOut varchar(20),
-    plateNumber varchar(20),
-    user varchar(20),
+    id SERIAL PRIMARY KEY,
+    stt varchar(20) NOT NULL,
+    date varchar(20) NOT NULL,
+    time_in varchar(20) NOT NULL,
+    time_out varchar(20),
+    plate_number varchar(20) NOT NULL,
+    customer_name varchar(50),
     sdt varchar(20),
-    carCompany varchar(20),
-    vehicleLine varchar(20),
-    service varchar(20),
+    car_company varchar(20) NOT NULL,
+    vehicle_line varchar(20) NOT NULL,
+    service varchar(20) ,
+    car_size varchar(20),
     status varchar(20)
 );
+
+insert into production (car_company,car_size,date,plate_number,sdt,service,status,stt,time_in,time_out,user,vehicle_line) values ('string','string','string','string','string','string','string','string','string','string','string','string')
 
 CREATE TABLE customer (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

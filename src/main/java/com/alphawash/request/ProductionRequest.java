@@ -8,10 +8,11 @@ public record ProductionRequest(
         String timeIn,
         String timeOut,
         String plateNumber,
-        String user,
+        String customerName,
         String sdt,
         String carCompany,
         String vehicleLine,
         String service,
+        String carSize,
         String status
 ) {}

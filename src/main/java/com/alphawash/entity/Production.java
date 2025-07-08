@@ -20,10 +20,11 @@ public class Production {
     private String timeIn;
     private String timeOut;
     private String plateNumber;
-    private String user;
+    private String customerName;
     private String sdt;
     private String carCompany;
     private String vehicleLine;
     private String service;
+    private String carSize;
     private String status;
 }
