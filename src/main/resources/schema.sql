@@ -17,7 +17,8 @@ CREATE TABLE production(
     vehicle_line varchar(20) NOT NULL,
     service varchar(20) ,
     car_size varchar(20),
-    status varchar(20)
+    status varchar(20),
+    employees varchar(100),
 );
 
 insert into production (car_company,car_size,date,plate_number,sdt,service,status,stt,time_in,time_out,user,vehicle_line) values ('string','string','string','string','string','string','string','string','string','string','string','string')

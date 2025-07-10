@@ -1,9 +1,9 @@
-package com.alphawash.request;
+package com.alphawash.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-public record ProductionRequest(
+public record ProductionResponse(
+        Long id,
         String stt,
         String date,
         String timeIn,

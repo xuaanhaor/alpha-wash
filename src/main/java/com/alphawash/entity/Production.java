@@ -2,6 +2,8 @@ package com.alphawash.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.*;
 
 @Entity
@@ -27,4 +29,5 @@ public class Production {
     private String service;
     private String carSize;
     private String status;
+    private String employees;
 }
