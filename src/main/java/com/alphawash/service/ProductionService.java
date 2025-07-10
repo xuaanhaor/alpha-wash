@@ -12,4 +12,6 @@ public interface ProductionService {
     List<ProductionResponse> getAllProductions();
 
     ProductionResponse getProductionById(Long id);
+
+    Production updateProduction(Long id, ProductionRequest request);
 }

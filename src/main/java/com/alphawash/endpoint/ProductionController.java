@@ -35,4 +35,13 @@ public class ProductionController {
         return ResponseEntity.ok(production);
     }
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Production> updateProduction(
+            @PathVariable Long id,
+            @RequestBody ProductionRequest request
+    ) {
+        Production updated = productionService.updateProduction(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
 }

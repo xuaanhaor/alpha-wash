@@ -39,4 +39,28 @@ public class ProductionServiceImpl implements ProductionService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bản ghi với id: " + id));
         return productionConverter.toResponse(production);
     }
+
+    @Override
+    public Production updateProduction(Long id, ProductionRequest request) {
+        Production existing = productionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu rửa xe với id: " + id));
+
+        // Cập nhật thông tin từ request vào entity hiện có
+        existing.setStt(request.stt());
+        existing.setDate(request.date());
+        existing.setTimeIn(request.timeIn());
+        existing.setTimeOut(request.timeOut());
+        existing.setPlateNumber(request.plateNumber());
+        existing.setCustomerName(request.customerName());
+        existing.setSdt(request.sdt());
+        existing.setCarCompany(request.carCompany());
+        existing.setVehicleLine(request.vehicleLine());
+        existing.setService(request.service());
+        existing.setCarSize(request.carSize());
+        existing.setStatus(request.status());
+        existing.setEmployees(String.join(",", request.employees()));
+
+        return productionRepository.save(existing);
+    }
+
 }
