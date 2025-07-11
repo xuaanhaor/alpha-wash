@@ -25,6 +25,7 @@ public class ProductionConverter {
                 .service(request.service())
                 .carSize(request.carSize())
                 .status(request.status())
+                .statusPayment(request.statusPayment())
                 .employees(String.join(",", request.employees()))
                 .build();
     }
@@ -48,6 +49,7 @@ public class ProductionConverter {
                 entity.getService(),
                 entity.getCarSize(),
                 entity.getStatus(),
+                entity.getStatusPayment(),
                 employees
         );
     }

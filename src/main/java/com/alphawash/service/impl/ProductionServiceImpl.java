@@ -58,6 +58,7 @@ public class ProductionServiceImpl implements ProductionService {
         existing.setService(request.service());
         existing.setCarSize(request.carSize());
         existing.setStatus(request.status());
+        existing.setStatusPayment(request.statusPayment());
         existing.setEmployees(String.join(",", request.employees()));
 
         return productionRepository.save(existing);

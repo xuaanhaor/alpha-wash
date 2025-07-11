@@ -16,5 +16,6 @@ public record ProductionResponse(
         String service,
         String carSize,
         String status,
+        String statusPayment,
         List<String> employees
 ) {}

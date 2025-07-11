@@ -11,17 +11,16 @@ CREATE TABLE production(
     time_in varchar(20) NOT NULL,
     time_out varchar(20),
     plate_number varchar(20) NOT NULL,
-    customer_name varchar(50),
+    customer_name varchar(100),
     sdt varchar(20),
     car_company varchar(20) NOT NULL,
     vehicle_line varchar(20) NOT NULL,
-    service varchar(20) ,
+    service varchar(225) ,
     car_size varchar(20),
-    status varchar(20),
-    employees varchar(100),
-);
-
-insert into production (car_company,car_size,date,plate_number,sdt,service,status,stt,time_in,time_out,user,vehicle_line) values ('string','string','string','string','string','string','string','string','string','string','string','string')
+    status varchar(50),
+    status_payment varchar(50),
+    employees varchar(100)
+)
 
 CREATE TABLE customer (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

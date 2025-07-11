@@ -29,5 +29,6 @@ public class Production {
     private String service;
     private String carSize;
     private String status;
+    private String statusPayment;
     private String employees;
 }
