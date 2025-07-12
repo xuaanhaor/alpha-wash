@@ -3,6 +3,7 @@ package com.alphawash.endpoint;
 import com.alphawash.constant.Constant;
 import com.alphawash.converter.BrandConverter;
 import com.alphawash.dto.BrandDto;
+import com.alphawash.dto.BrandWithModelDto;
 import com.alphawash.request.BrandRequest;
 import com.alphawash.response.ApiResponse;
 import com.alphawash.response.BrandResponse;
@@ -29,6 +30,12 @@ public class BrandController {
                         BrandConverter.INSTANCE.toResponse(brandService.getAll())
                 )
         );
+    }
+
+    @GetMapping("/with-models")
+    public ResponseEntity<ApiResponse<List<BrandWithModelDto>>> getBrandsWithModels() {
+        List<BrandWithModelDto> result = brandService.getBrandWithModel();
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping(ID_PATH_PARAMETER)

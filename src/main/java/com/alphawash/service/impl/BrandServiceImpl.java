@@ -1,7 +1,9 @@
 package com.alphawash.service.impl;
 
 import com.alphawash.converter.BrandConverter;
+import com.alphawash.converter.BrandWithModelConverter;
 import com.alphawash.dto.BrandDto;
+import com.alphawash.dto.BrandWithModelDto;
 import com.alphawash.entity.Brand;
 import com.alphawash.repository.BrandRepository;
 import com.alphawash.service.BrandService;
@@ -46,5 +48,11 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public void delete(Long id) {
         brandRepository.deleteById(id);
+    }
+
+    @Override
+    public List<BrandWithModelDto> getBrandWithModel() {
+        List<Object[]> rows = brandRepository.getBrandWithModel();
+        return BrandWithModelConverter.mapList(rows);
     }
 }
