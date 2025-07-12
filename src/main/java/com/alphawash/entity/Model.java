@@ -4,25 +4,24 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "service")
+@Table(name = "model")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Service {
+public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "model_id")
     private Long id;
 
-    @Column(name = "service_name")
-    private String serviceName;
+    @Column(name = "model_name")
+    private String modelName;
 
-    private String duration;
-
-    private String note;
+    private String size;
 
     @ManyToOne
-    @JoinColumn(name = "service_type_id")
-    private ServiceType serviceType;
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 }

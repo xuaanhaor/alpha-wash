@@ -4,22 +4,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "vehicle_catalog")
+@Table(name = "service_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VehicleCatalog {
+public class ServiceType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    private String brand;
-
-    private String model;
-
-    private Integer year;
-
-    private String size;
+    @Column(name = "service_type_name")
+    private String serviceTypeName;
 }
