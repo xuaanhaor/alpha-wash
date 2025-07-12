@@ -1,25 +1,25 @@
 package com.alphawash.entity;
 
 import jakarta.persistence.*;
-import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Table(name = "order_service_detail")
+@Table(name = "employee_skill")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderServiceDetail {
+public class EmployeeSkill {
     @Id
-    private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "order_service_id")
-    private OrderService orderService;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private Service service;
 }

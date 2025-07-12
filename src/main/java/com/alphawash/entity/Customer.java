@@ -13,9 +13,14 @@ import lombok.*;
 @Builder
 public class Customer {
     @Id
+    @GeneratedValue
     private UUID id;
 
-    private String name;
+    @Column(name = "customer_name")
+    private String customerName;
 
     private String phone;
+
+    @Column(columnDefinition = "TEXT")
+    private String note;
 }

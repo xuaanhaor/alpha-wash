@@ -4,21 +4,18 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "employee")
+@Table(name = "brands")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Employee {
+public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "brand_id")
     private Long id;
 
-    private String name;
-
-    private String phone;
-
-    @Column(columnDefinition = "TEXT")
-    private String note;
+    @Column(name = "brand_name")
+    private String brandName;
 }

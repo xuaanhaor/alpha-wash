@@ -19,13 +19,20 @@ public class Vehicle {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @Column(name = "licence_plate", unique = true, nullable = false)
-    private String licencePlate;
+    @Column(name = "license_plate", unique = true, nullable = false)
+    private String licensePlate;
 
     @ManyToOne
-    @JoinColumn(name = "catalog_id")
-    private VehicleCatalog catalog;
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "model_id")
+    private Model model;
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String note;
 }
