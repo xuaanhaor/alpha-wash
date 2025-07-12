@@ -13,7 +13,7 @@ import lombok.*;
 public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "model_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "model_name")
