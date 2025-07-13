@@ -1,5 +1,6 @@
 package com.alphawash.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
@@ -17,6 +18,7 @@ public class Vehicle {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonBackReference
     private Customer customer;
 
     @Column(name = "license_plate", unique = true, nullable = false)
