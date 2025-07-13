@@ -9,8 +9,5 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface VehicleConverter {
     VehicleConverter INSTANCE = Mappers.getMapper(VehicleConverter.class);
-
-    VehicleDto toDto(Vehicle vehicle);
-
     List<VehicleDto> toDto(List<Vehicle> vehicles);
 }

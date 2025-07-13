@@ -31,7 +31,7 @@ create table employee
 (
     id    SERIAL PRIMARY KEY,
     name  varchar(50) NOT NULL,
-    phone varchar(10) NOT NULL,
+    phone varchar(10) UNIQUE NOT NULL,
     note  TEXT
 );
 
@@ -46,7 +46,7 @@ create table customer
 (
     id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     customer_name VARCHAR(100),
-    phone         VARCHAR(10) NOT NULL,
+    phone         VARCHAR(10) UNIQUE NOT NULL,
     NOTE          TEXT
 );
 
@@ -63,7 +63,6 @@ CREATE TABLE model
     size       VARCHAR(5)  NOT NULL,
     brand_id   SERIAL references brands (id)
 );
-alter table model alter column id type SERIAL;
 
 CREATE TABLE vehicle
 (
@@ -161,4 +160,36 @@ FROM orders o
          JOIN model m on m.id = v.model_id
 WHERE o.id = '0b07fa84-3f58-4240-a0a9-0b49c29d86a8'
 GROUP BY o.id, c.customer_name, d.id, s.service_name, sc.size, b.id, m.id;
-SELECT * FROM get_order_detail('0b07fa84-3f58-4240-a0a9-0b49c29d86a8');
+SELECT *
+FROM get_order_detail('0b07fa84-3f58-4240-a0a9-0b49c29d86a8');
+
+
+select *
+from vehicle v
+         join customer c on v.customer_id = c.id
+         join brands b on v.brand_id = b.id
+         join model m on v.model_id = m.id
+where c.phone = '0123456789';
+
+SELECT *
+FROM vehicle v
+         JOIN customer c ON v.customer_id = c.id
+         JOIN brands b ON v.brand_id = b.id
+         JOIN model m ON v.model_id = m.id
+WHERE c.phone = '0123456789';
+
+select c.customer_name,
+       c.phone
+from customer c
+         join vehicle v on c.id = v.customer_id
+         join brands b on v.brand_id = b.id
+         join model m on b.id = m.brand_id
+where c.phone = '0123456789';
+
+-- [12:55:57.229] [13.00ms]
+select c1_0.customer_name, c1_0.phone
+from customer c1_0
+         join vehicle v1_0 on c1_0.id = v1_0.customer_id
+         join brands b1_0 on b1_0.id = v1_0.brand_id
+         join model m1_0 on m1_0.id = v1_0.model_id
+where c1_0.phone = '0373038920'
