@@ -1,19 +1,17 @@
 package com.alphawash.controller;
 
-import com.alphawash.constant.Constant;
+import static com.alphawash.constant.Constant.*;
+
 import com.alphawash.converter.ModelConverter;
 import com.alphawash.dto.ModelDto;
 import com.alphawash.request.ModelRequest;
 import com.alphawash.response.ApiResponse;
 import com.alphawash.response.ModelResponse;
 import com.alphawash.service.ModelService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.alphawash.constant.Constant.*;
 
 @RestController
 @RequestMapping(API_MODEL)
@@ -24,9 +22,7 @@ public class ModelController {
 
     @GetMapping(ROOT)
     public ResponseEntity<ApiResponse<List<ModelResponse>>> getAll() {
-        return ResponseEntity.ok(ApiResponse.success(
-                ModelConverter.INSTANCE.toResponse(modelService.getAll())
-        ));
+        return ResponseEntity.ok(ApiResponse.success(ModelConverter.INSTANCE.toResponse(modelService.getAll())));
     }
 
     @GetMapping(ID_PATH_PARAMETER)
@@ -41,9 +37,7 @@ public class ModelController {
     public ResponseEntity<ApiResponse<ModelResponse>> create(@RequestBody ModelRequest request) {
         ModelDto dto = ModelConverter.INSTANCE.fromRequest(request);
         ModelDto saved = modelService.create(dto);
-        return ResponseEntity.ok(ApiResponse.success(
-                ModelConverter.INSTANCE.toResponse(saved)
-        ));
+        return ResponseEntity.ok(ApiResponse.success(ModelConverter.INSTANCE.toResponse(saved)));
     }
 
     @PutMapping(UPDATE_WITH_PATH_PARAMETER)
@@ -51,9 +45,7 @@ public class ModelController {
         ModelDto dto = ModelConverter.INSTANCE.fromRequest(request);
         ModelDto updated = modelService.update(id, dto);
         return updated != null
-                ? ResponseEntity.ok(ApiResponse.success(
-                ModelConverter.INSTANCE.toResponse(updated)
-        ))
+                ? ResponseEntity.ok(ApiResponse.success(ModelConverter.INSTANCE.toResponse(updated)))
                 : ResponseEntity.notFound().build();
     }
 

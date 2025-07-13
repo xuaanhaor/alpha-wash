@@ -1,19 +1,18 @@
 package com.alphawash.controller;
 
+import static com.alphawash.constant.Constant.*;
+
 import com.alphawash.converter.CustomerConverter;
 import com.alphawash.dto.CustomerDto;
 import com.alphawash.request.CustomerRequest;
 import com.alphawash.response.ApiResponse;
 import com.alphawash.response.CustomerResponse;
 import com.alphawash.service.CustomerService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
-
-import static com.alphawash.constant.Constant.*;
 
 @RestController
 @RequestMapping(API_CUSTOMER)
@@ -44,7 +43,8 @@ public class CustomerController {
     }
 
     @PutMapping(UPDATE_WITH_PATH_PARAMETER)
-    public ResponseEntity<ApiResponse<CustomerResponse>> update(@PathVariable UUID id, @RequestBody CustomerRequest request) {
+    public ResponseEntity<ApiResponse<CustomerResponse>> update(
+            @PathVariable UUID id, @RequestBody CustomerRequest request) {
         CustomerDto dto = CustomerConverter.INSTANCE.fromRequest(request);
         CustomerDto updated = customerService.update(id, dto);
         return updated != null

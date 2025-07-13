@@ -5,11 +5,10 @@ import com.alphawash.dto.CustomerDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.repository.CustomerRepository;
 import com.alphawash.service.CustomerService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto getById(UUID id) {
-        return customerRepository.findById(id)
+        return customerRepository
+                .findById(id)
                 .map(CustomerConverter.INSTANCE::toDto)
                 .orElse(null);
     }
@@ -37,12 +37,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto update(UUID id, CustomerDto dto) {
-        return customerRepository.findById(id).map(c -> {
-            c.setCustomerName(dto.getCustomerName());
-            c.setPhone(dto.getPhone());
-            c.setNote(dto.getNote());
-            return CustomerConverter.INSTANCE.toDto(customerRepository.save(c));
-        }).orElse(null);
+        return customerRepository
+                .findById(id)
+                .map(c -> {
+                    c.setCustomerName(dto.getCustomerName());
+                    c.setPhone(dto.getPhone());
+                    c.setNote(dto.getNote());
+                    return CustomerConverter.INSTANCE.toDto(customerRepository.save(c));
+                })
+                .orElse(null);
     }
 
     @Override

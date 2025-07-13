@@ -1,6 +1,7 @@
 package com.alphawash.endpoint;
 
-import com.alphawash.constant.Constant;
+import static com.alphawash.constant.Constant.*;
+
 import com.alphawash.converter.BrandConverter;
 import com.alphawash.dto.BrandDto;
 import com.alphawash.dto.BrandWithModelDto;
@@ -8,13 +9,10 @@ import com.alphawash.request.BrandRequest;
 import com.alphawash.response.ApiResponse;
 import com.alphawash.response.BrandResponse;
 import com.alphawash.service.BrandService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.alphawash.constant.Constant.*;
 
 @RestController
 @RequestMapping(API_BRANDS)
@@ -25,14 +23,10 @@ public class BrandController {
 
     @GetMapping(ROOT)
     public ResponseEntity<ApiResponse<List<BrandResponse>>> getAll() {
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        BrandConverter.INSTANCE.toResponse(brandService.getAll())
-                )
-        );
+        return ResponseEntity.ok(ApiResponse.success(BrandConverter.INSTANCE.toResponse(brandService.getAll())));
     }
 
-    @GetMapping("/with-models")
+    @GetMapping(API_BRAND_WITH_MODELS)
     public ResponseEntity<ApiResponse<List<BrandWithModelDto>>> getBrandsWithModels() {
         List<BrandWithModelDto> result = brandService.getBrandWithModel();
         return ResponseEntity.ok(ApiResponse.success(result));

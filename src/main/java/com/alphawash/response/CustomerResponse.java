@@ -1,8 +1,7 @@
 package com.alphawash.response;
 
-import lombok.*;
-
 import java.util.UUID;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
