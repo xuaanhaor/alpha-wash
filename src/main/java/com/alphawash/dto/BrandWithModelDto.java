@@ -1,11 +1,10 @@
 package com.alphawash.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +19,7 @@ public class BrandWithModelDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class Model{
+    public static class Model {
         private Long id;
         private String modelName;
         private String size;

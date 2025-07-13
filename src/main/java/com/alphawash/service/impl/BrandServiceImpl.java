@@ -7,10 +7,9 @@ import com.alphawash.dto.BrandWithModelDto;
 import com.alphawash.entity.Brand;
 import com.alphawash.repository.BrandRepository;
 import com.alphawash.service.BrandService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +25,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public BrandDto getById(Long id) {
-        return brandRepository.findById(id)
-                .map(converter::toDto)
-                .orElse(null);
+        return brandRepository.findById(id).map(converter::toDto).orElse(null);
     }
 
     @Override
@@ -39,10 +36,13 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public BrandDto update(Long id, BrandDto dto) {
-        return brandRepository.findById(id).map(entity -> {
-            entity.setBrandName(dto.getBrandName());
-            return converter.toDto(brandRepository.save(entity));
-        }).orElse(null);
+        return brandRepository
+                .findById(id)
+                .map(entity -> {
+                    entity.setBrandName(dto.getBrandName());
+                    return converter.toDto(brandRepository.save(entity));
+                })
+                .orElse(null);
     }
 
     @Override

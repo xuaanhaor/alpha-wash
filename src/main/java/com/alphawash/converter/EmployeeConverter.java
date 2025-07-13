@@ -14,11 +14,15 @@ public interface EmployeeConverter {
     EmployeeConverter INSTANCE = Mappers.getMapper(EmployeeConverter.class);
 
     EmployeeDto toDto(Employee employee);
+
     Employee toEntity(EmployeeDto dto);
 
     @Mapping(target = "id", ignore = true)
     EmployeeDto fromRequest(EmployeeRequest request);
+
     EmployeeResponse toResponse(EmployeeDto dto);
+
     List<EmployeeDto> toDto(List<Employee> employees);
+
     List<EmployeeResponse> toResponse(List<EmployeeDto> dtos);
 }

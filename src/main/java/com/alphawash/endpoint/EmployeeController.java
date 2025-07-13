@@ -1,19 +1,18 @@
 package com.alphawash.endpoint;
 
+import static com.alphawash.constant.Constant.INSERT_ENDPOINT;
+import static com.alphawash.constant.Constant.ROOT;
+
 import com.alphawash.constant.Constant;
 import com.alphawash.converter.EmployeeConverter;
 import com.alphawash.dto.EmployeeDto;
 import com.alphawash.request.EmployeeRequest;
 import com.alphawash.response.EmployeeResponse;
 import com.alphawash.service.EmployeeService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.alphawash.constant.Constant.INSERT_ENDPOINT;
-import static com.alphawash.constant.Constant.ROOT;
 
 @RestController
 @RequestMapping(Constant.API_EMPLOYEE)
@@ -46,8 +45,8 @@ public class EmployeeController {
     }
 
     @PutMapping(Constant.UPDATE_WITH_PATH_PARAMETER)
-    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable("id") Long id,
-                                                           @RequestBody EmployeeRequest request) {
+    public ResponseEntity<EmployeeResponse> updateEmployee(
+            @PathVariable("id") Long id, @RequestBody EmployeeRequest request) {
         EmployeeDto dto = EmployeeConverter.INSTANCE.fromRequest(request);
         EmployeeDto updated = employeeService.update(id, dto);
         if (updated == null) {

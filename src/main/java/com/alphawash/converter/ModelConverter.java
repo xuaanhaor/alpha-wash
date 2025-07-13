@@ -1,14 +1,12 @@
 package com.alphawash.converter;
 
 import com.alphawash.dto.ModelDto;
-import com.alphawash.entity.Brand;
 import com.alphawash.entity.Model;
 import com.alphawash.request.ModelRequest;
 import com.alphawash.response.ModelResponse;
+import java.util.List;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper
 public interface ModelConverter {
@@ -26,5 +24,6 @@ public interface ModelConverter {
     Model toEntity(ModelDto dto);
 
     List<ModelDto> toDto(List<Model> entities);
+
     List<ModelResponse> toResponse(List<ModelDto> dtos);
 }
