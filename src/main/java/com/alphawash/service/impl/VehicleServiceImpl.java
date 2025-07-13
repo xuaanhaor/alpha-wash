@@ -28,7 +28,7 @@ public class VehicleServiceImpl implements VehicleService {
     public List<VehicleDto> insert(VehicleRequest request) {
         var dto = repository.findById(request.id());
         if (dto.isPresent()) {
-            ////            var vehicle = VehicleConverter.INSTANCE.fromRequest(request);
+            //            Object vehicle = null;
             //            repository.save(vehicle);
             //            return VehicleConverter.INSTANCE.toDto(List.of(vehicle));
         }
@@ -38,7 +38,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto findById(UUID id) {
         var dto = repository.findById(id);
-        return dto.map(VehicleConverter.INSTANCE::toDto).orElse(null);
+        return null;
     }
 
     @Override
@@ -47,9 +47,9 @@ public class VehicleServiceImpl implements VehicleService {
         var dto = repository.findById(request.id());
         dto.ifPresentOrElse(
                 vehicle -> {
-                    //                var updatedVehicle = VehicleConverter.INSTANCE.fromRequest(request);
-                    //                updatedVehicle.setId(vehicle.getId());
-                    //                repository.save(updatedVehicle);
+                    //                    var updatedVehicle = VehicleConverter.INSTANCE.fromRequest(request);
+                    //                    updatedVehicle.setId(vehicle.getId());
+                    //                    repository.save(updatedVehicle);
                 },
                 () -> {
                     throw new IllegalArgumentException("Vehicle not found with id: " + request.id());
@@ -59,6 +59,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto findByLicensePlate(String licensePlate) {
         var vehicle = repository.findByLicensePlate(licensePlate);
-        return vehicle.map(VehicleConverter.INSTANCE::toDto).orElse(null);
+        //        return vehicle.map(VehicleConverter.INSTANCE::toDto).orElse(null);
+        return null; // Placeholder for actual implementation
     }
 }
