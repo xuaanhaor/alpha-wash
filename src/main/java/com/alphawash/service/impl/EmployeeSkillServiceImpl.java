@@ -8,10 +8,9 @@ import com.alphawash.repository.EmployeeSkillRepository;
 import com.alphawash.repository.ServiceRepository;
 import com.alphawash.service.EmployeeSkillService;
 import com.alphawash.util.PatchHelper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +28,7 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
 
     @Override
     public EmployeeSkillDto getById(Long id) {
-        return employeeSkillRepository.findById(id)
-                .map(converter::toDto)
-                .orElse(null);
+        return employeeSkillRepository.findById(id).map(converter::toDto).orElse(null);
     }
 
     @Override
@@ -44,14 +41,21 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
 
     @Override
     public EmployeeSkillDto update(Long id, EmployeeSkillDto patchData) {
-        return employeeSkillRepository.findById(id).map(existing -> {
-            EmployeeSkillDto currentDto = converter.toDto(existing);
-            PatchHelper.applyPatch(patchData, currentDto);
-            EmployeeSkill updated = converter.toEntity(currentDto);
-            updated.setEmployee(employeeRepository.findById(currentDto.getEmployeeId()).orElse(null));
-            updated.setService(serviceRepository.findById(currentDto.getServiceId()).orElse(null));
-            return converter.toDto(employeeSkillRepository.save(updated));
-        }).orElse(null);
+        return employeeSkillRepository
+                .findById(id)
+                .map(existing -> {
+                    EmployeeSkillDto currentDto = converter.toDto(existing);
+                    PatchHelper.applyPatch(patchData, currentDto);
+                    EmployeeSkill updated = converter.toEntity(currentDto);
+                    updated.setEmployee(employeeRepository
+                            .findById(currentDto.getEmployeeId())
+                            .orElse(null));
+                    updated.setService(serviceRepository
+                            .findById(currentDto.getServiceId())
+                            .orElse(null));
+                    return converter.toDto(employeeSkillRepository.save(updated));
+                })
+                .orElse(null);
     }
 
     @Override

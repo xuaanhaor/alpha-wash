@@ -35,9 +35,9 @@ public class CustomerController {
 
     @Operation(summary = "Get customer by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Customer found"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Customer found"),
+        @ApiResponse(responseCode = "404", description = "Customer not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(ID_PATH_PARAMETER)
     public ResponseEntity<CustomerResponse> getById(@PathVariable UUID id) {
@@ -58,13 +58,12 @@ public class CustomerController {
 
     @Operation(summary = "Update existing customer")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Customer updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Customer updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Customer not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
-    public ResponseEntity<CustomerResponse> update(
-            @PathVariable UUID id, @RequestBody CustomerRequest request) {
+    public ResponseEntity<CustomerResponse> update(@PathVariable UUID id, @RequestBody CustomerRequest request) {
         CustomerDto dto = CustomerConverter.INSTANCE.fromRequest(request);
         CustomerDto updated = customerService.update(id, dto);
         return updated != null
@@ -74,9 +73,9 @@ public class CustomerController {
 
     @Operation(summary = "Delete customer by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Customer not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping(DELETE_WITH_PATH_PARAMETER)
     public ResponseEntity<Void> delete(@PathVariable UUID id) {

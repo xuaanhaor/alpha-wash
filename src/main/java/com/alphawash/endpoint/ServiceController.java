@@ -1,22 +1,21 @@
 package com.alphawash.endpoint;
 
+import static com.alphawash.constant.Constant.*;
+
 import com.alphawash.converter.ServiceConverter;
 import com.alphawash.dto.ServiceDto;
 import com.alphawash.request.ServiceRequest;
 import com.alphawash.response.ServiceResponse;
 import com.alphawash.service.ServiceService;
 import com.alphawash.util.ObjectUtils;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static com.alphawash.constant.Constant.*;
 
 @RestController
 @RequestMapping(API_SERVICE)
@@ -28,8 +27,8 @@ public class ServiceController {
 
     @Operation(summary = "Get all services")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of services"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of services"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(ROOT)
     public ResponseEntity<List<ServiceResponse>> getAll() {
@@ -39,9 +38,9 @@ public class ServiceController {
 
     @Operation(summary = "Get a service by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Service found"),
-            @ApiResponse(responseCode = "404", description = "Service not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Service found"),
+        @ApiResponse(responseCode = "404", description = "Service not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(ID_PATH_PARAMETER)
     public ResponseEntity<ServiceResponse> getById(@PathVariable Long id) {
@@ -54,8 +53,8 @@ public class ServiceController {
 
     @Operation(summary = "Create a new service")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Service created successfully"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Service created successfully"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(INSERT_ENDPOINT)
     public ResponseEntity<ServiceResponse> create(@RequestBody ServiceRequest request) {
@@ -67,9 +66,9 @@ public class ServiceController {
     @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     @Operation(summary = "Partially update a service")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Service updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Service not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Service updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Service not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<ServiceResponse> update(@PathVariable Long id, @RequestBody ServiceRequest request) {
         ServiceDto dto = ServiceConverter.INSTANCE.fromRequest(request);
@@ -82,9 +81,9 @@ public class ServiceController {
 
     @Operation(summary = "Delete a service by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Service deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Service not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "204", description = "Service deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Service not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping(DELETE_WITH_PATH_PARAMETER)
     public ResponseEntity<Void> delete(@PathVariable Long id) {

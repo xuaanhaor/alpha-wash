@@ -7,9 +7,8 @@ import com.alphawash.repository.ServiceRepository;
 import com.alphawash.repository.ServiceTypeRepository;
 import com.alphawash.service.ServiceService;
 import com.alphawash.util.PatchHelper;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -26,33 +25,33 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public ServiceDto getById(Long id) {
-        return serviceRepository.findById(id)
-                .map(converter::toDto)
-                .orElse(null);
+        return serviceRepository.findById(id).map(converter::toDto).orElse(null);
     }
 
     @Override
     public ServiceDto create(ServiceDto dto) {
         Service entity = converter.toEntity(dto);
-        entity.setServiceType(serviceTypeRepository.findById(dto.getServiceTypeId()).orElseThrow());
+        entity.setServiceType(
+                serviceTypeRepository.findById(dto.getServiceTypeId()).orElseThrow());
         return converter.toDto(serviceRepository.save(entity));
     }
 
     @Override
     public ServiceDto update(Long id, ServiceDto patchData) {
-        return serviceRepository.findById(id).map(existing -> {
-            ServiceDto currentDto = converter.toDto(existing);
-            PatchHelper.applyPatch(patchData, currentDto);
-            Service updatedEntity = converter.toEntity(currentDto);
-            updatedEntity.setServiceType(
-                    serviceTypeRepository.findById(currentDto.getServiceTypeId()).orElse(null)
-            );
+        return serviceRepository
+                .findById(id)
+                .map(existing -> {
+                    ServiceDto currentDto = converter.toDto(existing);
+                    PatchHelper.applyPatch(patchData, currentDto);
+                    Service updatedEntity = converter.toEntity(currentDto);
+                    updatedEntity.setServiceType(serviceTypeRepository
+                            .findById(currentDto.getServiceTypeId())
+                            .orElse(null));
 
-            return converter.toDto(serviceRepository.save(updatedEntity));
-        }).orElse(null);
+                    return converter.toDto(serviceRepository.save(updatedEntity));
+                })
+                .orElse(null);
     }
-
-
 
     @Override
     public void delete(Long id) {

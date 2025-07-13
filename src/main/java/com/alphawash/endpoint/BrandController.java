@@ -8,13 +8,11 @@ import com.alphawash.dto.BrandWithModelDto;
 import com.alphawash.request.BrandRequest;
 import com.alphawash.response.BrandResponse;
 import com.alphawash.service.BrandService;
-
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +33,8 @@ public class BrandController {
     }
 
     @Operation(summary = "Get all brands with their associated models")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved brands with models")
-    })
+    @ApiResponses(
+            value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved brands with models")})
     @GetMapping(API_BRAND_WITH_MODELS)
     public ResponseEntity<List<BrandWithModelDto>> getBrandsWithModels() {
         List<BrandWithModelDto> result = brandService.getBrandWithModel();
@@ -45,21 +42,25 @@ public class BrandController {
     }
 
     @Operation(summary = "Get a brand by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Brand found"),
-            @ApiResponse(responseCode = "404", description = "Brand not found with given ID")
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Brand found"),
+                @ApiResponse(responseCode = "404", description = "Brand not found with given ID")
+            })
     @GetMapping(ID_PATH_PARAMETER)
     public ResponseEntity<BrandResponse> getById(@PathVariable Long id) {
         BrandDto dto = brandService.getById(id);
-        return dto != null ? ResponseEntity.ok(BrandConverter.INSTANCE.toResponse(dto)) : ResponseEntity.notFound().build();
+        return dto != null
+                ? ResponseEntity.ok(BrandConverter.INSTANCE.toResponse(dto))
+                : ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "Create a new brand")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Brand created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data")
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Brand created successfully"),
+                @ApiResponse(responseCode = "400", description = "Invalid input data")
+            })
     @PostMapping(INSERT_ENDPOINT)
     public ResponseEntity<BrandResponse> create(@RequestBody BrandRequest request) {
         BrandDto dto = BrandConverter.INSTANCE.fromRequest(request);
@@ -68,22 +69,26 @@ public class BrandController {
     }
 
     @Operation(summary = "Update a brand by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Brand updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Brand not found")
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Brand updated successfully"),
+                @ApiResponse(responseCode = "404", description = "Brand not found")
+            })
     @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<BrandResponse> update(@PathVariable Long id, @RequestBody BrandRequest request) {
         BrandDto dto = BrandConverter.INSTANCE.fromRequest(request);
         BrandDto updated = brandService.update(id, dto);
-        return updated != null ? ResponseEntity.ok(BrandConverter.INSTANCE.toResponse(updated)) : ResponseEntity.notFound().build();
+        return updated != null
+                ? ResponseEntity.ok(BrandConverter.INSTANCE.toResponse(updated))
+                : ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "Delete a brand by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Brand deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Brand not found")
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "204", description = "Brand deleted successfully"),
+                @ApiResponse(responseCode = "404", description = "Brand not found")
+            })
     @DeleteMapping(DELETE_WITH_PATH_PARAMETER)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         brandService.delete(id);

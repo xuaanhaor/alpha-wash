@@ -5,10 +5,9 @@ import com.alphawash.dto.CustomerDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.repository.CustomerRepository;
 import com.alphawash.service.CustomerService;
+import com.alphawash.util.PatchHelper;
 import java.util.List;
 import java.util.UUID;
-
-import com.alphawash.util.PatchHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +38,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto update(UUID id, CustomerDto patchData) {
-        return customerRepository.findById(id).map(existing -> {
-            CustomerDto currentDto = CustomerConverter.INSTANCE.toDto(existing);
-            PatchHelper.applyPatch(patchData, currentDto);
-            Customer updated = CustomerConverter.INSTANCE.toEntity(currentDto);
-            return CustomerConverter.INSTANCE.toDto(customerRepository.save(updated));
-        }).orElse(null);
+        return customerRepository
+                .findById(id)
+                .map(existing -> {
+                    CustomerDto currentDto = CustomerConverter.INSTANCE.toDto(existing);
+                    PatchHelper.applyPatch(patchData, currentDto);
+                    Customer updated = CustomerConverter.INSTANCE.toEntity(currentDto);
+                    return CustomerConverter.INSTANCE.toDto(customerRepository.save(updated));
+                })
+                .orElse(null);
     }
-
 
     @Override
     public void delete(UUID id) {

@@ -1,12 +1,9 @@
 package com.alphawash.response;
 
-import com.alphawash.util.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Objects;
 
 @Getter
 @Setter

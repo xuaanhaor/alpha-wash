@@ -1,9 +1,8 @@
 package com.alphawash.response;
 
 import com.alphawash.constant.Size;
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

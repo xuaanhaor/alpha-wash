@@ -11,11 +11,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(API_MODEL)
@@ -34,9 +33,9 @@ public class ModelController {
 
     @Operation(summary = "Get model by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Model found"),
-            @ApiResponse(responseCode = "404", description = "Model not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Model found"),
+        @ApiResponse(responseCode = "404", description = "Model not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping(ID_PATH_PARAMETER)
     public ResponseEntity<ModelResponse> getById(@PathVariable Long id) {
@@ -57,9 +56,9 @@ public class ModelController {
 
     @Operation(summary = "Update a vehicle model")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Model updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Model not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "200", description = "Model updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Model not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<ModelResponse> update(@PathVariable Long id, @RequestBody ModelRequest request) {
@@ -72,9 +71,9 @@ public class ModelController {
 
     @Operation(summary = "Delete a vehicle model by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Model deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Model not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "204", description = "Model deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Model not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping(DELETE_WITH_PATH_PARAMETER)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
