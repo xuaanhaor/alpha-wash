@@ -8,6 +8,8 @@ import com.alphawash.entity.Brand;
 import com.alphawash.repository.BrandRepository;
 import com.alphawash.service.BrandService;
 import java.util.List;
+
+import com.alphawash.util.PatchHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,15 +37,15 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandDto update(Long id, BrandDto dto) {
-        return brandRepository
-                .findById(id)
-                .map(entity -> {
-                    entity.setBrandName(dto.getBrandName());
-                    return converter.toDto(brandRepository.save(entity));
-                })
-                .orElse(null);
+    public BrandDto update(Long id, BrandDto patchData) {
+        return brandRepository.findById(id).map(existing -> {
+            BrandDto currentDto = converter.toDto(existing);
+            PatchHelper.applyPatch(patchData, currentDto);
+            Brand updated = converter.toEntity(currentDto);
+            return converter.toDto(brandRepository.save(updated));
+        }).orElse(null);
     }
+
 
     @Override
     public void delete(Long id) {

@@ -8,6 +8,9 @@ import com.alphawash.repository.BrandRepository;
 import com.alphawash.repository.ModelRepository;
 import com.alphawash.service.ModelService;
 import java.util.List;
+
+import com.alphawash.util.ObjectUtils;
+import com.alphawash.util.PatchHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,17 +41,18 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public ModelDto update(Long id, ModelDto dto) {
-        return modelRepository
-                .findById(id)
-                .map(existing -> {
-                    existing.setModelName(dto.getModelName());
-                    existing.setSize(dto.getSize());
-                    existing.setBrand(brandRepository.findById(dto.getBrandId()).orElse(null));
-                    return converter.toDto(modelRepository.save(existing));
-                })
-                .orElse(null);
+    public ModelDto update(Long id, ModelDto patchData) {
+        return modelRepository.findById(id).map(existing -> {
+            ModelDto currentDto = converter.toDto(existing);
+            PatchHelper.applyPatch(patchData, currentDto);
+            Model updatedEntity = converter.toEntity(currentDto);
+            if (ObjectUtils.isNotNull(currentDto.getBrandId())) {
+                updatedEntity.setBrand(brandRepository.findById(currentDto.getBrandId()).orElse(null));
+            }
+            return converter.toDto(modelRepository.save(updatedEntity));
+        }).orElse(null);
     }
+
 
     @Override
     public void delete(Long id) {

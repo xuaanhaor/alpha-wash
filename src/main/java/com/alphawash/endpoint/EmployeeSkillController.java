@@ -5,6 +5,7 @@ import com.alphawash.dto.EmployeeSkillDto;
 import com.alphawash.request.EmployeeSkillRequest;
 import com.alphawash.response.EmployeeSkillResponse;
 import com.alphawash.service.EmployeeSkillService;
+import com.alphawash.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -63,18 +64,21 @@ public class EmployeeSkillController {
         return ResponseEntity.ok(EmployeeSkillConverter.INSTANCE.toResponse(saved));
     }
 
-    @Operation(summary = "Update an employee skill by ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Employee skill updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Employee skill not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+    @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
+    @Operation(summary = "Partially update employee-skill")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Update successful"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
-    public ResponseEntity<EmployeeSkillResponse> update(@PathVariable Long id, @RequestBody EmployeeSkillRequest request) {
+    public ResponseEntity<EmployeeSkillResponse> patchUpdate(
+            @PathVariable Long id,
+            @RequestBody EmployeeSkillRequest request) {
+
         EmployeeSkillDto dto = EmployeeSkillConverter.INSTANCE.fromRequest(request);
         EmployeeSkillDto updated = employeeSkillService.update(id, dto);
-        return updated != null
+
+        return ObjectUtils.isNotNull(updated)
                 ? ResponseEntity.ok(EmployeeSkillConverter.INSTANCE.toResponse(updated))
                 : ResponseEntity.notFound().build();
     }

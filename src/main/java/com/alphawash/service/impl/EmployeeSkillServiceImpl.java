@@ -7,6 +7,7 @@ import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.repository.EmployeeSkillRepository;
 import com.alphawash.repository.ServiceRepository;
 import com.alphawash.service.EmployeeSkillService;
+import com.alphawash.util.PatchHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +43,14 @@ public class EmployeeSkillServiceImpl implements EmployeeSkillService {
     }
 
     @Override
-    public EmployeeSkillDto update(Long id, EmployeeSkillDto dto) {
+    public EmployeeSkillDto update(Long id, EmployeeSkillDto patchData) {
         return employeeSkillRepository.findById(id).map(existing -> {
-            existing.setEmployee(employeeRepository.findById(dto.getEmployeeId()).orElse(null));
-            existing.setService(serviceRepository.findById(dto.getServiceId()).orElse(null));
-            return converter.toDto(employeeSkillRepository.save(existing));
+            EmployeeSkillDto currentDto = converter.toDto(existing);
+            PatchHelper.applyPatch(patchData, currentDto);
+            EmployeeSkill updated = converter.toEntity(currentDto);
+            updated.setEmployee(employeeRepository.findById(currentDto.getEmployeeId()).orElse(null));
+            updated.setService(serviceRepository.findById(currentDto.getServiceId()).orElse(null));
+            return converter.toDto(employeeSkillRepository.save(updated));
         }).orElse(null);
     }
 

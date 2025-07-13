@@ -6,6 +6,8 @@ import com.alphawash.entity.Employee;
 import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.service.EmployeeService;
 import java.util.List;
+
+import com.alphawash.util.PatchHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,17 +36,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto update(Long id, EmployeeDto dto) {
-        return employeeRepository
-                .findById(id)
-                .map(existing -> {
-                    existing.setName(dto.getName());
-                    existing.setPhone(dto.getPhone());
-                    existing.setNote(dto.getNote());
-                    return employeeConverter.toDto(employeeRepository.save(existing));
-                })
-                .orElse(null);
+    public EmployeeDto update(Long id, EmployeeDto patchData) {
+        return employeeRepository.findById(id).map(existing -> {
+            EmployeeDto currentDto = employeeConverter.toDto(existing);
+            PatchHelper.applyPatch(patchData, currentDto);
+            Employee updated = employeeConverter.toEntity(currentDto);
+            return employeeConverter.toDto(employeeRepository.save(updated));
+        }).orElse(null);
     }
+
 
     @Override
     public void delete(Long id) {
