@@ -1,4 +1,4 @@
-package com.alphawash.controller;
+package com.alphawash.endpoint;
 
 import static com.alphawash.constant.Constant.*;
 
