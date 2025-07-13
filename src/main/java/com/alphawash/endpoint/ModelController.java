@@ -9,6 +9,8 @@ import com.alphawash.response.ApiResponse;
 import com.alphawash.response.ModelResponse;
 import com.alphawash.service.ModelService;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(API_MODEL)
 @RequiredArgsConstructor
+@Tag(name = "Vehicle", description = "Vehicle management operations")
 public class ModelController {
 
     private final ModelService modelService;
+
 
     @GetMapping(ROOT)
     public ResponseEntity<ApiResponse<List<ModelResponse>>> getAll() {
@@ -40,7 +44,7 @@ public class ModelController {
         return ResponseEntity.ok(ApiResponse.success(ModelConverter.INSTANCE.toResponse(saved)));
     }
 
-    @PutMapping(UPDATE_WITH_PATH_PARAMETER)
+    @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<ApiResponse<ModelResponse>> update(@PathVariable Long id, @RequestBody ModelRequest request) {
         ModelDto dto = ModelConverter.INSTANCE.fromRequest(request);
         ModelDto updated = modelService.update(id, dto);

@@ -44,7 +44,7 @@ public class EmployeeController {
         return ResponseEntity.ok(EmployeeConverter.INSTANCE.toResponse(saved));
     }
 
-    @PutMapping(Constant.UPDATE_WITH_PATH_PARAMETER)
+    @PatchMapping(Constant.UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<EmployeeResponse> updateEmployee(
             @PathVariable("id") Long id, @RequestBody EmployeeRequest request) {
         EmployeeDto dto = EmployeeConverter.INSTANCE.fromRequest(request);

@@ -42,7 +42,7 @@ public class CustomerController {
         return ResponseEntity.ok(ApiResponse.success(CustomerConverter.INSTANCE.toResponse(saved)));
     }
 
-    @PutMapping(UPDATE_WITH_PATH_PARAMETER)
+    @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<ApiResponse<CustomerResponse>> update(
             @PathVariable UUID id, @RequestBody CustomerRequest request) {
         CustomerDto dto = CustomerConverter.INSTANCE.fromRequest(request);
