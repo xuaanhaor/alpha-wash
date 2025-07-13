@@ -6,6 +6,7 @@ import com.alphawash.converter.CustomerConverter;
 import com.alphawash.dto.CustomerDto;
 import com.alphawash.request.CustomerRequest;
 import com.alphawash.response.CustomerResponse;
+import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,5 +82,11 @@ public class CustomerController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         customerService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/phone")
+    public ResponseEntity<CustomerVehicleResponse> findByPhone(@RequestParam(name = "number") String number) {
+        var result = customerService.findByPhone(number);
+        return ResponseEntity.ok(result);
     }
 }

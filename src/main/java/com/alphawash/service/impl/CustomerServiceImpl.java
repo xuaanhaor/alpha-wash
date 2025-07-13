@@ -4,9 +4,11 @@ import com.alphawash.converter.CustomerConverter;
 import com.alphawash.dto.CustomerDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.repository.CustomerRepository;
+import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
 import com.alphawash.util.PatchHelper;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,5 +54,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void delete(UUID id) {
         customerRepository.deleteById(id);
+    }
+
+    @Override
+    public CustomerVehicleResponse findByPhone(String phone) {
+        Optional<Customer> result = customerRepository.findByPhone(phone);
+        return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
     }
 }

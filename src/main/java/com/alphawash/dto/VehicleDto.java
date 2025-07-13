@@ -14,7 +14,7 @@ public class VehicleDto {
     private Customer customer;
     private String licensePlate;
     private BrandDto brand;
-    private ModelDto model;
+    private ModelFromEntityDto model;
     private String imageUrl;
     private String note;
 }

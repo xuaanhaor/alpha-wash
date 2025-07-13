@@ -1,5 +1,6 @@
 package com.alphawash.dto;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -12,4 +13,5 @@ public class CustomerDto {
     private String customerName;
     private String phone;
     private String note;
+    private List<VehicleDto> vehicles;
 }
