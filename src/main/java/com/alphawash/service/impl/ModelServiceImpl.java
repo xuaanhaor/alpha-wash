@@ -7,6 +7,8 @@ import com.alphawash.entity.Model;
 import com.alphawash.repository.BrandRepository;
 import com.alphawash.repository.ModelRepository;
 import com.alphawash.service.ModelService;
+import com.alphawash.util.ObjectUtils;
+import com.alphawash.util.PatchHelper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,14 +40,19 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public ModelDto update(Long id, ModelDto dto) {
+    public ModelDto update(Long id, ModelDto patchData) {
         return modelRepository
                 .findById(id)
                 .map(existing -> {
-                    existing.setModelName(dto.getModelName());
-                    existing.setSize(dto.getSize());
-                    existing.setBrand(brandRepository.findById(dto.getBrandId()).orElse(null));
-                    return converter.toDto(modelRepository.save(existing));
+                    ModelDto currentDto = converter.toDto(existing);
+                    PatchHelper.applyPatch(patchData, currentDto);
+                    Model updatedEntity = converter.toEntity(currentDto);
+                    if (ObjectUtils.isNotNull(currentDto.getBrandId())) {
+                        updatedEntity.setBrand(brandRepository
+                                .findById(currentDto.getBrandId())
+                                .orElse(null));
+                    }
+                    return converter.toDto(modelRepository.save(updatedEntity));
                 })
                 .orElse(null);
     }
