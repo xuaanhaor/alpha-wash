@@ -8,9 +8,7 @@ import com.alphawash.repository.ServiceRepository;
 import com.alphawash.service.ServiceCatalogService;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -53,11 +51,7 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
                                 .orElse(null));
                     }
                     return converter.toDto(repository.updateReturning(
-                            currentDto.getSize().name(),
-                            currentDto.getPrice(),
-                            currentDto.getServiceId(),
-                            id
-                    ));
+                            currentDto.getSize().name(), currentDto.getPrice(), currentDto.getServiceId(), id));
                 })
                 .orElse(null);
     }
