@@ -58,4 +58,10 @@ public class BrandServiceImpl implements BrandService {
         List<Object[]> rows = brandRepository.getBrandWithModel();
         return BrandWithModelConverter.mapList(rows);
     }
+
+    @Override
+    public BrandWithModelDto getBrandWithModelById(Long id) {
+        List<Object[]> row = brandRepository.findModelsByBrandId(id);
+        return BrandWithModelConverter.map(row);
+    }
 }
