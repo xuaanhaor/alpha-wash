@@ -16,4 +16,6 @@ public interface BrandService {
     void delete(Long id);
 
     List<BrandWithModelDto> getBrandWithModel();
+
+    BrandWithModelDto getBrandWithModelById(Long id);
 }

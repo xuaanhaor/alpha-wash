@@ -34,7 +34,7 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     public ServiceCatalogDto create(ServiceCatalogDto dto) {
         ServiceCatalog entity = converter.toEntity(dto);
         entity.setService(serviceRepository.findById(dto.getServiceId()).orElse(null));
-        return converter.toDto(repository.save(entity));
+        return converter.toDto(repository.insertReturning(dto.getSize().name(), dto.getPrice(), dto.getServiceId()));
     }
 
     @Override
@@ -50,7 +50,8 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
                                 .findById(currentDto.getServiceId())
                                 .orElse(null));
                     }
-                    return converter.toDto(repository.save(patchedEntity));
+                    return converter.toDto(repository.updateReturning(
+                            currentDto.getSize().name(), currentDto.getPrice(), currentDto.getServiceId(), id));
                 })
                 .orElse(null);
     }
@@ -58,5 +59,11 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     @Override
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<ServiceCatalogDto> getByServiceId(Long serviceId) {
+        List<ServiceCatalog> entities = repository.findByService_Id(serviceId);
+        return converter.toDto(entities);
     }
 }

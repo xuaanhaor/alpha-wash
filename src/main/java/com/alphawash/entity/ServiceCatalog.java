@@ -17,7 +17,9 @@ public class ServiceCatalog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //    @JdbcTypeCode(SqlTypes.OTHER)
     @Enumerated(EnumType.STRING)
+    @Column(name = "size")
     private Size size;
 
     private BigDecimal price;

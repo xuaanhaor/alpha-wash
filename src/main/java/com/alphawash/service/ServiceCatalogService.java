@@ -13,4 +13,6 @@ public interface ServiceCatalogService {
     ServiceCatalogDto update(Long id, ServiceCatalogDto dto);
 
     void delete(Long id);
+
+    List<ServiceCatalogDto> getByServiceId(Long serviceId);
 }

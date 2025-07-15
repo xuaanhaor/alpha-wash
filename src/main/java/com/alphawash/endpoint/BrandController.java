@@ -8,6 +8,7 @@ import com.alphawash.dto.BrandWithModelDto;
 import com.alphawash.request.BrandRequest;
 import com.alphawash.response.BrandResponse;
 import com.alphawash.service.BrandService;
+import com.alphawash.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -39,6 +40,20 @@ public class BrandController {
     public ResponseEntity<List<BrandWithModelDto>> getBrandsWithModels() {
         List<BrandWithModelDto> result = brandService.getBrandWithModel();
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Get a brand with its associated models by brand ID")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Successfully retrieved brand with models"),
+                @ApiResponse(responseCode = "404", description = "Brand not found")
+            })
+    @GetMapping(API_BRAND_WITH_MODELS + ID_PATH_PARAMETER)
+    public BrandWithModelDto getBrandWithModelsById(@PathVariable Long id) {
+        BrandWithModelDto result = brandService.getBrandWithModelById(id);
+        return ObjectUtils.isNotNull(result)
+                ? ResponseEntity.ok(result).getBody()
+                : (BrandWithModelDto) ResponseEntity.notFound().build().getBody();
     }
 
     @Operation(summary = "Get a brand by ID")
