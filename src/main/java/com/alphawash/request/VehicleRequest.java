@@ -1,8 +1,6 @@
 package com.alphawash.request;
 
-import com.alphawash.dto.BrandDto;
-import com.alphawash.dto.CustomerDto;
-import com.alphawash.dto.ModelDto;
+import com.alphawash.dto.*;
 import java.util.UUID;
 
 public record VehicleRequest(
@@ -10,6 +8,6 @@ public record VehicleRequest(
         CustomerDto customer,
         String licensePlate,
         BrandDto brand,
-        ModelDto model,
+        ModelFromEntityDto model,
         String imageUrl,
         String note) {}

@@ -10,6 +10,6 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
     @Query(value = "SELECT * FROM get_brand_with_model()", nativeQuery = true)
     List<Object[]> getBrandWithModel();
 
-    @Query(value = "SELECT * FROM get_models_by_brand_id(:brandId)", nativeQuery = true)
-    List<Object[]> findModelsByBrandId(@Param("brandId") Long brandId);
+    @Query(value = "SELECT * FROM get_models_by_brand_code(:brandCode)", nativeQuery = true)
+    List<Object[]> findModelsByBrandId(@Param("brandCode") String brandCode);
 }

@@ -14,18 +14,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order {
+public class Order extends BaseEntity {
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "employee_id")
-    private String employeeId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     private LocalDateTime date;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
     @Column(name = "checkin_time")
     private LocalTime checkinTime;
@@ -33,7 +31,11 @@ public class Order {
     @Column(name = "checkout_time")
     private LocalTime checkoutTime;
 
+    @Column(name = "vat")
     private BigDecimal vat;
+
+    @Column(name = "discount")
+    private BigDecimal discount;
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;

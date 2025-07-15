@@ -15,7 +15,6 @@ public interface CustomerConverter {
     CustomerConverter INSTANCE = Mappers.getMapper(CustomerConverter.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "vehicles", ignore = true)
     CustomerDto fromRequest(CustomerRequest request);
 
     CustomerResponse toResponse(CustomerDto dto);

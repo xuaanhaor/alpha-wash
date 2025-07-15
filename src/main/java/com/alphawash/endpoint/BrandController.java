@@ -42,15 +42,15 @@ public class BrandController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Get a brand with its associated models by brand ID")
+    @Operation(summary = "Get a brand with its associated models by brand code")
     @ApiResponses(
             value = {
                 @ApiResponse(responseCode = "200", description = "Successfully retrieved brand with models"),
                 @ApiResponse(responseCode = "404", description = "Brand not found")
             })
-    @GetMapping(API_BRAND_WITH_MODELS + ID_PATH_PARAMETER)
-    public BrandWithModelDto getBrandWithModelsById(@PathVariable Long id) {
-        BrandWithModelDto result = brandService.getBrandWithModelById(id);
+    @GetMapping(API_BRAND_WITH_MODELS + "/by-code")
+    public BrandWithModelDto getBrandWithModelsById(@RequestParam String code) {
+        BrandWithModelDto result = brandService.getBrandWithModelByBrandCode(code);
         return ObjectUtils.isNotNull(result)
                 ? ResponseEntity.ok(result).getBody()
                 : (BrandWithModelDto) ResponseEntity.notFound().build().getBody();
