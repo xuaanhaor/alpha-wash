@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface VehicleService {
     List<VehicleDto> search();
 
-    List<VehicleDto> insert(VehicleRequest request);
+    VehicleDto insert(VehicleRequest request);
 
     VehicleDto findById(UUID id);
 

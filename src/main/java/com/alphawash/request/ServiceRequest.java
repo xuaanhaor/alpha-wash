@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ServiceRequest {
+    private String code;
     private String serviceName;
     private String duration;
     private String note;

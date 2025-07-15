@@ -1,8 +1,6 @@
 package com.alphawash.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -13,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Customer {
+public class Customer extends BaseEntity {
     @Id
     @GeneratedValue
     private UUID id;
@@ -26,8 +24,4 @@ public class Customer {
 
     @Column(columnDefinition = "TEXT")
     private String note;
-
-    @OneToMany(mappedBy = "customer")
-    @JsonManagedReference
-    private List<Vehicle> vehicles;
 }

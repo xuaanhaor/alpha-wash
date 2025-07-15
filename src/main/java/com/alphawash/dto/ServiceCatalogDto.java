@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 public class ServiceCatalogDto {
     private Long id;
+    private String code;
     private Size size;
     private BigDecimal price;
     private Long serviceId;
