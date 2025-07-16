@@ -65,7 +65,10 @@ public class OrderConverter {
                     }
                 }
             }
-
+            // tiến độ thi công
+            String status = (String) row[i++];
+            // note đơn chi tiết
+            String note = (String) row[i++];
             // vehicle
             OrderTableDto.VehicleDTO vehicle = new OrderTableDto.VehicleDTO();
             vehicle.setId((UUID) row[i++]);
@@ -93,6 +96,8 @@ public class OrderConverter {
 
             // detail
             OrderTableDto.OrderDetailDTO detail = new OrderTableDto.OrderDetailDTO();
+            detail.setStatus(status);
+            detail.setNote(note);
             detail.setEmployee(employees);
             detail.setVehicle(vehicle);
             detail.setService(service);
