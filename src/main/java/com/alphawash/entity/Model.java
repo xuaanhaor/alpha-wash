@@ -16,6 +16,9 @@ public class Model extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
+
     @Column(name = "model_name")
     private String modelName;
 
@@ -23,6 +26,6 @@ public class Model extends BaseEntity {
     private String size;
 
     @ManyToOne
-    @JoinColumn(name = "brand_code")
+    @JoinColumn(name = "brand_code", referencedColumnName = "code")
     private Brand brand;
 }

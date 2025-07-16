@@ -20,7 +20,8 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public List<ServiceDto> getAll() {
-        return converter.toDto(serviceRepository.findAll());
+        List<Service> services = serviceRepository.findAll();
+        return converter.toDto(services);
     }
 
     @Override

@@ -97,3 +97,99 @@ BEGIN
         WHERE b.code = branchCode;
 END;
 $$ LANGUAGE plpgsql;
+
+--
+
+DROP FUNCTION IF EXISTS get_full_orders();
+
+CREATE OR REPLACE FUNCTION get_full_orders()
+RETURNS TABLE (
+    order_id UUID,
+    order_date TIMESTAMP,
+    check_in TIME,
+    check_out TIME,
+    note TEXT,
+    payment_status VARCHAR,
+    vat NUMERIC,
+    discount NUMERIC,
+    total_price NUMERIC,
+
+    customer_id UUID,
+    customer_name VARCHAR,
+    customer_phone VARCHAR,
+
+    employee_ids TEXT,
+
+    vehicle_id UUID,
+    license_plate VARCHAR,
+    image_url TEXT,
+
+    brand_id INT,
+    brand_name VARCHAR,
+
+    model_id INT,
+    model_name VARCHAR,
+    model_size VARCHAR,
+
+    service_id INT,
+    service_name VARCHAR,
+
+    service_catalog_id INT,
+    service_price NUMERIC,
+    service_size size,
+
+    node TEXT,
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.id AS order_id,
+        o.date AS order_date,
+        o.checkin_time AS check_in,
+        o.checkout_time AS check_out,
+		o.note AS note,
+        o.paymentStatus AS payment_status,
+        o.vat,
+        o.discount,
+        o.total_price,
+
+        c.id AS customer_id,
+        c.customer_name,
+        c.phone AS customer_phone,
+
+        od.employee_id AS employee_ids,
+
+        v.id AS vehicle_id,
+        v.license_plate,
+        v.image_url,
+
+        b.id AS brand_id,
+        b.brand_name,
+
+        m.id AS model_id,
+        m.model_name,
+        m.size AS model_size,
+
+        s.id AS service_id,
+        s.service_name,
+
+        sc.id AS service_catalog_id,
+        sc.price AS service_price,
+        sc.size AS service_size
+
+    FROM orders o
+    JOIN customer c ON o.customer_id = c.id
+    JOIN order_detail od ON od.order_id = o.id
+    JOIN vehicle v ON v.id = od.vehicle_id
+    LEFT JOIN brands b ON b.code = v.brand_code
+    LEFT JOIN model m ON m.code = v.model_code
+    LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
+    LEFT JOIN service s ON s.code = sc.service_code
+    WHERE o.delete_flag = FALSE;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_full_orders();
+
+

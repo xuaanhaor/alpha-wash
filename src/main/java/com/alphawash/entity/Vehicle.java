@@ -23,11 +23,11 @@ public class Vehicle extends BaseEntity {
     private String licensePlate;
 
     @ManyToOne
-    @JoinColumn(name = "brand_code")
+    @JoinColumn(name = "brand_code", referencedColumnName = "code")
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "model_code")
+    @JoinColumn(name = "model_code", referencedColumnName = "code")
     private Model model;
 
     @Column(name = "image_url")

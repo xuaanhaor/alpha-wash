@@ -165,6 +165,9 @@ CREATE TABLE orders
     PRIMARY KEY (id)
 );
 
+ALTER TABLE orders
+ADD COLUMN note TEXT;
+
 CREATE TABLE order_detail
 (
     id                   UUID        DEFAULT uuid_generate_v4(),
@@ -181,3 +184,6 @@ CREATE TABLE order_detail
     exclusive_key        INT,
     PRIMARY KEY (id)
 );
+
+ALTER TABLE order_detail
+ADD COLUMN note TEXT;
