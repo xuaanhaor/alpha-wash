@@ -1,15 +1,13 @@
 package com.alphawash.dto;
 
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 public class OrderTableDto {
@@ -44,7 +42,6 @@ public class OrderTableDto {
         private ServiceDTO service;
         private String note;
     }
-
 
     @Data
     public static class EmployeeDTO {

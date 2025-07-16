@@ -1,7 +1,6 @@
 package com.alphawash.repository;
 
 import com.alphawash.entity.Order;
-
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

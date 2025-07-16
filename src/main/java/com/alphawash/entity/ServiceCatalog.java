@@ -28,6 +28,6 @@ public class ServiceCatalog extends BaseEntity {
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "service_code")
+    @JoinColumn(name = "service_code", referencedColumnName = "code")
     private Service service;
 }

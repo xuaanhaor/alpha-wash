@@ -28,6 +28,6 @@ public class Service extends BaseEntity {
     private String note;
 
     @ManyToOne
-    @JoinColumn(name = "service_type_code")
+    @JoinColumn(name = "service_type_code", referencedColumnName = "code")
     private ServiceType serviceType;
 }

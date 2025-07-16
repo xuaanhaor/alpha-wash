@@ -4,12 +4,10 @@ import com.alphawash.converter.OrderConverter;
 import com.alphawash.dto.OrderTableDto;
 import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.repository.OrderRepository;
-import com.alphawash.service.ModelService;
 import com.alphawash.service.OrderService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

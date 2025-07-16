@@ -20,6 +20,6 @@ public class EmployeeSkill extends BaseEntity {
     private Employee employee;
 
     @ManyToOne
-    @JoinColumn(name = "service_code")
+    @JoinColumn(name = "service_code", referencedColumnName = "code")
     private Service service;
 }

@@ -1,12 +1,8 @@
 package com.alphawash.converter;
 
 import com.alphawash.dto.*;
-import com.alphawash.entity.Employee;
 import com.alphawash.repository.EmployeeRepository;
-
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
@@ -18,6 +14,7 @@ public class OrderConverter {
     public OrderConverter(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
+
     public List<OrderTableDto> mapFromRawObjectList(List<Object[]> rows) {
         Map<UUID, OrderTableDto> orderMap = new LinkedHashMap<>();
 
@@ -64,7 +61,8 @@ public class OrderConverter {
                             dto.setEmployeeName(emp.getName());
                             employees.add(dto);
                         });
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             }
 
@@ -81,14 +79,14 @@ public class OrderConverter {
 
             // === service ===
             OrderTableDto.ServiceDTO service = new OrderTableDto.ServiceDTO();
-            service.setId(toLong(row[i++]));                     // index 20
-            service.setServiceName((String) row[i++]);           // index 21
+            service.setId(toLong(row[i++])); // index 20
+            service.setServiceName((String) row[i++]); // index 21
 
             // === service_catalog ===
             OrderTableDto.ServiceCatalogDTO catalog = new OrderTableDto.ServiceCatalogDTO();
-            catalog.setId(toLong(row[i++]));                     // index 22
-            catalog.setPrice((BigDecimal) row[i++]);             // index 23
-            catalog.setSize((String) row[i++]);                  // index 24
+            catalog.setId(toLong(row[i++])); // index 22
+            catalog.setPrice((BigDecimal) row[i++]); // index 23
+            catalog.setSize((String) row[i++]); // index 24
 
             // link catalog vào service
             service.setServiceCatalog(catalog);
@@ -99,13 +97,11 @@ public class OrderConverter {
             detail.setVehicle(vehicle);
             detail.setService(service);
 
-
             order.getOrderDetails().add(detail);
         }
 
         return new ArrayList<>(orderMap.values());
     }
-
 
     private Long toLong(Object obj) {
         if (obj instanceof Number n) {

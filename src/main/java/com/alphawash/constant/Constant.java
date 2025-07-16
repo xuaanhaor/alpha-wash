@@ -21,5 +21,5 @@ public class Constant {
     public static final String API_SERVICE_TYPE = API + "/service-type";
     public static final String API_VEHICLE = API + "/vehicle";
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
-    public static final String API_BRAND_WITH_MODELS = API_BRANDS + "/with-models";
+    public static final String API_BRAND_WITH_MODELS = "/brands/with-models";
 }
