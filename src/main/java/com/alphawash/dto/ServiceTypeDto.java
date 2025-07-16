@@ -8,5 +8,6 @@ import lombok.*;
 @Builder
 public class ServiceTypeDto {
     private Long id;
+    private String code;
     private String serviceTypeName;
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class BrandWithModelDto {
-    private Long id;
+    private String code;
     private String brandName;
     private List<Model> models;
 
@@ -20,7 +20,7 @@ public class BrandWithModelDto {
     @AllArgsConstructor
     @Builder
     public static class Model {
-        private Long id;
+        private String code;
         private String modelName;
         private String size;
     }

@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ServiceTypeRequest {
+    private String code;
     private String serviceTypeName;
 }

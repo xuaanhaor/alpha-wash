@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDetail {
+public class OrderDetail extends BaseEntity {
     @Id
     @GeneratedValue
     private UUID id;
@@ -20,9 +20,15 @@ public class OrderDetail {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @Column(name = "employee_id")
+    private String employeeId;
+
     @ManyToOne
-    @JoinColumn(name = "service_catalog_id")
+    @JoinColumn(name = "service_catalog_code")
     private ServiceCatalog serviceCatalog;
+
+    @Column(name = "status")
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

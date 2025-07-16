@@ -25,12 +25,11 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
-    public List<VehicleDto> insert(VehicleRequest request) {
+    public VehicleDto insert(VehicleRequest request) {
         var dto = repository.findById(request.id());
-        if (dto.isPresent()) {
-            //            Object vehicle = null;
-            //            repository.save(vehicle);
-            //            return VehicleConverter.INSTANCE.toDto(List.of(vehicle));
+        if (dto.isEmpty()) {
+            var savedVehicle = repository.save(VehicleConverter.INSTANCE.fromRequest(request));
+            return VehicleConverter.INSTANCE.toDto(savedVehicle);
         }
         return null;
     }
@@ -47,9 +46,9 @@ public class VehicleServiceImpl implements VehicleService {
         var dto = repository.findById(request.id());
         dto.ifPresentOrElse(
                 vehicle -> {
-                    //                    var updatedVehicle = VehicleConverter.INSTANCE.fromRequest(request);
-                    //                    updatedVehicle.setId(vehicle.getId());
-                    //                    repository.save(updatedVehicle);
+                    var updatedVehicle = VehicleConverter.INSTANCE.fromRequest(request);
+                    updatedVehicle.setId(vehicle.getId());
+                    repository.save(updatedVehicle);
                 },
                 () -> {
                     throw new IllegalArgumentException("Vehicle not found with id: " + request.id());
@@ -59,7 +58,10 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto findByLicensePlate(String licensePlate) {
         var vehicle = repository.findByLicensePlate(licensePlate);
-        //        return vehicle.map(VehicleConverter.INSTANCE::toDto).orElse(null);
-        return null; // Placeholder for actual implementation
+        if (vehicle.isPresent()) {
+            return VehicleConverter.INSTANCE.toDto(vehicle.get());
+        } else {
+            throw new IllegalArgumentException("Vehicle not found with license plate: " + licensePlate);
+        }
     }
 }

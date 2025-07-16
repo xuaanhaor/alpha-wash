@@ -12,19 +12,22 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceCatalog {
+public class ServiceCatalog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //    @JdbcTypeCode(SqlTypes.OTHER)
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "size")
     private Size size;
 
+    @Column(name = "price")
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "service_id")
+    @JoinColumn(name = "service_code")
     private Service service;
 }

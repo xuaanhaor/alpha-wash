@@ -1,6 +1,5 @@
 package com.alphawash.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
@@ -12,24 +11,23 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Vehicle {
+public class Vehicle extends BaseEntity {
     @Id
     private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonBackReference
     private Customer customer;
 
     @Column(name = "license_plate", unique = true, nullable = false)
     private String licensePlate;
 
     @ManyToOne
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = "brand_code")
     private Brand brand;
 
     @ManyToOne
-    @JoinColumn(name = "model_id")
+    @JoinColumn(name = "model_code")
     private Model model;
 
     @Column(name = "image_url")

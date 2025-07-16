@@ -15,14 +15,14 @@ public class BrandWithModelConverter {
 
         // Tất cả các hàng đều có cùng brandId và brandName
         Object[] firstRow = rows.get(0);
-        Long brandId = ((Number) firstRow[3]).longValue();
+        String brandCode = (String) firstRow[3];
         String brandName = (String) firstRow[4];
 
         List<BrandWithModelDto.Model> models = new ArrayList<>();
 
         for (Object[] row : rows) {
             BrandWithModelDto.Model model = BrandWithModelDto.Model.builder()
-                    .id(((Number) row[0]).longValue()) // model_id
+                    .code((String) row[0])
                     .modelName((String) row[1])
                     .size((String) row[2])
                     .build();
@@ -30,29 +30,29 @@ public class BrandWithModelConverter {
         }
 
         return BrandWithModelDto.builder()
-                .id(brandId)
+                .code(brandCode)
                 .brandName(brandName)
                 .models(models)
                 .build();
     }
 
     public static List<BrandWithModelDto> mapList(List<Object[]> rows) {
-        Map<Long, BrandWithModelDto> brandMap = new LinkedHashMap<>();
+        Map<String, BrandWithModelDto> brandMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
-            Long brandId = ((Number) row[3]).longValue();
+            String brandCode = (String) row[3];
             String brandName = (String) row[4];
 
             // Tạo model
             BrandWithModelDto.Model model = BrandWithModelDto.Model.builder()
-                    .id(((Number) row[0]).longValue()) // model_id
+                    .code((String) row[0]) // model_id
                     .modelName((String) row[1])
                     .size((String) row[2])
                     .build();
 
             // Nếu brand chưa tồn tại trong map → tạo mới
-            brandMap.computeIfAbsent(brandId, id -> BrandWithModelDto.builder()
-                            .id(id)
+            brandMap.computeIfAbsent(brandCode, code -> BrandWithModelDto.builder()
+                            .code(code)
                             .brandName(brandName)
                             .models(new ArrayList<>())
                             .build())

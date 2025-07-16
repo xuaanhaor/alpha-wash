@@ -60,8 +60,8 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandWithModelDto getBrandWithModelById(Long id) {
-        List<Object[]> row = brandRepository.findModelsByBrandId(id);
+    public BrandWithModelDto getBrandWithModelByBrandCode(String code) {
+        List<Object[]> row = brandRepository.findModelsByBrandId(code);
         return BrandWithModelConverter.map(row);
     }
 }

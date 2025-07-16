@@ -10,19 +10,24 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Service {
+public class Service extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
+
     @Column(name = "service_name")
     private String serviceName;
 
+    @Column(name = "duration")
     private String duration;
 
+    @Column(name = "note")
     private String note;
 
     @ManyToOne
-    @JoinColumn(name = "service_type_id")
+    @JoinColumn(name = "service_type_code")
     private ServiceType serviceType;
 }

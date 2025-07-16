@@ -17,5 +17,5 @@ public interface BrandService {
 
     List<BrandWithModelDto> getBrandWithModel();
 
-    BrandWithModelDto getBrandWithModelById(Long id);
+    BrandWithModelDto getBrandWithModelByBrandCode(String code);
 }
