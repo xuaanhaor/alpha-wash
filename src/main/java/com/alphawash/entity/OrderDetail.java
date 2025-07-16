@@ -30,9 +30,8 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "status")
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @Column(name = "note")
+    private String note;
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")

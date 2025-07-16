@@ -99,7 +99,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 --
-
 DROP FUNCTION IF EXISTS get_full_orders();
 
 CREATE OR REPLACE FUNCTION get_full_orders()
@@ -113,32 +112,25 @@ RETURNS TABLE (
     vat NUMERIC,
     discount NUMERIC,
     total_price NUMERIC,
-
     customer_id UUID,
     customer_name VARCHAR,
     customer_phone VARCHAR,
-
     employee_ids TEXT,
-
+    status_order_detail VARCHAR,
+    note_order_detail TEXT,
     vehicle_id UUID,
     license_plate VARCHAR,
     image_url TEXT,
-
     brand_id INT,
     brand_name VARCHAR,
-
     model_id INT,
     model_name VARCHAR,
     model_size VARCHAR,
-
     service_id INT,
     service_name VARCHAR,
-
     service_catalog_id INT,
     service_price NUMERIC,
-    service_size size,
-
-    node TEXT,
+    service_size size
 )
 AS $$
 BEGIN
@@ -153,31 +145,25 @@ BEGIN
         o.vat,
         o.discount,
         o.total_price,
-
         c.id AS customer_id,
         c.customer_name,
         c.phone AS customer_phone,
-
         od.employee_id AS employee_ids,
-
+		od.status AS status_order_detail,
+		od.note AS note_order_detail,
         v.id AS vehicle_id,
         v.license_plate,
         v.image_url,
-
         b.id AS brand_id,
         b.brand_name,
-
         m.id AS model_id,
         m.model_name,
         m.size AS model_size,
-
         s.id AS service_id,
         s.service_name,
-
         sc.id AS service_catalog_id,
         sc.price AS service_price,
         sc.size AS service_size
-
     FROM orders o
     JOIN customer c ON o.customer_id = c.id
     JOIN order_detail od ON od.order_id = o.id
@@ -190,6 +176,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 SELECT * FROM get_full_orders();
+
 
 

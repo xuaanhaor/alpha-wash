@@ -40,6 +40,7 @@ public class OrderTableDto {
         private List<EmployeeDTO> employee;
         private VehicleDTO vehicle;
         private ServiceDTO service;
+        private String status;
         private String note;
     }
 
