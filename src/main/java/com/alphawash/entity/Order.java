@@ -31,8 +31,14 @@ public class Order extends BaseEntity {
     @Column(name = "checkout_time")
     private LocalTime checkoutTime;
 
-    @Column(name = "paymentstatus")
+    @Column(name = "payment_status")
     private String paymentStatus;
+
+    @Column(name = "payment_type")
+    private String paymentType;
+
+    @Column(name = "tip")
+    private BigDecimal tip;
 
     @Column(name = "vat")
     private BigDecimal vat;

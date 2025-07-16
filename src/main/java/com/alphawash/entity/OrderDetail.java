@@ -27,9 +27,6 @@ public class OrderDetail extends BaseEntity {
     @JoinColumn(name = "service_catalog_code", referencedColumnName = "code")
     private ServiceCatalog serviceCatalog;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "note")
     private String note;
 

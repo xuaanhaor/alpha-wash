@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @EntityGraph(attributePaths = {"vehicles", "vehicles.brand", "vehicles.model"})
     Optional<Customer> findByPhone(String phone);
+
+    Optional<Customer> findById(UUID id);
 }

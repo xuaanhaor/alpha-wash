@@ -147,26 +147,26 @@ CREATE TABLE vehicle
 
 CREATE TABLE orders
 (
-    id            UUID        DEFAULT uuid_generate_v4(),
-    customer_id   UUID REFERENCES customer (id) NOT NULL,
-    date          TIMESTAMP,
-    checkin_time  TIME,
-    checkout_time TIME,
-    paymentStatus VARCHAR(20) DEFAULT 'PENDING',
-    vat           NUMERIC,
-    discount      NUMERIC,
-    total_price   NUMERIC,
-    delete_flag   BOOLEAN     DEFAULT FALSE,
-    created_by    VARCHAR(50),
-    updated_by    VARCHAR(50),
-    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    id             UUID        DEFAULT uuid_generate_v4(),
+    customer_id    UUID,
+    date           TIMESTAMP,
+    checkin_time   TIME,
+    checkout_time  TIME,
+    payment_status VARCHAR(20) DEFAULT 'PENDING',
+    payment_type   VARCHAR(20),
+    vat            NUMERIC,
+    tip            NUMERIC,
+    discount       NUMERIC,
+    note           TEXT,
+    total_price    NUMERIC,
+    delete_flag    BOOLEAN     DEFAULT FALSE,
+    created_by     VARCHAR(50),
+    updated_by     VARCHAR(50),
+    created_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key  INT,
     PRIMARY KEY (id)
 );
-
-ALTER TABLE orders
-ADD COLUMN note TEXT;
 
 CREATE TABLE order_detail
 (
@@ -174,8 +174,8 @@ CREATE TABLE order_detail
     order_id             UUID REFERENCES orders (id)                   NOT NULL,
     employee_id          TEXT,
     service_catalog_code VARCHAR(20) REFERENCES service_catalog (code) NOT NULL,
-    status               VARCHAR(20) DEFAULT 'PENDING',
     vehicle_id           UUID REFERENCES vehicle (id)                  NOT NULL,
+    note                 TEXT,
     delete_flag          BOOLEAN     DEFAULT FALSE,
     created_by           VARCHAR(50),
     updated_by           VARCHAR(50),
@@ -184,6 +184,3 @@ CREATE TABLE order_detail
     exclusive_key        INT,
     PRIMARY KEY (id)
 );
-
-ALTER TABLE order_detail
-ADD COLUMN note TEXT;

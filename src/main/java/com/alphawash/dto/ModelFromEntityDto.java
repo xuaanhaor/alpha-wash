@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class ModelFromEntityDto {
     private Long id;
+    private String code;
     private String modelName;
     private String size;
-    private BrandDto brand;
 }

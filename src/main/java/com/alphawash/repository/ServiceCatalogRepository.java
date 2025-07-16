@@ -3,6 +3,7 @@ package com.alphawash.repository;
 import com.alphawash.entity.ServiceCatalog;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,4 +36,6 @@ public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, 
     ServiceCatalog updateReturning(String size, BigDecimal price, Long serviceId, Long id);
 
     List<ServiceCatalog> findByService_Id(Long serviceId);
+
+    Optional<ServiceCatalog> findByCode(String code);
 }
