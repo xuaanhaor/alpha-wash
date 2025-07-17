@@ -1,6 +1,9 @@
 package com.alphawash.service;
 
 import com.alphawash.dto.ModelDto;
+import com.alphawash.dto.ModelWithoutBrandDto;
+import com.alphawash.entity.Model;
+
 import java.util.List;
 
 public interface ModelService {
@@ -13,4 +16,6 @@ public interface ModelService {
     ModelDto update(Long id, ModelDto dto);
 
     void delete(Long id);
+
+    List<ModelWithoutBrandDto> findByBrandCode(String brandCode);
 }
