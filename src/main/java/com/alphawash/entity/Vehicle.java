@@ -13,6 +13,7 @@ import lombok.*;
 @Builder
 public class Vehicle extends BaseEntity {
     @Id
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne

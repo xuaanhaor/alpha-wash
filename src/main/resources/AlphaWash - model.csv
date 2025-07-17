@@ -1,242 +1,242 @@
 id,code,model_name,size,brand_code,,
-1,M0001,Mazda2,S,B0001,,"insert into model(model_name, size, brand_id) values('Mazda2','S',B0001);"
-2,M0002,CX-3,M,B0001,,"insert into model(model_name, size, brand_id) values('CX-3','M',B0001);"
-3,M0003,Mazda3,M,B0001,,"insert into model(model_name, size, brand_id) values('Mazda3','M',B0001);"
-4,M0004,Mazda6,M,B0001,,"insert into model(model_name, size, brand_id) values('Mazda6','M',B0001);"
-5,M0005,CX-30,M,B0001,,"insert into model(model_name, size, brand_id) values('CX-30','M',B0001);"
-6,M0006,CX-5,M,B0001,,"insert into model(model_name, size, brand_id) values('CX-5','M',B0001);"
-7,M0007,CX-8,L,B0001,,"insert into model(model_name, size, brand_id) values('CX-8','L',B0001);"
-8,M0008,BT-50,L,B0001,,"insert into model(model_name, size, brand_id) values('BT-50','L',B0001);"
-9,M0009,GS8,,B0002,,"insert into model(model_name, size, brand_id) values('GS8','',B0002);"
-10,M0010,M8,L,B0002,,"insert into model(model_name, size, brand_id) values('M8','L',B0002);"
-11,M0011,M6 Pro,,B0002,,"insert into model(model_name, size, brand_id) values('M6 Pro','',B0002);"
-12,M0012,XC40,M,B0003,,"insert into model(model_name, size, brand_id) values('XC40','M',B0003);"
-13,M0013,XC60,M,B0003,,"insert into model(model_name, size, brand_id) values('XC60','M',B0003);"
-14,M0014,XC90,L,B0003,,"insert into model(model_name, size, brand_id) values('XC90','L',B0003);"
-15,M0015,V90,M,B0003,,"insert into model(model_name, size, brand_id) values('V90','M',B0003);"
-16,M0016,V60 Cross Country,M,B0003,,"insert into model(model_name, size, brand_id) values('V60 Cross Country','M',B0003);"
-17,M0017,S90,M,B0003,,"insert into model(model_name, size, brand_id) values('S90','M',B0003);"
-18,M0018,Fadil,S,B0004,,"insert into model(model_name, size, brand_id) values('Fadil','S',B0004);"
-19,M0019,Lux A2.0,M,B0004,,"insert into model(model_name, size, brand_id) values('Lux A2.0','M',B0004);"
-20,M0020,Lux SA2.0,M,B0004,,"insert into model(model_name, size, brand_id) values('Lux SA2.0','M',B0004);"
-21,M0021,President,L,B0004,,"insert into model(model_name, size, brand_id) values('President','L',B0004);"
-22,M0022,VF e34,M,B0004,,"insert into model(model_name, size, brand_id) values('VF e34','M',B0004);"
-23,M0023,VF 8,M,B0004,,"insert into model(model_name, size, brand_id) values('VF 8','M',B0004);"
-24,M0024,VF 5,M,B0004,,"insert into model(model_name, size, brand_id) values('VF 5','M',B0004);"
-25,M0025,VF 9,L,B0004,,"insert into model(model_name, size, brand_id) values('VF 9','L',B0004);"
-26,M0026,VF 6,M,B0004,,"insert into model(model_name, size, brand_id) values('VF 6','M',B0004);"
-27,M0027,VF 7,M,B0004,,"insert into model(model_name, size, brand_id) values('VF 7','M',B0004);"
-28,M0028,VF 3,S,B0004,,"insert into model(model_name, size, brand_id) values('VF 3','S',B0004);"
-29,M0029,H6,,B0005,,"insert into model(model_name, size, brand_id) values('H6','',B0005);"
-30,M0030,Karoq,,B0006,,"insert into model(model_name, size, brand_id) values('Karoq','',B0006);"
-31,M0031,Kodiaq,,B0006,,"insert into model(model_name, size, brand_id) values('Kodiaq','',B0006);"
-32,M0032,1500,L,B0007,,"insert into model(model_name, size, brand_id) values('1500','L',B0007);"
-33,M0033,DBX,L,B0008,,"insert into model(model_name, size, brand_id) values('DBX','L',B0008);"
-34,M0034,Lynk & Co 09,L,B0009,,"insert into model(model_name, size, brand_id) values('Lynk & Co 09','L',B0009);"
-35,M0035,Lynk & Co 06,M,B0009,,"insert into model(model_name, size, brand_id) values('Lynk & Co 06','M',B0009);"
-36,M0036,Lynk & Co 01,M,B0009,,"insert into model(model_name, size, brand_id) values('Lynk & Co 01','M',B0009);"
-37,M0037,Lynk & Co 05,M,B0009,,"insert into model(model_name, size, brand_id) values('Lynk & Co 05','M',B0009);"
-38,M0038,Lynk & Co 03,M,B0009,,"insert into model(model_name, size, brand_id) values('Lynk & Co 03','M',B0009);"
-39,M0039,Y Plus,,B0010,,"insert into model(model_name, size, brand_id) values('Y Plus','',B0010);"
-40,M0040,ES,,B0010,,"insert into model(model_name, size, brand_id) values('ES','',B0010);"
-41,M0041,718,S,B0011,,"insert into model(model_name, size, brand_id) values('718','S',B0011);"
-42,M0042,911,M,B0011,,"insert into model(model_name, size, brand_id) values('911','M',B0011);"
-43,M0043,Taycan,M,B0011,,"insert into model(model_name, size, brand_id) values('Taycan','M',B0011);"
-44,M0044,Panamera,M,B0011,,"insert into model(model_name, size, brand_id) values('Panamera','M',B0011);"
-45,M0045,Macan,M,B0011,,"insert into model(model_name, size, brand_id) values('Macan','M',B0011);"
-46,M0046,Cayenne,L,B0011,,"insert into model(model_name, size, brand_id) values('Cayenne','L',B0011);"
-47,M0047,Macan EV,M,B0011,,"insert into model(model_name, size, brand_id) values('Macan EV','M',B0011);"
-48,M0048,Series 5,M,B0012,,"insert into model(model_name, size, brand_id) values('Series 5','M',B0012);"
-49,M0049,Series 7,L,B0012,,"insert into model(model_name, size, brand_id) values('Series 7','L',B0012);"
-50,M0050,X1,S,B0012,,"insert into model(model_name, size, brand_id) values('X1','S',B0012);"
-51,M0051,X3,M,B0012,,"insert into model(model_name, size, brand_id) values('X3','M',B0012);"
-52,M0052,X4,M,B0012,,"insert into model(model_name, size, brand_id) values('X4','M',B0012);"
-53,M0053,X6,M,B0012,,"insert into model(model_name, size, brand_id) values('X6','M',B0012);"
-54,M0054,Z4 Roadster,S,B0012,,"insert into model(model_name, size, brand_id) values('Z4 Roadster','S',B0012);"
-55,M0055,Series 3,M,B0012,,"insert into model(model_name, size, brand_id) values('Series 3','M',B0012);"
-56,M0056,X5,M,B0012,,"insert into model(model_name, size, brand_id) values('X5','M',B0012);"
-57,M0057,X7,L,B0012,,"insert into model(model_name, size, brand_id) values('X7','L',B0012);"
-58,M0058,Series 4,M,B0012,,"insert into model(model_name, size, brand_id) values('Series 4','M',B0012);"
-59,M0059,i7,L,B0012,,"insert into model(model_name, size, brand_id) values('i7','L',B0012);"
-60,M0060,Series 8,L,B0012,,"insert into model(model_name, size, brand_id) values('Series 8','L',B0012);"
-61,M0061,iX3,M,B0012,,"insert into model(model_name, size, brand_id) values('iX3','M',B0012);"
-62,M0062,i4,M,B0012,,"insert into model(model_name, size, brand_id) values('i4','M',B0012);"
-63,M0063,XM,L,B0012,,"insert into model(model_name, size, brand_id) values('XM','L',B0012);"
-64,M0064,A-class,M,B0013,,"insert into model(model_name, size, brand_id) values('A-class','M',B0013);"
-65,M0065,C-Class,M,B0013,,"insert into model(model_name, size, brand_id) values('C-Class','M',B0013);"
-66,M0066,E-Class,M,B0013,,"insert into model(model_name, size, brand_id) values('E-Class','M',B0013);"
-67,M0067,S-Class,L,B0013,,"insert into model(model_name, size, brand_id) values('S-Class','L',B0013);"
-68,M0068,GLC,M,B0013,,"insert into model(model_name, size, brand_id) values('GLC','M',B0013);"
-69,M0069,GLB,M,B0013,,"insert into model(model_name, size, brand_id) values('GLB','M',B0013);"
-70,M0070,GLS,L,B0013,,"insert into model(model_name, size, brand_id) values('GLS','L',B0013);"
-71,M0071,G-Class,L,B0013,,"insert into model(model_name, size, brand_id) values('G-Class','L',B0013);"
-72,M0072,GT-Coupe,L,B0013,,"insert into model(model_name, size, brand_id) values('GT-Coupe','L',B0013);"
-73,M0073,V-Class,L,B0013,,"insert into model(model_name, size, brand_id) values('V-Class','L',B0013);"
-74,M0074,GLE,L,B0013,,"insert into model(model_name, size, brand_id) values('GLE','L',B0013);"
-75,M0075,GLA,M,B0013,,"insert into model(model_name, size, brand_id) values('GLA','M',B0013);"
-76,M0076,EQS,M,B0013,,"insert into model(model_name, size, brand_id) values('EQS','M',B0013);"
-77,M0077,EQS SUV,L,B0013,,"insert into model(model_name, size, brand_id) values('EQS SUV','L',B0013);"
-78,M0078,EQB,M,B0013,,"insert into model(model_name, size, brand_id) values('EQB','M',B0013);"
-79,M0079,EQE SUV,L,B0013,,"insert into model(model_name, size, brand_id) values('EQE SUV','L',B0013);"
-80,M0080,AMG SL,M,B0013,,"insert into model(model_name, size, brand_id) values('AMG SL','M',B0013);"
-81,M0081,Maybach EQS SUV,L,B0013,,"insert into model(model_name, size, brand_id) values('Maybach EQS SUV','L',B0013);"
-82,M0082,C5,,B0014,,"insert into model(model_name, size, brand_id) values('C5','',B0014);"
-83,M0083,2008,M,B0015,,"insert into model(model_name, size, brand_id) values('2008','M',B0015);"
-84,M0084,3008,M,B0015,,"insert into model(model_name, size, brand_id) values('3008','M',B0015);"
-85,M0085,5008,M,B0015,,"insert into model(model_name, size, brand_id) values('5008','M',B0015);"
-86,M0086,Traveller,L,B0015,,"insert into model(model_name, size, brand_id) values('Traveller','L',B0015);"
-87,M0087,408,M,B0015,,"insert into model(model_name, size, brand_id) values('408','M',B0015);"
-88,M0088,Polo,S,B0016,,"insert into model(model_name, size, brand_id) values('Polo','S',B0016);"
-89,M0089,Tiguan,M,B0016,,"insert into model(model_name, size, brand_id) values('Tiguan','M',B0016);"
-90,M0090,Passat,M,B0016,,"insert into model(model_name, size, brand_id) values('Passat','M',B0016);"
-91,M0091,T-Cross,M,B0016,,"insert into model(model_name, size, brand_id) values('T-Cross','M',B0016);"
-92,M0092,Touareg,M,B0016,,"insert into model(model_name, size, brand_id) values('Touareg','M',B0016);"
-93,M0093,Virtus,M,B0016,,"insert into model(model_name, size, brand_id) values('Virtus','M',B0016);"
-94,M0094,Viloran,L,B0016,,"insert into model(model_name, size, brand_id) values('Viloran','L',B0016);"
-95,M0095,Teramont X,L,B0016,,"insert into model(model_name, size, brand_id) values('Teramont X','L',B0016);"
-96,M0096,Teramont,L,B0016,,"insert into model(model_name, size, brand_id) values('Teramont','L',B0016);"
-97,M0097,mu-X,M,B0017,,"insert into model(model_name, size, brand_id) values('mu-X','M',B0017);"
-98,M0098,D-Max,L,B0017,,"insert into model(model_name, size, brand_id) values('D-Max','L',B0017);"
-99,M0099,A4,M,B0018,,"insert into model(model_name, size, brand_id) values('A4','M',B0018);"
-100,M0100,Q2,M,B0018,,"insert into model(model_name, size, brand_id) values('Q2','M',B0018);"
-101,M0101,Q3,M,B0018,,"insert into model(model_name, size, brand_id) values('Q3','M',B0018);"
-102,M0102,Q5,M,B0018,,"insert into model(model_name, size, brand_id) values('Q5','M',B0018);"
-103,M0103,Q7,M,B0018,,"insert into model(model_name, size, brand_id) values('Q7','M',B0018);"
-104,M0104,Q8,M,B0018,,"insert into model(model_name, size, brand_id) values('Q8','M',B0018);"
-105,M0105,A8L,L,B0018,,"insert into model(model_name, size, brand_id) values('A8L','L',B0018);"
-106,M0106,e-tron GT,M,B0018,,"insert into model(model_name, size, brand_id) values('e-tron GT','M',B0018);"
-107,M0107,Q8 e-tron,L,B0018,,"insert into model(model_name, size, brand_id) values('Q8 e-tron','L',B0018);"
-108,M0108,A6,M,B0018,,"insert into model(model_name, size, brand_id) values('A6','M',B0018);"
-109,M0109,A7,M,B0018,,"insert into model(model_name, size, brand_id) values('A7','M',B0018);"
-110,M0110,XE,M,B0019,,"insert into model(model_name, size, brand_id) values('XE','M',B0019);"
-111,M0111,XF,M,B0019,,"insert into model(model_name, size, brand_id) values('XF','M',B0019);"
-112,M0112,F-Pace,M,B0019,,"insert into model(model_name, size, brand_id) values('F-Pace','M',B0019);"
-113,M0113,E-Pace,M,B0019,,"insert into model(model_name, size, brand_id) values('E-Pace','M',B0019);"
-114,M0114,F-Type,M,B0019,,"insert into model(model_name, size, brand_id) values('F-Type','M',B0019);"
-115,M0115,ZS,M,B0020,,"insert into model(model_name, size, brand_id) values('ZS','M',B0020);"
-116,M0116,HS,M,B0020,,"insert into model(model_name, size, brand_id) values('HS','M',B0020);"
-117,M0117,MG5,M,B0020,,"insert into model(model_name, size, brand_id) values('MG5','M',B0020);"
-118,M0118,RX5,M,B0020,,"insert into model(model_name, size, brand_id) values('RX5','M',B0020);"
-119,M0119,MG4 EV,M,B0020,,"insert into model(model_name, size, brand_id) values('MG4 EV','M',B0020);"
-120,M0120,MG7,M,B0020,,"insert into model(model_name, size, brand_id) values('MG7','M',B0020);"
-121,M0121,Cyberster,M,B0020,,"insert into model(model_name, size, brand_id) values('Cyberster','M',B0020);"
-122,M0122,7X-E,M,B0021,,"insert into model(model_name, size, brand_id) values('7X-E','M',B0021);"
-123,M0123,7X,M,B0021,,"insert into model(model_name, size, brand_id) values('7X','M',B0021);"
-124,M0124,Navara,L,B0022,,"insert into model(model_name, size, brand_id) values('Navara','L',B0022);"
-125,M0125,Almera,M,B0022,,"insert into model(model_name, size, brand_id) values('Almera','M',B0022);"
-126,M0126,Kicks,M,B0022,,"insert into model(model_name, size, brand_id) values('Kicks','M',B0022);"
-127,M0127,E-HS9,M,B0023,,"insert into model(model_name, size, brand_id) values('E-HS9','M',B0023);"
-128,M0128,H9,M,B0023,,"insert into model(model_name, size, brand_id) values('H9','M',B0023);"
-129,M0129,Forester,M,B0024,,"insert into model(model_name, size, brand_id) values('Forester','M',B0024);"
-130,M0130,Outback,M,B0024,,"insert into model(model_name, size, brand_id) values('Outback','M',B0024);"
-131,M0131,BR-Z,S,B0024,,"insert into model(model_name, size, brand_id) values('BR-Z','S',B0024);"
-132,M0132,WRX,M,B0024,,"insert into model(model_name, size, brand_id) values('WRX','M',B0024);"
-133,M0133,Crosstrek,M,B0024,,"insert into model(model_name, size, brand_id) values('Crosstrek','M',B0024);"
-134,M0134,3 Door,M,B0025,,"insert into model(model_name, size, brand_id) values('3 Door','M',B0025);"
-135,M0135,5 Door,M,B0025,,"insert into model(model_name, size, brand_id) values('5 Door','M',B0025);"
-136,M0136,Countryman,M,B0025,,"insert into model(model_name, size, brand_id) values('Countryman','M',B0025);"
-137,M0137,JCW,M,B0025,,"insert into model(model_name, size, brand_id) values('JCW','M',B0025);"
-138,M0138,EcoSport,M,B0026,,"insert into model(model_name, size, brand_id) values('EcoSport','M',B0026);"
-139,M0139,Everest,M,B0026,,"insert into model(model_name, size, brand_id) values('Everest','M',B0026);"
-140,M0140,Ranger,M,B0026,,"insert into model(model_name, size, brand_id) values('Ranger','M',B0026);"
-141,M0141,Explorer,M,B0026,,"insert into model(model_name, size, brand_id) values('Explorer','M',B0026);"
-142,M0142,Territory,M,B0026,,"insert into model(model_name, size, brand_id) values('Territory','M',B0026);"
-143,M0143,Ranger Raptor,M,B0026,,"insert into model(model_name, size, brand_id) values('Ranger Raptor','M',B0026);"
-144,M0144,IS,S,B0027,,"insert into model(model_name, size, brand_id) values('IS','S',B0027);"
-145,M0145,LS,M,B0027,,"insert into model(model_name, size, brand_id) values('LS','M',B0027);"
-146,M0146,NX,M,B0027,,"insert into model(model_name, size, brand_id) values('NX','M',B0027);"
-147,M0147,RX,M,B0027,,"insert into model(model_name, size, brand_id) values('RX','M',B0027);"
-148,M0148,LX,M,B0027,,"insert into model(model_name, size, brand_id) values('LX','M',B0027);"
-149,M0149,LM,M,B0027,,"insert into model(model_name, size, brand_id) values('LM','M',B0027);"
-150,M0150,GX,M,B0027,,"insert into model(model_name, size, brand_id) values('GX','M',B0027);"
-151,M0151,Wrangler,M,B0028,,"insert into model(model_name, size, brand_id) values('Wrangler','M',B0028);"
-152,M0152,Gladiator,M,B0028,,"insert into model(model_name, size, brand_id) values('Gladiator','M',B0028);"
-153,M0153,Grand Cherokee L,M,B0028,,"insert into model(model_name, size, brand_id) values('Grand Cherokee L','M',B0028);"
-154,M0154,Atto 3,M,B0029,,"insert into model(model_name, size, brand_id) values('Atto 3','M',B0029);"
-155,M0155,Seal,M,B0029,,"insert into model(model_name, size, brand_id) values('Seal','M',B0029);"
-156,M0156,Dolphin,M,B0029,,"insert into model(model_name, size, brand_id) values('Dolphin','M',B0029);"
-157,M0157,M6,M,B0029,,"insert into model(model_name, size, brand_id) values('M6','M',B0029);"
-158,M0158,Han,M,B0029,,"insert into model(model_name, size, brand_id) values('Han','M',B0029);"
-159,M0159,City,M,B0030,,"insert into model(model_name, size, brand_id) values('City','M',B0030);"
-160,M0160,HR-V,M,B0030,,"insert into model(model_name, size, brand_id) values('HR-V','M',B0030);"
-161,M0161,CR-V,M,B0030,,"insert into model(model_name, size, brand_id) values('CR-V','M',B0030);"
-162,M0162,Accord,M,B0030,,"insert into model(model_name, size, brand_id) values('Accord','M',B0030);"
-163,M0163,Brio,M,B0030,,"insert into model(model_name, size, brand_id) values('Brio','M',B0030);"
-164,M0164,Civic,M,B0030,,"insert into model(model_name, size, brand_id) values('Civic','M',B0030);"
-165,M0165,Civic Type R,M,B0030,,"insert into model(model_name, size, brand_id) values('Civic Type R','M',B0030);"
-166,M0166,BR-V,M,B0030,,"insert into model(model_name, size, brand_id) values('BR-V','M',B0030);"
-167,M0167,Flying Spur,M,B0031,,"insert into model(model_name, size, brand_id) values('Flying Spur','M',B0031);"
-168,M0168,Bentayga,M,B0031,,"insert into model(model_name, size, brand_id) values('Bentayga','M',B0031);"
-169,M0169,Continental,M,B0031,,"insert into model(model_name, size, brand_id) values('Continental','M',B0031);"
-170,M0170,Levante,M,B0032,,"insert into model(model_name, size, brand_id) values('Levante','M',B0032);"
-171,M0171,Ghibli,,B0032,,"insert into model(model_name, size, brand_id) values('Ghibli','',B0032);"
-172,M0172,Quattroporte,M,B0032,,"insert into model(model_name, size, brand_id) values('Quattroporte','M',B0032);"
-173,M0173,Grecale,M,B0032,,"insert into model(model_name, size, brand_id) values('Grecale','M',B0032);"
-174,M0174,GranTurismo,M,B0032,,"insert into model(model_name, size, brand_id) values('GranTurismo','M',B0032);"
-175,M0175,Attrage,M,B0033,,"insert into model(model_name, size, brand_id) values('Attrage','M',B0033);"
-176,M0176,Outlander,M,B0033,,"insert into model(model_name, size, brand_id) values('Outlander','M',B0033);"
-177,M0177,Triton,M,B0033,,"insert into model(model_name, size, brand_id) values('Triton','M',B0033);"
-178,M0178,Pajero Sport,M,B0033,,"insert into model(model_name, size, brand_id) values('Pajero Sport','M',B0033);"
-179,M0179,Xpander,M,B0033,,"insert into model(model_name, size, brand_id) values('Xpander','M',B0033);"
-180,M0180,Xforce,M,B0033,,"insert into model(model_name, size, brand_id) values('Xforce','M',B0033);"
-181,M0181,i10,S,B0034,,"insert into model(model_name, size, brand_id) values('i10','S',B0034);"
-182,M0182,Accent,M,B0034,,"insert into model(model_name, size, brand_id) values('Accent','M',B0034);"
-183,M0183,Kona,M,B0034,,"insert into model(model_name, size, brand_id) values('Kona','M',B0034);"
-184,M0184,Elantra,M,B0034,,"insert into model(model_name, size, brand_id) values('Elantra','M',B0034);"
-185,M0185,Tucson,M,B0034,,"insert into model(model_name, size, brand_id) values('Tucson','M',B0034);"
-186,M0186,Santa Fe,M,B0034,,"insert into model(model_name, size, brand_id) values('Santa Fe','M',B0034);"
-187,M0187,Creta,M,B0034,,"insert into model(model_name, size, brand_id) values('Creta','M',B0034);"
-188,M0188,Stargazer,M,B0034,,"insert into model(model_name, size, brand_id) values('Stargazer','M',B0034);"
-189,M0189,Ioniq 5,M,B0034,,"insert into model(model_name, size, brand_id) values('Ioniq 5','M',B0034);"
-190,M0190,Custin,M,B0034,,"insert into model(model_name, size, brand_id) values('Custin','M',B0034);"
-191,M0191,Palisade,M,B0034,,"insert into model(model_name, size, brand_id) values('Palisade','M',B0034);"
-192,M0192,Venue,M,B0034,,"insert into model(model_name, size, brand_id) values('Venue','M',B0034);"
-193,M0193,Hongguang Mini EV,S,B0035,,"insert into model(model_name, size, brand_id) values('Hongguang Mini EV','S',B0035);"
-194,M0194,Bingo,M,B0035,,"insert into model(model_name, size, brand_id) values('Bingo','M',B0035);"
-195,M0195,Wigo,M,B0036,,"insert into model(model_name, size, brand_id) values('Wigo','M',B0036);"
-196,M0196,Vios,M,B0036,,"insert into model(model_name, size, brand_id) values('Vios','M',B0036);"
-197,M0197,Corolla Altis,M,B0036,,"insert into model(model_name, size, brand_id) values('Corolla Altis','M',B0036);"
-198,M0198,Camry,M,B0036,,"insert into model(model_name, size, brand_id) values('Camry','M',B0036);"
-199,M0199,Rush,M,B0036,,"insert into model(model_name, size, brand_id) values('Rush','M',B0036);"
-200,M0200,Avanza,M,B0036,,"insert into model(model_name, size, brand_id) values('Avanza','M',B0036);"
-201,M0201,Innova,M,B0036,,"insert into model(model_name, size, brand_id) values('Innova','M',B0036);"
-202,M0202,Fortuner,M,B0036,,"insert into model(model_name, size, brand_id) values('Fortuner','M',B0036);"
-203,M0203,Granvia,M,B0036,,"insert into model(model_name, size, brand_id) values('Granvia','M',B0036);"
-204,M0204,Land Cruiser LC300,L,B0036,,"insert into model(model_name, size, brand_id) values('Land Cruiser LC300','L',B0036);"
-205,M0205,Land Cruiser Prado,L,B0036,,"insert into model(model_name, size, brand_id) values('Land Cruiser Prado','L',B0036);"
-206,M0206,Corolla Cross,M,B0036,,"insert into model(model_name, size, brand_id) values('Corolla Cross','M',B0036);"
-207,M0207,Hilux,L,B0036,,"insert into model(model_name, size, brand_id) values('Hilux','L',B0036);"
-208,M0208,Alphard,L,B0036,,"insert into model(model_name, size, brand_id) values('Alphard','L',B0036);"
-209,M0209,Yaris,M,B0036,,"insert into model(model_name, size, brand_id) values('Yaris','M',B0036);"
-210,M0210,Raize,M,B0036,,"insert into model(model_name, size, brand_id) values('Raize','M',B0036);"
-211,M0211,Avanza Premio,M,B0036,,"insert into model(model_name, size, brand_id) values('Avanza Premio','M',B0036);"
-212,M0212,Veloz Cross,M,B0036,,"insert into model(model_name, size, brand_id) values('Veloz Cross','M',B0036);"
-213,M0213,Yaris Cross,M,B0036,,"insert into model(model_name, size, brand_id) values('Yaris Cross','M',B0036);"
-214,M0214,Innova Cross,M,B0036,,"insert into model(model_name, size, brand_id) values('Innova Cross','M',B0036);"
-215,M0215,Swift,M,B0037,,"insert into model(model_name, size, brand_id) values('Swift','M',B0037);"
-216,M0216,Ciaz,M,B0037,,"insert into model(model_name, size, brand_id) values('Ciaz','M',B0037);"
-217,M0217,Ertiga,M,B0037,,"insert into model(model_name, size, brand_id) values('Ertiga','M',B0037);"
-218,M0218,XL7,M,B0037,,"insert into model(model_name, size, brand_id) values('XL7','M',B0037);"
-219,M0219,Jimny,M,B0037,,"insert into model(model_name, size, brand_id) values('Jimny','M',B0037);"
-220,M0220,Morning,S,B0038,,"insert into model(model_name, size, brand_id) values('Morning','S',B0038);"
-221,M0221,Soluto,S,B0038,,"insert into model(model_name, size, brand_id) values('Soluto','S',B0038);"
-222,M0222,Cerato,M,B0038,,"insert into model(model_name, size, brand_id) values('Cerato','M',B0038);"
-223,M0223,Optima,M,B0038,,"insert into model(model_name, size, brand_id) values('Optima','M',B0038);"
-224,M0224,Sorento,M,B0038,,"insert into model(model_name, size, brand_id) values('Sorento','M',B0038);"
-225,M0225,Rondo,M,B0038,,"insert into model(model_name, size, brand_id) values('Rondo','M',B0038);"
-226,M0226,Quoris,M,B0038,,"insert into model(model_name, size, brand_id) values('Quoris','M',B0038);"
-227,M0227,K3,M,B0038,,"insert into model(model_name, size, brand_id) values('K3','M',B0038);"
-228,M0228,Carnival,M,B0038,,"insert into model(model_name, size, brand_id) values('Carnival','M',B0038);"
-229,M0229,Sonet,M,B0038,,"insert into model(model_name, size, brand_id) values('Sonet','M',B0038);"
-230,M0230,K5,M,B0038,,"insert into model(model_name, size, brand_id) values('K5','M',B0038);"
-231,M0231,Sportage,M,B0038,,"insert into model(model_name, size, brand_id) values('Sportage','M',B0038);"
-232,M0232,Carens,M,B0038,,"insert into model(model_name, size, brand_id) values('Carens','M',B0038);"
-233,M0233,Seltos,M,B0038,,"insert into model(model_name, size, brand_id) values('Seltos','M',B0038);"
-234,M0234,Range Rover Velar,M,B0039,,"insert into model(model_name, size, brand_id) values('Range Rover Velar','M',B0039);"
-235,M0235,Range Rover Evoque,M,B0039,,"insert into model(model_name, size, brand_id) values('Range Rover Evoque','M',B0039);"
-236,M0236,Range Rover,M,B0039,,"insert into model(model_name, size, brand_id) values('Range Rover','M',B0039);"
-237,M0237,Range Rover Sport,M,B0039,,"insert into model(model_name, size, brand_id) values('Range Rover Sport','M',B0039);"
-238,M0238,Discovery,M,B0039,,"insert into model(model_name, size, brand_id) values('Discovery','M',B0039);"
-239,M0239,Discovery Sport,L,B0039,,"insert into model(model_name, size, brand_id) values('Discovery Sport','L',B0039);"
-240,M0240,"Defender 90, 110",L,B0039,,"insert into model(model_name, size, brand_id) values('Defender 90, 110','L',B0039);"
-241,M0241,Defender 130,L,B0039,,"insert into model(model_name, size, brand_id) values('Defender 130','L',B0039);"
+1,M0001,Mazda2,S,B0001,,
+2,M0002,CX-3,M,B0001,,
+3,M0003,Mazda3,M,B0001,,
+4,M0004,Mazda6,M,B0001,,
+5,M0005,CX-30,M,B0001,,
+6,M0006,CX-5,M,B0001,,
+7,M0007,CX-8,L,B0001,,
+8,M0008,BT-50,L,B0001,,
+9,M0009,GS8,,B0002,,
+10,M0010,M8,L,B0002,,
+11,M0011,M6 Pro,,B0002,,
+12,M0012,XC40,M,B0003,,
+13,M0013,XC60,M,B0003,,
+14,M0014,XC90,L,B0003,,
+15,M0015,V90,M,B0003,,
+16,M0016,V60 Cross Country,M,B0003,,
+17,M0017,S90,M,B0003,,
+18,M0018,Fadil,S,B0004,,
+19,M0019,Lux A2.0,M,B0004,,
+20,M0020,Lux SA2.0,M,B0004,,
+21,M0021,President,L,B0004,,
+22,M0022,VF e34,M,B0004,,
+23,M0023,VF 8,M,B0004,,
+24,M0024,VF 5,M,B0004,,
+25,M0025,VF 9,L,B0004,,
+26,M0026,VF 6,M,B0004,,
+27,M0027,VF 7,M,B0004,,
+28,M0028,VF 3,S,B0004,,
+29,M0029,H6,,B0005,,
+30,M0030,Karoq,,B0006,,
+31,M0031,Kodiaq,,B0006,,
+32,M0032,1500,L,B0007,,
+33,M0033,DBX,L,B0008,,
+34,M0034,Lynk & Co 09,L,B0009,,
+35,M0035,Lynk & Co 06,M,B0009,,
+36,M0036,Lynk & Co 01,M,B0009,,
+37,M0037,Lynk & Co 05,M,B0009,,
+38,M0038,Lynk & Co 03,M,B0009,,
+39,M0039,Y Plus,,B0010,,
+40,M0040,ES,,B0010,,
+41,M0041,718,S,B0011,,
+42,M0042,911,M,B0011,,
+43,M0043,Taycan,M,B0011,,
+44,M0044,Panamera,M,B0011,,
+45,M0045,Macan,M,B0011,,
+46,M0046,Cayenne,L,B0011,,
+47,M0047,Macan EV,M,B0011,,
+48,M0048,Series 5,M,B0012,,
+49,M0049,Series 7,L,B0012,,
+50,M0050,X1,S,B0012,,
+51,M0051,X3,M,B0012,,
+52,M0052,X4,M,B0012,,
+53,M0053,X6,M,B0012,,
+54,M0054,Z4 Roadster,S,B0012,,
+55,M0055,Series 3,M,B0012,,
+56,M0056,X5,M,B0012,,
+57,M0057,X7,L,B0012,,
+58,M0058,Series 4,M,B0012,,
+59,M0059,i7,L,B0012,,
+60,M0060,Series 8,L,B0012,,
+61,M0061,iX3,M,B0012,,
+62,M0062,i4,M,B0012,,
+63,M0063,XM,L,B0012,,
+64,M0064,A-class,M,B0013,,
+65,M0065,C-Class,M,B0013,,
+66,M0066,E-Class,M,B0013,,
+67,M0067,S-Class,L,B0013,,
+68,M0068,GLC,M,B0013,,
+69,M0069,GLB,M,B0013,,
+70,M0070,GLS,L,B0013,,
+71,M0071,G-Class,L,B0013,,
+72,M0072,GT-Coupe,L,B0013,,
+73,M0073,V-Class,L,B0013,,
+74,M0074,GLE,L,B0013,,
+75,M0075,GLA,M,B0013,,
+76,M0076,EQS,M,B0013,,
+77,M0077,EQS SUV,L,B0013,,
+78,M0078,EQB,M,B0013,,
+79,M0079,EQE SUV,L,B0013,,
+80,M0080,AMG SL,M,B0013,,
+81,M0081,Maybach EQS SUV,L,B0013,,
+82,M0082,C5,,B0014,,
+83,M0083,2008,M,B0015,,
+84,M0084,3008,M,B0015,,
+85,M0085,5008,M,B0015,,
+86,M0086,Traveller,L,B0015,,
+87,M0087,408,M,B0015,,
+88,M0088,Polo,S,B0016,,
+89,M0089,Tiguan,M,B0016,,
+90,M0090,Passat,M,B0016,,
+91,M0091,T-Cross,M,B0016,,
+92,M0092,Touareg,M,B0016,,
+93,M0093,Virtus,M,B0016,,
+94,M0094,Viloran,L,B0016,,
+95,M0095,Teramont X,L,B0016,,
+96,M0096,Teramont,L,B0016,,
+97,M0097,mu-X,M,B0017,,
+98,M0098,D-Max,L,B0017,,
+99,M0099,A4,M,B0018,,
+100,M0100,Q2,M,B0018,,
+101,M0101,Q3,M,B0018,,
+102,M0102,Q5,M,B0018,,
+103,M0103,Q7,M,B0018,,
+104,M0104,Q8,M,B0018,,
+105,M0105,A8L,L,B0018,,
+106,M0106,e-tron GT,M,B0018,,
+107,M0107,Q8 e-tron,L,B0018,,
+108,M0108,A6,M,B0018,,
+109,M0109,A7,M,B0018,,
+110,M0110,XE,M,B0019,,
+111,M0111,XF,M,B0019,,
+112,M0112,F-Pace,M,B0019,,
+113,M0113,E-Pace,M,B0019,,
+114,M0114,F-Type,M,B0019,,
+115,M0115,ZS,M,B0020,,
+116,M0116,HS,M,B0020,,
+117,M0117,MG5,M,B0020,,
+118,M0118,RX5,M,B0020,,
+119,M0119,MG4 EV,M,B0020,,
+120,M0120,MG7,M,B0020,,
+121,M0121,Cyberster,M,B0020,,
+122,M0122,7X-E,M,B0021,,
+123,M0123,7X,M,B0021,,
+124,M0124,Navara,L,B0022,,
+125,M0125,Almera,M,B0022,,
+126,M0126,Kicks,M,B0022,,
+127,M0127,E-HS9,M,B0023,,
+128,M0128,H9,M,B0023,,
+129,M0129,Forester,M,B0024,,
+130,M0130,Outback,M,B0024,,
+131,M0131,BR-Z,S,B0024,,
+132,M0132,WRX,M,B0024,,
+133,M0133,Crosstrek,M,B0024,,
+134,M0134,3 Door,M,B0025,,
+135,M0135,5 Door,M,B0025,,
+136,M0136,Countryman,M,B0025,,
+137,M0137,JCW,M,B0025,,
+138,M0138,EcoSport,M,B0026,,
+139,M0139,Everest,M,B0026,,
+140,M0140,Ranger,M,B0026,,
+141,M0141,Explorer,M,B0026,,
+142,M0142,Territory,M,B0026,,
+143,M0143,Ranger Raptor,M,B0026,,
+144,M0144,IS,S,B0027,,
+145,M0145,LS,M,B0027,,
+146,M0146,NX,M,B0027,,
+147,M0147,RX,M,B0027,,
+148,M0148,LX,M,B0027,,
+149,M0149,LM,M,B0027,,
+150,M0150,GX,M,B0027,,
+151,M0151,Wrangler,M,B0028,,
+152,M0152,Gladiator,M,B0028,,
+153,M0153,Grand Cherokee L,M,B0028,,
+154,M0154,Atto 3,M,B0029,,
+155,M0155,Seal,M,B0029,,
+156,M0156,Dolphin,M,B0029,,
+157,M0157,M6,M,B0029,,
+158,M0158,Han,M,B0029,,
+159,M0159,City,M,B0030,,
+160,M0160,HR-V,M,B0030,,
+161,M0161,CR-V,M,B0030,,
+162,M0162,Accord,M,B0030,,
+163,M0163,Brio,M,B0030,,
+164,M0164,Civic,M,B0030,,
+165,M0165,Civic Type R,M,B0030,,
+166,M0166,BR-V,M,B0030,,
+167,M0167,Flying Spur,M,B0031,,
+168,M0168,Bentayga,M,B0031,,
+169,M0169,Continental,M,B0031,,
+170,M0170,Levante,M,B0032,,
+171,M0171,Ghibli,,B0032,,
+172,M0172,Quattroporte,M,B0032,,
+173,M0173,Grecale,M,B0032,,
+174,M0174,GranTurismo,M,B0032,,
+175,M0175,Attrage,M,B0033,,
+176,M0176,Outlander,M,B0033,,
+177,M0177,Triton,M,B0033,,
+178,M0178,Pajero Sport,M,B0033,,
+179,M0179,Xpander,M,B0033,,
+180,M0180,Xforce,M,B0033,,
+181,M0181,i10,S,B0034,,
+182,M0182,Accent,M,B0034,,
+183,M0183,Kona,M,B0034,,
+184,M0184,Elantra,M,B0034,,
+185,M0185,Tucson,M,B0034,,
+186,M0186,Santa Fe,M,B0034,,
+187,M0187,Creta,M,B0034,,
+188,M0188,Stargazer,M,B0034,,
+189,M0189,Ioniq 5,M,B0034,,
+190,M0190,Custin,M,B0034,,
+191,M0191,Palisade,M,B0034,,
+192,M0192,Venue,M,B0034,,
+193,M0193,Hongguang Mini EV,S,B0035,,
+194,M0194,Bingo,M,B0035,,
+195,M0195,Wigo,M,B0036,,
+196,M0196,Vios,M,B0036,,
+197,M0197,Corolla Altis,M,B0036,,
+198,M0198,Camry,M,B0036,,
+199,M0199,Rush,M,B0036,,
+200,M0200,Avanza,M,B0036,,
+201,M0201,Innova,M,B0036,,
+202,M0202,Fortuner,M,B0036,,
+203,M0203,Granvia,M,B0036,,
+204,M0204,Land Cruiser LC300,L,B0036,,
+205,M0205,Land Cruiser Prado,L,B0036,,
+206,M0206,Corolla Cross,M,B0036,,
+207,M0207,Hilux,L,B0036,,
+208,M0208,Alphard,L,B0036,,
+209,M0209,Yaris,M,B0036,,
+210,M0210,Raize,M,B0036,,
+211,M0211,Avanza Premio,M,B0036,,
+212,M0212,Veloz Cross,M,B0036,,
+213,M0213,Yaris Cross,M,B0036,,
+214,M0214,Innova Cross,M,B0036,,
+215,M0215,Swift,M,B0037,,
+216,M0216,Ciaz,M,B0037,,
+217,M0217,Ertiga,M,B0037,,
+218,M0218,XL7,M,B0037,,
+219,M0219,Jimny,M,B0037,,
+220,M0220,Morning,S,B0038,,
+221,M0221,Soluto,S,B0038,,
+222,M0222,Cerato,M,B0038,,
+223,M0223,Optima,M,B0038,,
+224,M0224,Sorento,M,B0038,,
+225,M0225,Rondo,M,B0038,,
+226,M0226,Quoris,M,B0038,,
+227,M0227,K3,M,B0038,,
+228,M0228,Carnival,M,B0038,,
+229,M0229,Sonet,M,B0038,,
+230,M0230,K5,M,B0038,,
+231,M0231,Sportage,M,B0038,,
+232,M0232,Carens,M,B0038,,
+233,M0233,Seltos,M,B0038,,
+234,M0234,Range Rover Velar,M,B0039,,
+235,M0235,Range Rover Evoque,M,B0039,,
+236,M0236,Range Rover,M,B0039,,
+237,M0237,Range Rover Sport,M,B0039,,
+238,M0238,Discovery,M,B0039,,
+239,M0239,Discovery Sport,L,B0039,,
+240,M0240,"Defender 90, 110",L,B0039,,
+241,M0241,Defender 130,L,B0039,,

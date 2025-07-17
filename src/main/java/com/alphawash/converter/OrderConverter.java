@@ -98,7 +98,7 @@ public class OrderConverter {
             OrderTableDto.OrderDetailDTO detail = new OrderTableDto.OrderDetailDTO();
             detail.setStatus(status);
             detail.setNote(note);
-            detail.setEmployee(employees);
+            detail.setEmployees(employees);
             detail.setVehicle(vehicle);
             detail.setService(service);
 

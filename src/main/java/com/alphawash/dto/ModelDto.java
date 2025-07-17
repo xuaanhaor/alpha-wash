@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 public class ModelDto {
     private Long id;
+    private String code;
     private String modelName;
     private String size;
     private Long brandId;

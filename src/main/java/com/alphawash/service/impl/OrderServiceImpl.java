@@ -19,10 +19,15 @@ import com.alphawash.repository.OrderRepository;
 import com.alphawash.repository.ServiceCatalogRepository;
 import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.BasicOrderRequest;
+import com.alphawash.request.UpdateBasicOrderRequest;
 import com.alphawash.service.OrderService;
+import com.alphawash.util.DateTimeUtils;
+import com.alphawash.util.ObjectUtils;
+import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -107,6 +112,61 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    @Transactional
+    public int updateOrderById(UpdateBasicOrderRequest request) {
+        UUID id = request.id();
+        BasicOrderRequest basicOrderRequest = request.request();
+        Order order = orderRepository
+                .findById(id)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Order not found with ID: " + id));
+        Customer customer = null;
+        if (!Objects.isNull(basicOrderRequest.customer())) {
+            if (isBlankUUID(basicOrderRequest.customer().id())
+                    && (StringUtils.isNotNullOrEmpty(
+                                    basicOrderRequest.customer().name())
+                            && StringUtils.isNotNullOrEmpty(
+                                    basicOrderRequest.customer().phone()))) {
+                // if not found by ID, create a new customer
+                customer = customerRepository.save(Customer.builder()
+                        .customerName(basicOrderRequest.customer().name())
+                        .phone(basicOrderRequest.customer().phone())
+                        .build());
+            } else {
+                // if found by ID, retrieve the customer
+                if (!isBlankUUID(basicOrderRequest.customer().id())) {
+                    customer = customerRepository
+                            .findById(basicOrderRequest.customer().id())
+                            .orElseThrow(() -> new BusinessException(
+                                    HttpStatus.NOT_FOUND,
+                                    "Customer not found with ID: "
+                                            + basicOrderRequest.customer().id()));
+                }
+            }
+        }
+
+        try {
+            updateOrderRequest(basicOrderRequest, order);
+            OrderDetail orderDetail = orderDetailRepository
+                    .findByOrderId(order.getId())
+                    .orElseThrow(() -> new BusinessException(
+                            HttpStatus.NOT_FOUND, "Order detail not found for order ID: " + order.getId()));
+            Vehicle vehicle = null;
+            if (basicOrderRequest.vehicle() != null) {
+                vehicle = orderRepository
+                        .findVehicleByOrderId(order.getId())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.NOT_FOUND, "Vehicle not found for order ID: " + order.getId()));
+                updateVehicle(basicOrderRequest, vehicle, customer);
+            }
+            updateOrderDetail(basicOrderRequest, orderDetail, order, vehicle);
+
+        } catch (Exception e) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to update order: " + e.getMessage());
+        }
+        return 0;
+    }
+
     private Order insertOrder(BasicOrderRequest request) {
         Order order = Order.builder()
                 .date(request.information().date())
@@ -123,6 +183,60 @@ public class OrderServiceImpl implements OrderService {
                 .note(request.information().note())
                 .build();
         return orderRepository.save(order);
+    }
+
+    private void updateOrderRequest(BasicOrderRequest request, Order order) {
+        ObjectUtils.setIfNotNull(request.information().date(), order::setDate);
+        ObjectUtils.setIfNotNull(request.information().checkInTime(), order::setCheckinTime);
+        ObjectUtils.setIfNotNull(request.information().paymentStatus(), order::setPaymentStatus);
+        ObjectUtils.setIfNotNull(request.information().paymentType(), order::setPaymentType);
+        ObjectUtils.setIfNotNull(request.information().tip(), order::setTip);
+        ObjectUtils.setIfNotNull(request.information().discount(), order::setDiscount);
+        ObjectUtils.setIfNotNull(request.information().vat(), order::setVat);
+        ObjectUtils.setIfNotNull(request.information().totalPrice(), order::setTotalPrice);
+        ObjectUtils.setIfNotNull(request.information().note(), order::setNote);
+        order.setUpdatedAt(DateTimeUtils.getCurrentDate());
+        order.setExclusiveKey(order.getExclusiveKey() + 1);
+        orderRepository.save(order);
+    }
+
+    private void updateOrderDetail(BasicOrderRequest request, OrderDetail orderDetail, Order order, Vehicle vehicle) {
+        if (StringUtils.isNotNullOrEmpty(request.service().serviceCatalogCode())) {
+            ServiceCatalog serviceCatalog = serviceCatalogRepository
+                    .findByCode(request.service().serviceCatalogCode())
+                    .orElseThrow(() -> new BusinessException(
+                            HttpStatus.NOT_FOUND,
+                            "Service catalog not found with code: "
+                                    + request.service().serviceCatalogCode()));
+            orderDetail.setServiceCatalog(serviceCatalog);
+        }
+
+        ObjectUtils.setIfNotNull(request.information().employeeId(), orderDetail::setEmployeeId);
+        ObjectUtils.setIfNotNull(request.information().note(), orderDetail::setNote);
+        orderDetail.setOrder(order);
+        orderDetail.setVehicle(vehicle);
+        orderDetail.setUpdatedAt(DateTimeUtils.getCurrentDate());
+        orderDetailRepository.save(orderDetail);
+    }
+
+    private void updateVehicle(BasicOrderRequest request, Vehicle vehicle, Customer customer) {
+        Brand brand = brandRepository
+                .findByCode(request.vehicle().brandCode())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.NOT_FOUND,
+                        "Brand not found with code: " + request.vehicle().brandCode()));
+        Model model = modelRepository
+                .findByCode(request.vehicle().modelCode())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.NOT_FOUND,
+                        "Model not found with code: " + request.vehicle().modelCode()));
+        vehicle.setBrand(brand);
+        vehicle.setModel(model);
+        ObjectUtils.setIfNotNull(request.vehicle().licensePlate(), vehicle::setLicensePlate);
+        ObjectUtils.setIfNotNull(request.vehicle().note(), vehicle::setNote);
+        ObjectUtils.setIfNotNull(customer, vehicle::setCustomer);
+        vehicle.setUpdatedAt(DateTimeUtils.getCurrentDate());
+        vehicleRepository.save(vehicle);
     }
 
     private boolean isBlankUUID(UUID uuid) {

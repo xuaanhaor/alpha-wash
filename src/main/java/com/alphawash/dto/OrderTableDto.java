@@ -37,7 +37,7 @@ public class OrderTableDto {
     @Setter
     @Data
     public static class OrderDetailDTO {
-        private List<EmployeeDTO> employee;
+        private List<EmployeeDTO> employees;
         private VehicleDTO vehicle;
         private ServiceDTO service;
         private String status;

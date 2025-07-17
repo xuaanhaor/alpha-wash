@@ -233,3 +233,67 @@ BEGIN
         WHERE o.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_vehicle_by_order_id(p_order_id UUID)
+    RETURNS TABLE
+            (
+                id            UUID,
+                license_plate VARCHAR,
+                customer_id   UUID,
+                brand_code    VARCHAR,
+                model_code    VARCHAR,
+                image_url     TEXT,
+                note          TEXT,
+                delete_flag   BOOLEAN,
+                created_by    VARCHAR,
+                updated_by    VARCHAR,
+                created_at    TIMESTAMP,
+                updated_at    TIMESTAMP,
+                exclusive_key INT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        select v.*
+        from orders o
+                 join order_detail od on o.id = od.order_id
+                 join vehicle v on od.vehicle_id = v.id
+        where o.id = p_order_id
+          and o.delete_flag = false;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_customer_vehicle_by_phone(p_customer_phone VARCHAR)
+    RETURNS TABLE
+            (
+                id            UUID,
+                phone         VARCHAR,
+                customer_name VARCHAR,
+                brand_code    VARCHAR,
+                brand_name    VARCHAR,
+                model_code    VARCHAR,
+                model_name    VARCHAR,
+                license_plate VARCHAR
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT c.id,
+               c.phone,
+               c.customer_name,
+               v.brand_code,
+               b.brand_name,
+               v.model_code,
+               m.model_name,
+               v.license_plate
+        FROM customer c
+                 left join vehicle v on c.id = v.customer_id
+                 join brands b on v.brand_code = b.code
+                 join model m on v.model_code = m.code
+        where c.phone = p_customer_phone
+          and c.delete_flag = false
+          and v.delete_flag = false;
+END;
+$$ LANGUAGE plpgsql;

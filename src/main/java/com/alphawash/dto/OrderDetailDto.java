@@ -27,7 +27,7 @@ public class OrderDetailDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    class ServiceCatalogDto {
+    public static class ServiceCatalogDto {
         private Long id;
         private String code;
         private String size;
@@ -40,7 +40,7 @@ public class OrderDetailDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    class VehicleDto {
+    public static class VehicleDto {
         private UUID id;
         private CustomerDto customer;
         private String licensePlate;
