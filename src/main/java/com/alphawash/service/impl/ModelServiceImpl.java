@@ -2,6 +2,7 @@ package com.alphawash.service.impl;
 
 import com.alphawash.converter.ModelConverter;
 import com.alphawash.dto.ModelDto;
+import com.alphawash.dto.ModelWithoutBrandDto;
 import com.alphawash.entity.Brand;
 import com.alphawash.entity.Model;
 import com.alphawash.repository.BrandRepository;
@@ -9,7 +10,9 @@ import com.alphawash.repository.ModelRepository;
 import com.alphawash.service.ModelService;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,5 +63,13 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void delete(Long id) {
         modelRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ModelWithoutBrandDto> findByBrandCode(String brandCode) {
+        var list = modelRepository.findByBrandCode(brandCode);
+        return list.stream()
+                .map(model -> new ModelWithoutBrandDto(model.getId(), model.getModelName(), model.getSize()))
+                .toList();
     }
 }

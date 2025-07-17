@@ -4,6 +4,7 @@ import static com.alphawash.constant.Constant.*;
 
 import com.alphawash.converter.ModelConverter;
 import com.alphawash.dto.ModelDto;
+import com.alphawash.dto.ModelWithoutBrandDto;
 import com.alphawash.request.ModelRequest;
 import com.alphawash.response.ModelResponse;
 import com.alphawash.service.ModelService;
@@ -79,5 +80,11 @@ public class ModelController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         modelService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("by-brand")
+    public ResponseEntity<List<ModelWithoutBrandDto>> getModel(@RequestParam String brandCode) {
+        var result = modelService.findByBrandCode(brandCode);
+        return ResponseEntity.ok(result);
     }
 }
