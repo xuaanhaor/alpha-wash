@@ -84,7 +84,7 @@ public class ServiceCatalogController {
         @ApiResponse(responseCode = "200", description = "Entries found"),
         @ApiResponse(responseCode = "404", description = "No entries found")
     })
-    @GetMapping(API_SERVICE + ID_PATH_PARAMETER)
+    @GetMapping(API_SERVICE_CATEGORY + ID_PATH_PARAMETER)
     public ResponseEntity<List<ServiceCatalogResponse>> getByServiceId(@PathVariable Long id) {
         List<ServiceCatalogDto> dtos = service.getByServiceId(id);
         if (dtos.isEmpty()) {

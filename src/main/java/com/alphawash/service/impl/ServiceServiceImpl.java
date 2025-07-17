@@ -33,7 +33,7 @@ public class ServiceServiceImpl implements ServiceService {
     public ServiceDto create(ServiceDto dto) {
         Service entity = converter.toEntity(dto);
         entity.setServiceType(
-                serviceTypeRepository.findById(dto.getServiceTypeId()).orElseThrow());
+                serviceTypeRepository.findByCode(dto.getServiceTypeCode()).orElseThrow());
         return converter.toDto(serviceRepository.save(entity));
     }
 
@@ -46,7 +46,7 @@ public class ServiceServiceImpl implements ServiceService {
                     PatchHelper.applyPatch(patchData, currentDto);
                     Service updatedEntity = converter.toEntity(currentDto);
                     updatedEntity.setServiceType(serviceTypeRepository
-                            .findById(currentDto.getServiceTypeId())
+                            .findByCode(currentDto.getServiceTypeCode())
                             .orElse(null));
 
                     return converter.toDto(serviceRepository.save(updatedEntity));

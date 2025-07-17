@@ -15,10 +15,9 @@ public interface ServiceConverter {
     ServiceConverter INSTANCE = Mappers.getMapper(ServiceConverter.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "serviceTypeId", source = "serviceTypeId")
     ServiceDto fromRequest(ServiceRequest request);
 
-    @Mapping(target = "serviceTypeId", source = "serviceType.id")
+    @Mapping(target = "serviceTypeCode", source = "serviceType.code")
     ServiceDto toDto(Service entity);
 
     @Mapping(target = "serviceType", ignore = true)

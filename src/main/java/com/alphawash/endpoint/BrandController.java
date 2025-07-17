@@ -28,7 +28,7 @@ public class BrandController {
 
     @Operation(summary = "Get all vehicle brands")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved brand list")})
-    @GetMapping(SEARCH_ENDPOINT)
+    @GetMapping(ROOT)
     public ResponseEntity<List<BrandResponse>> getAll() {
         return ResponseEntity.ok(BrandConverter.INSTANCE.toResponse(brandService.getAll()));
     }

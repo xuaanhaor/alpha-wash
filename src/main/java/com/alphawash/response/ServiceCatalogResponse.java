@@ -12,5 +12,6 @@ public class ServiceCatalogResponse {
     private Long id;
     private Size size;
     private BigDecimal price;
+    private String code;
     private Long serviceId;
 }
