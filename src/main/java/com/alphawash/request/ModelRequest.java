@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ModelRequest {
+    private String code;
     private String modelName;
     private String size;
     private Long brandId;

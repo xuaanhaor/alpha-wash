@@ -1,17 +1,17 @@
 id,code,service_name,duration,note,service_type_id,,
-1,S0001,Rửa Nhanh | Quick Wash,30m - 45m,,1,ST0001,"insert into model(service_name, duration, note, service_type_id) values('Rửa Nhanh | Quick Wash','30m - 45m','',1);"
-2,S0002,Rửa Tiêu Chuẩn | Standard Wash,1h - 1h15m,,1,ST0001,"insert into model(service_name, duration, note, service_type_id) values('Rửa Tiêu Chuẩn | Standard Wash','1h - 1h15m','',1);"
-3,S0003,Rửa Chuyên Sâu | Deep Wash,1h30m - 2h,,1,ST0001,"insert into model(service_name, duration, note, service_type_id) values('Rửa Chuyên Sâu | Deep Wash','1h30m - 2h','',1);"
-4,S0004,Vệ sinh nội thất,4h - 5h,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Vệ sinh nội thất','4h - 5h','',2);"
-5,S0005,Vệ sinh khoang máy,1h30m - 2h,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Vệ sinh khoang máy','1h30m - 2h','',2);"
-6,S0006,Vệ sinh dàn lạnh,1h,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Vệ sinh dàn lạnh','1h','',2);"
-7,S0007,Tẩy nhựa đường,45m,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Tẩy nhựa đường','45m','',2);"
-8,S0008,Tẩy ố kính/mảng dầu,3h,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Tẩy ố kính/mảng dầu','3h','',2);"
-9,S0009,Vệ sinh mâm xe (4 bánh),30m,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Vệ sinh mâm xe (4 bánh)','30m','',2);"
-10,S0010,Đánh bóng sơn,2h,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Đánh bóng sơn','2h','',2);"
-11,S0011,Hiệu chỉnh sơn,2d,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Hiệu chỉnh sơn','2d','',2);"
-12,S0012,Phục hồi nhựa ngoài,45m,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Phục hồi nhựa ngoài','45m','',2);"
-13,S0013,Phủ ceramic toàn xe,3d,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Phủ ceramic toàn xe','3d','',2);"
-14,S0014,Ceramic kính (Bảo Hành 6 Tháng),2d,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Ceramic kính (Bảo Hành 6 Tháng)','2d','',2);"
-15,S0015,Ceramic kính (Bảo Hành 1 Năm),2d,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Ceramic kính (Bảo Hành 1 Năm)','2d','',2);"
-16,S0016,Ceramic mâm,2d,,2,ST0002,"insert into model(service_name, duration, note, service_type_id) values('Ceramic mâm','2d','',2);"
+1,S0001,Rửa Nhanh | Quick Wash,30m - 45m,,1,ST0001,,
+2,S0002,Rửa Tiêu Chuẩn | Standard Wash,1h - 1h15m,,1,ST0001,,
+3,S0003,Rửa Chuyên Sâu | Deep Wash,1h30m - 2h,,1,ST0001,,
+4,S0004,Vệ sinh nội thất,4h - 5h,,2,ST0002,,
+5,S0005,Vệ sinh khoang máy,1h30m - 2h,,2,ST0002,,
+6,S0006,Vệ sinh dàn lạnh,1h,,2,ST0002,,
+7,S0007,Tẩy nhựa đường,45m,,2,ST0002,,
+8,S0008,Tẩy ố kính/mảng dầu,3h,,2,ST0002,,
+9,S0009,Vệ sinh mâm xe (4 bánh),30m,,2,ST0002,,
+10,S0010,Đánh bóng sơn,2h,,2,ST0002,,
+11,S0011,Hiệu chỉnh sơn,2d,,2,ST0002,,
+12,S0012,Phục hồi nhựa ngoài,45m,,2,ST0002,,
+13,S0013,Phủ ceramic toàn xe,3d,,2,ST0002,,
+14,S0014,Ceramic kính (Bảo Hành 6 Tháng),2d,,2,ST0002,,
+15,S0015,Ceramic kính (Bảo Hành 1 Năm),2d,,2,ST0002,,
+16,S0016,Ceramic mâm,2d,,2,ST0002,,

@@ -1,5 +1,7 @@
 package com.alphawash.util;
 
+import java.util.function.Consumer;
+
 public class ObjectUtils<T> {
 
     public static <T> boolean isNull(T obj) {
@@ -16,5 +18,11 @@ public class ObjectUtils<T> {
 
     public static <T> boolean isNotEmpty(T[] array) {
         return !isEmpty(array);
+    }
+
+    public static <T> void setIfNotNull(T value, Consumer<T> setter) {
+        if (value != null) {
+            setter.accept(value);
+        }
     }
 }

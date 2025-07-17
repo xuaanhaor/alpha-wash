@@ -2,6 +2,8 @@ package com.alphawash.endpoint;
 
 import com.alphawash.constant.Constant;
 import com.alphawash.dto.OrderTableDto;
+import com.alphawash.request.BasicOrderRequest;
+import com.alphawash.request.UpdateBasicOrderRequest;
 import com.alphawash.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,5 +34,17 @@ public class OrderController {
     public ResponseEntity<List<OrderTableDto>> getOrders() {
         List<OrderTableDto> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
+    }
+
+    @PostMapping(Constant.API_CREATE_ORDER)
+    public ResponseEntity<Void> createOrder(@RequestBody BasicOrderRequest request) {
+        orderService.createOrder(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(Constant.UPDATE_ENDPOINT)
+    public ResponseEntity<Void> updateOrder(@RequestBody UpdateBasicOrderRequest request) {
+        orderService.updateOrderById(request);
+        return ResponseEntity.ok().build();
     }
 }
