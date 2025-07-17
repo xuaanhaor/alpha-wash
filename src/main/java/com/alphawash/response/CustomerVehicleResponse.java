@@ -1,5 +1,7 @@
 package com.alphawash.response;
 
+import com.alphawash.dto.CustomerVehicleDto;
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -9,7 +11,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CustomerVehicleResponse {
-    private String phone;
     private UUID customerId;
     private String customerName;
+    private String phone;
+    List<CustomerVehicleDto> vehicles;
 }
