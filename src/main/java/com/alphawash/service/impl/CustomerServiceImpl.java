@@ -2,10 +2,14 @@ package com.alphawash.service.impl;
 
 import com.alphawash.converter.CustomerConverter;
 import com.alphawash.dto.CustomerDto;
+import com.alphawash.dto.CustomerVehicleDto;
+import com.alphawash.dto.CustomerVehicleFlatDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.repository.CustomerRepository;
 import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
+import com.alphawash.util.CollectionUtils;
+import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
 import java.util.List;
 import java.util.Optional;
@@ -60,5 +64,50 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerVehicleResponse findByPhone(String phone) {
         Optional<Customer> result = customerRepository.findByPhone(phone);
         return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
+    }
+
+    @Override
+    public CustomerVehicleResponse findCustomerVehicleByPhone(String phone) {
+        List<CustomerVehicleFlatDto> flatList = customerRepository.findCustomerWithVehicleByPhone(phone);
+
+        //        Map<UUID, CustomerVehicleResponse> vehicleMap = new LinkedHashMap<>();
+        //
+        //        for (CustomerVehicleFlatDto flat : flatList) {
+        //            vehicleMap.computeIfAbsent(flat.getId(), id -> new CustomerVehicleResponse(
+        //                    flat.getId(),
+        //                    flat.getCustomerName(),
+        //                    flat.getPhone(),
+        //                    new ArrayList<>()
+        //            )).getVehicles().add(new CustomerVehicleDto(
+        //                    flat.getBrandCode(),
+        //                    flat.getBrandName(),
+        //                    flat.getModelCode(),
+        //                    flat.getModelName(),
+        //                    flat.getLicensePlate()
+        //            ));
+        //        }
+        //
+        //        return new ArrayList<>(grouped.values());
+
+        if (CollectionUtils.isNotEmpty(flatList)) {
+            var first = flatList.get(0);
+            List<CustomerVehicleDto> vehicles = flatList.stream()
+                    .filter(item -> ObjectUtils.isNotNull(item.getLicensePlate()))
+                    .map(flat -> new CustomerVehicleDto(
+                            flat.getBrandCode(),
+                            flat.getBrandName(),
+                            flat.getModelCode(),
+                            flat.getModelName(),
+                            flat.getLicensePlate()))
+                    .toList();
+            return CustomerVehicleResponse.builder()
+                    .customerId(first.getId())
+                    .customerName(first.getCustomerName())
+                    .phone(first.getPhone())
+                    .vehicles(vehicles)
+                    .build();
+        }
+
+        return null;
     }
 }

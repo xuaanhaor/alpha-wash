@@ -17,4 +17,6 @@ public interface CustomerService {
     void delete(UUID id);
 
     CustomerVehicleResponse findByPhone(String phone);
+
+    CustomerVehicleResponse findCustomerVehicleByPhone(String phone);
 }

@@ -89,4 +89,10 @@ public class CustomerController {
         var result = customerService.findByPhone(number);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/by-phone-with-vehicles")
+    public ResponseEntity<CustomerVehicleResponse> findCustomerVehicleByPhone(@RequestParam String phone) {
+        CustomerVehicleResponse result = customerService.findCustomerVehicleByPhone(phone);
+        return ResponseEntity.ok(result);
+    }
 }
