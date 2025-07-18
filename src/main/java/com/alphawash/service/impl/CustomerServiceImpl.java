@@ -100,7 +100,8 @@ public class CustomerServiceImpl implements CustomerService {
                             flat.getBrandName(),
                             flat.getModelCode(),
                             flat.getModelName(),
-                            flat.getLicensePlate()))
+                            flat.getLicensePlate(),
+                            flat.gét))
                     .toList();
             return CustomerVehicleResponse.builder()
                     .customerId(first.getId())

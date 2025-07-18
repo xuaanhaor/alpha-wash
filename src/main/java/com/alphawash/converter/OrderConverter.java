@@ -42,7 +42,7 @@ public class OrderConverter {
         List<OrderTableDto.EmployeeDTO> employees = new ArrayList<>();
         String employeeStr = (String) row[i++];
         if (employeeStr != null && !employeeStr.isBlank()) {
-            for (String empIdStr : employeeStr.split("-")) {
+            for (String empIdStr : employeeStr.split(",")) {
                 try {
                     Long empId = Long.parseLong(empIdStr.trim());
                     employeeRepository.findById(empId).ifPresent(emp -> {
@@ -140,7 +140,7 @@ public class OrderConverter {
             String employeeStr = (String) row[i++];
             List<OrderTableDto.EmployeeDTO> employees = new ArrayList<>();
             if (employeeStr != null && !employeeStr.isBlank()) {
-                for (String empIdStr : employeeStr.split("-")) {
+                for (String empIdStr : employeeStr.split(",")) {
                     try {
                         Long empId = Long.parseLong(empIdStr.trim());
                         employeeRepository.findById(empId).ifPresent(emp -> {
