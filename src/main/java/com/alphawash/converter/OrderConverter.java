@@ -48,7 +48,7 @@ public class OrderConverter {
                     employeeRepository.findById(empId).ifPresent(emp -> {
                         OrderTableDto.EmployeeDTO dto = new OrderTableDto.EmployeeDTO();
                         dto.setId(emp.getId());
-                        dto.setEmployeeName(emp.getName());
+                        dto.setName(emp.getName());
                         employees.add(dto);
                     });
                 } catch (NumberFormatException ignored) {
@@ -147,7 +147,7 @@ public class OrderConverter {
                         employeeRepository.findById(empId).ifPresent(emp -> {
                             OrderTableDto.EmployeeDTO dto = new OrderTableDto.EmployeeDTO();
                             dto.setId(emp.getId());
-                            dto.setEmployeeName(emp.getName());
+                            dto.setName(emp.getName());
                             employees.add(dto);
                         });
                     } catch (NumberFormatException ignored) {
