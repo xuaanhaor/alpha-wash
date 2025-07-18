@@ -112,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new BusinessException(
                             HttpStatus.NOT_FOUND,
                             "Model not found with code: " + request.vehicle().modelCode()));
-            Order order = insertOrder(request);
+            Order order = insertOrder(request, customer);
 
             Vehicle vehicle = null;
             if (ObjectUtils.isNotNull(request.vehicle().licensePlate())) {
@@ -203,9 +203,10 @@ public class OrderServiceImpl implements OrderService {
         return 0;
     }
 
-    private Order insertOrder(BasicOrderRequest request) {
+    private Order insertOrder(BasicOrderRequest request, Customer customer) {
         Order order = Order.builder()
                 .date(request.information().date())
+                .customer(customer)
                 .checkinTime(request.information().checkInTime())
                 .paymentType(request.information().paymentType())
                 .paymentStatus(request.information().paymentStatus())
