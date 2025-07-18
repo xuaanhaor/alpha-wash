@@ -49,8 +49,10 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(existing -> {
                     CustomerDto currentDto = CustomerConverter.INSTANCE.toDto(existing);
                     PatchHelper.applyPatch(patchData, currentDto);
-                    Customer updated = CustomerConverter.INSTANCE.toEntity(currentDto);
-                    return CustomerConverter.INSTANCE.toDto(customerRepository.save(updated));
+                    existing.setCustomerName(currentDto.getCustomerName());
+                    existing.setPhone(currentDto.getPhone());
+                    existing.setNote(currentDto.getNote());
+                    return CustomerConverter.INSTANCE.toDto(customerRepository.save(existing));
                 })
                 .orElse(null);
     }

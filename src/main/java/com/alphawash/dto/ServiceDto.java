@@ -12,5 +12,5 @@ public class ServiceDto {
     private String serviceName;
     private String duration;
     private String note;
-    private Long serviceTypeId;
+    private String serviceTypeCode;
 }

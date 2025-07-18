@@ -8,8 +8,9 @@ import lombok.*;
 @Builder
 public class ServiceResponse {
     private Long id;
+    private String code;
     private String serviceName;
     private String duration;
     private String note;
-    private Long serviceTypeId;
+    private String serviceTypeCode;
 }

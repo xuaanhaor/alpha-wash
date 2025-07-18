@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ModelWithoutBrandDto {
     private Long id;
+    private String code;
     private String modelName;
     private String size;
 }

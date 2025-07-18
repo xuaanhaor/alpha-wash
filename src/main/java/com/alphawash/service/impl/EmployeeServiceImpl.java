@@ -41,8 +41,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .map(existing -> {
                     EmployeeDto currentDto = employeeConverter.toDto(existing);
                     PatchHelper.applyPatch(patchData, currentDto);
-                    Employee updated = employeeConverter.toEntity(currentDto);
-                    return employeeConverter.toDto(employeeRepository.save(updated));
+                    existing.setName(currentDto.getName());
+                    existing.setPhone(currentDto.getPhone());
+                    existing.setNote(currentDto.getNote());
+                    return employeeConverter.toDto(employeeRepository.save(existing));
                 })
                 .orElse(null);
     }

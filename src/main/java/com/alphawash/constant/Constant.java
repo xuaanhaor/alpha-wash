@@ -19,6 +19,7 @@ public class Constant {
     public static final String API_SERVICE = API + "/service";
     public static final String API_SERVICE_CATALOG = API + "/service-catalog";
     public static final String API_SERVICE_TYPE = API + "/service-type";
+    public static final String API_SERVICE_CATEGORY = "/by-service-id";
     public static final String API_VEHICLE = API + "/vehicle";
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
     public static final String API_BRAND_WITH_MODELS = "/brands/with-models";

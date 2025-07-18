@@ -67,7 +67,8 @@ public class ModelServiceImpl implements ModelService {
     public List<ModelWithoutBrandDto> findByBrandCode(String brandCode) {
         var list = modelRepository.findByBrandCode(brandCode);
         return list.stream()
-                .map(model -> new ModelWithoutBrandDto(model.getId(), model.getModelName(), model.getSize()))
+                .map(model ->
+                        new ModelWithoutBrandDto(model.getId(), model.getCode(), model.getModelName(), model.getSize()))
                 .toList();
     }
 }
