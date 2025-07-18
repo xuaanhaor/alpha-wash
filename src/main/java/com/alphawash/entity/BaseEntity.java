@@ -37,10 +37,12 @@ public class BaseEntity {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.deleteFlag = false;
+        this.exclusiveKey = 0;
     }
 
     @PreUpdate
     protected void onUpdate() {
+        this.exclusiveKey++;
         this.updatedAt = LocalDateTime.now();
     }
 }

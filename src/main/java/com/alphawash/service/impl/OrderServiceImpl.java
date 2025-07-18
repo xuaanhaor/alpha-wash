@@ -70,13 +70,21 @@ public class OrderServiceImpl implements OrderService {
     public void createOrder(BasicOrderRequest request) {
         Customer customer = null;
         if (ObjectUtils.isNotNull(request.customer())) {
-            if (StringUtils.isNotNullOrEmpty(request.customer().phone())) {
-                var customerResult =
-                        customerRepository.findByPhone(request.customer().phone());
-                customer = customerResult.orElseGet(() -> customerRepository.save(Customer.builder()
-                        .customerName(request.customer().name())
-                        .phone(request.customer().phone())
-                        .build()));
+            if (!isBlankUUID(request.customer().id())) {
+                var customerOptional =
+                        customerRepository.findById(request.customer().id());
+                if (customerOptional.isPresent()) {
+                    customer = customerOptional.get();
+                } else {
+                    var customerPhoneOptional =
+                            customerRepository.findByPhone(request.customer().phone());
+                    // if found by phone, use the existing customer
+                    // if not found by ID or phone, create a new customer
+                    customer = customerPhoneOptional.orElseGet(() -> customerRepository.save(Customer.builder()
+                            .customerName(request.customer().name())
+                            .phone(request.customer().phone())
+                            .build()));
+                }
             } else {
                 // if found by ID, retrieve the customer
                 customer = customerRepository
@@ -106,24 +114,22 @@ public class OrderServiceImpl implements OrderService {
                             "Model not found with code: " + request.vehicle().modelCode()));
             Order order = insertOrder(request);
 
+            Vehicle vehicle = null;
             if (ObjectUtils.isNotNull(request.vehicle().licensePlate())) {
-                vehicleRepository
-                        .findByLicensePlate(request.vehicle().licensePlate())
-                        .ifPresent(existingVehicle -> {
-                            throw new BusinessException(
-                                    HttpStatus.BAD_REQUEST,
-                                    "Vehicle with license plate "
-                                            + request.vehicle().licensePlate()
-                                            + " already exists.");
-                        });
+                var vehicleOptional =
+                        vehicleRepository.findByLicensePlate(request.vehicle().licensePlate());
+                if (vehicleOptional.isPresent()) {
+                    vehicle = vehicleOptional.get();
+                } else {
+                    vehicle = Vehicle.builder()
+                            .licensePlate(request.vehicle().licensePlate())
+                            .brand(brand)
+                            .model(model)
+                            .customer(customer)
+                            .build();
+                    vehicleRepository.save(vehicle);
+                }
             }
-            Vehicle vehicle = Vehicle.builder()
-                    .licensePlate(request.vehicle().licensePlate())
-                    .brand(brand)
-                    .model(model)
-                    .customer(customer)
-                    .build();
-            vehicleRepository.save(vehicle);
 
             OrderDetail orderDetail = OrderDetail.builder()
                     .order(order)
