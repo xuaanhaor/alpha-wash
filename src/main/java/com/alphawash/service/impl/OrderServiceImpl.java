@@ -70,17 +70,13 @@ public class OrderServiceImpl implements OrderService {
     public void createOrder(BasicOrderRequest request) {
         Customer customer = null;
         if (ObjectUtils.isNotNull(request.customer())) {
-            if (isBlankUUID(request.customer().id())) {
-                customerRepository.findByPhone(request.customer().phone()).ifPresent(existingCustomer -> {
-                    throw new BusinessException(
-                            HttpStatus.BAD_REQUEST,
-                            "Customer with phone " + request.customer().phone() + " already exists.");
-                });
-                // if not found by ID, create a new customer
-                customer = customerRepository.save(Customer.builder()
+            if (StringUtils.isNotNullOrEmpty(request.customer().phone())) {
+                var customerResult =
+                        customerRepository.findByPhone(request.customer().phone());
+                customer = customerResult.orElseGet(() -> customerRepository.save(Customer.builder()
                         .customerName(request.customer().name())
                         .phone(request.customer().phone())
-                        .build());
+                        .build()));
             } else {
                 // if found by ID, retrieve the customer
                 customer = customerRepository

@@ -1,5 +1,6 @@
 package com.alphawash.configuration;
 
+import com.alphawash.exception.BusinessException;
 import com.alphawash.response.ApiResponse;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -34,5 +35,17 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(ApiResponse.error("Validation failed: " + errorMsg));
+    }
+
+    /**
+     * Xử lý ngoại lệ nghiệp vụ.
+     * @param ex Ngoại lệ xảy ra
+     * @return ResponseEntity chứa ApiResponse với thông tin lỗi
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleException(BusinessException ex) {
+        ex.printStackTrace(); // debug, sau này log bằng logger
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("Business Exception: " + ex.getMessage()));
     }
 }
