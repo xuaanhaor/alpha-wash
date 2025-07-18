@@ -18,4 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     Optional<Vehicle> findVehicleByOrderId(@Param("p_order_id") UUID orderId);
 
     Optional<Order> findById(UUID id);
+
+    @Query(value = "SELECT * FROM get_full_order_by_id(?1)", nativeQuery = true)
+    List<Object[]> getFullOrderById(UUID orderId);
 }

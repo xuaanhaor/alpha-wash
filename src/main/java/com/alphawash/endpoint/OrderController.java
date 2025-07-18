@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,12 @@ public class OrderController {
     public ResponseEntity<List<OrderTableDto>> getOrders() {
         List<OrderTableDto> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping(Constant.ID_PATH_PARAMETER)
+    public ResponseEntity<OrderTableDto> getFullOrderById(@PathVariable("id") UUID id) {
+        OrderTableDto dto = orderService.getFullOrderById(id);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping(Constant.API_CREATE_ORDER)

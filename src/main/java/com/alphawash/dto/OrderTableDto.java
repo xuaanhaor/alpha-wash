@@ -17,6 +17,8 @@ public class OrderTableDto {
     private Time checkOut;
 
     private String paymentStatus;
+    private String paymentType;
+    private BigDecimal tip;
     private BigDecimal vat;
     private BigDecimal discount;
     private BigDecimal totalPrice;
@@ -56,8 +58,10 @@ public class OrderTableDto {
         private String licensePlate;
         private Long brandId;
         private String brandName;
+        private String brandCode;
         private Long modelId;
         private String modelName;
+        private String modelCode;
         private String size;
         private String imageUrl;
     }
@@ -65,13 +69,16 @@ public class OrderTableDto {
     @Data
     public static class ServiceDTO {
         private Long id;
+        private String serviceCode;
         private String serviceName;
+        private String serviceTypeCode;
         private ServiceCatalogDTO serviceCatalog;
     }
 
     @Data
     public static class ServiceCatalogDTO {
         private Long id;
+        private String serviceCatalogCode;
         private BigDecimal price;
         private String size;
     }

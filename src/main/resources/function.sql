@@ -71,34 +71,6 @@ END;
 $$;
 
 --
-
-DROP FUNCTION IF EXISTS get_models_by_brand_code(VARCHAR(20));
-
-CREATE OR REPLACE FUNCTION get_models_by_brand_code(branchCode VARCHAR(20))
-    RETURNS TABLE
-            (
-                model_code VARCHAR,
-                model_name VARCHAR,
-                size       VARCHAR,
-                brand_code VARCHAR,
-                brand_name VARCHAR
-            )
-AS
-$$
-BEGIN
-    RETURN QUERY
-        SELECT m.code as model_code,
-               m.model_name,
-               m.size,
-               b.code as brand_code,
-               b.brand_name
-        FROM model m
-                 JOIN brands b ON m.code = b.code
-        WHERE b.code = branchCode;
-END;
-$$ LANGUAGE plpgsql;
-
---
 DROP FUNCTION IF EXISTS get_full_orders();
 
 CREATE OR REPLACE FUNCTION get_full_orders()
@@ -110,6 +82,8 @@ CREATE OR REPLACE FUNCTION get_full_orders()
                 check_out           TIME,
                 note                TEXT,
                 payment_status      VARCHAR,
+                payment_type		VARCHAR,
+                tip					numeric,
                 vat                 NUMERIC,
                 discount            NUMERIC,
                 total_price         NUMERIC,
@@ -123,13 +97,18 @@ CREATE OR REPLACE FUNCTION get_full_orders()
                 license_plate       VARCHAR,
                 image_url           TEXT,
                 brand_id            INT,
+                brand_code			VARCHAR,
                 brand_name          VARCHAR,
                 model_id            INT,
+                model_code			VARCHAR,
                 model_name          VARCHAR,
                 model_size          VARCHAR,
                 service_id          INT,
+                service_code		VARCHAR,
                 service_name        VARCHAR,
+                service_type_code	VARCHAR,
                 service_catalog_id  INT,
+                service_catalog_code VARCHAR,
                 service_price       NUMERIC,
                 service_size        size
             )
@@ -143,6 +122,8 @@ BEGIN
                o.checkout_time  AS check_out,
                o.note           AS note,
                o.payment_status AS payment_status,
+			   o.payment_type   AS payment_type,
+			   o.tip			AS tip,
                o.vat,
                o.discount,
                o.total_price,
@@ -156,23 +137,29 @@ BEGIN
                v.license_plate,
                v.image_url,
                b.id             AS brand_id,
+			   b.code			AS brand_code,
                b.brand_name,
                m.id             AS model_id,
+			   m.code			AS model_code,
                m.model_name,
                m.size           AS model_size,
                s.id             AS service_id,
+               s.code           AS service_code,
                s.service_name,
+
+			   s.service_type_code AS service_type_code,
                sc.id            AS service_catalog_id,
+			   sc.code          AS service_catalog_code,
                sc.price         AS service_price,
                sc.size          AS service_size
         FROM orders o
-                 JOIN customer c ON o.customer_id = c.id
-                 JOIN order_detail od ON od.order_id = o.id
-                 JOIN vehicle v ON v.id = od.vehicle_id
-                 LEFT JOIN brands b ON b.code = v.brand_code
-                 LEFT JOIN model m ON m.code = v.model_code
-                 LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-                 LEFT JOIN service s ON s.code = sc.service_code
+             LEFT JOIN customer c ON o.customer_id = c.id
+LEFT JOIN order_detail od ON od.order_id = o.id
+LEFT JOIN vehicle v ON v.id = od.vehicle_id
+LEFT JOIN brands b ON b.code = v.brand_code
+LEFT JOIN model m ON m.code = v.model_code
+LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
+LEFT JOIN service s ON s.code = sc.service_code
         WHERE o.delete_flag = FALSE;
 END;
 $$ LANGUAGE plpgsql;
@@ -180,6 +167,8 @@ $$ LANGUAGE plpgsql;
 
 SELECT *
 FROM get_full_orders();
+
+------
 
 CREATE OR REPLACE FUNCTION get_orders()
     RETURNS TABLE
@@ -234,36 +223,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_vehicle_by_order_id(p_order_id UUID)
-    RETURNS TABLE
-            (
-                id            UUID,
-                license_plate VARCHAR,
-                customer_id   UUID,
-                brand_code    VARCHAR,
-                model_code    VARCHAR,
-                image_url     TEXT,
-                note          TEXT,
-                delete_flag   BOOLEAN,
-                created_by    VARCHAR,
-                updated_by    VARCHAR,
-                created_at    TIMESTAMP,
-                updated_at    TIMESTAMP,
-                exclusive_key INT
-            )
-AS
-$$
-BEGIN
-    RETURN QUERY
-        select v.*
-        from orders o
-                 join order_detail od on o.id = od.order_id
-                 join vehicle v on od.vehicle_id = v.id
-        where o.id = p_order_id
-          and o.delete_flag = false;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION get_customer_vehicle_by_phone(p_customer_phone VARCHAR)
     RETURNS TABLE
             (
@@ -289,11 +248,10 @@ BEGIN
                m.model_name,
                v.license_plate
         FROM customer c
-                 left join vehicle v on c.id = v.customer_id
-                 join brands b on v.brand_code = b.code
-                 join model m on v.model_code = m.code
-        where c.phone = p_customer_phone
-          and c.delete_flag = false
-          and v.delete_flag = false;
+                 LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
+                 LEFT JOIN brands b ON v.brand_code = b.code
+                 LEFT JOIN model m ON v.model_code = m.code
+        WHERE c.phone = p_customer_phone
+          AND c.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;

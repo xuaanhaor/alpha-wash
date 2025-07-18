@@ -2,4 +2,10 @@ package com.alphawash.request;
 
 import java.util.UUID;
 
-public record BasicCustomerRequest(UUID id, String name, String phone) {}
+import org.springframework.lang.Nullable;
+
+public record BasicCustomerRequest(
+        @Nullable UUID id,
+        @Nullable String name,
+        @Nullable String phone
+) {}

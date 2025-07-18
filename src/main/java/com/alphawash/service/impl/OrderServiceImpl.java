@@ -55,6 +55,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderTableDto getFullOrderById(UUID orderId) {
+        List<Object[]> result = orderRepository.getFullOrderById(orderId);
+
+        if (result == null || result.isEmpty()) {
+            return null; // hoặc throw NotFoundException
+        }
+        OrderConverter converter = new OrderConverter(employeeRepository);
+        return converter.mapFromSingleRow(result.get(0));
+    }
+
+    @Override
     @Transactional
     public void createOrder(BasicOrderRequest request) {
         Customer customer;
