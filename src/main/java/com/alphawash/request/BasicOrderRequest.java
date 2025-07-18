@@ -6,5 +6,4 @@ public record BasicOrderRequest(
         BasicInformationRequest information,
         BasicVehicleRequest vehicle,
         BasicServiceRequest service,
-        @Nullable
-        BasicCustomerRequest customer) {}
+        @Nullable BasicCustomerRequest customer) {}

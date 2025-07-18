@@ -51,7 +51,8 @@ public class OrderConverter {
                         dto.setEmployeeName(emp.getName());
                         employees.add(dto);
                     });
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
 
