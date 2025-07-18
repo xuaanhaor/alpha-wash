@@ -68,20 +68,28 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void createOrder(BasicOrderRequest request) {
-        Customer customer;
-        if (isBlankUUID(request.customer().id())) {
-            // if not found by ID, create a new customer
-            customer = customerRepository.save(Customer.builder()
-                    .customerName(request.customer().name())
-                    .phone(request.customer().phone())
-                    .build());
-        } else {
-            // if found by ID, retrieve the customer
-            customer = customerRepository
-                    .findById(request.customer().id())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND,
-                            "Customer not found with ID: " + request.customer().id()));
+        Customer customer = null;
+        if (ObjectUtils.isNotNull(request.customer())) {
+            if (isBlankUUID(request.customer().id())) {
+                customerRepository.findByPhone(request.customer().phone()).ifPresent(existingCustomer -> {
+                    throw new BusinessException(
+                            HttpStatus.BAD_REQUEST,
+                            "Customer with phone " + request.customer().phone() + " already exists.");
+                });
+                // if not found by ID, create a new customer
+                customer = customerRepository.save(Customer.builder()
+                        .customerName(request.customer().name())
+                        .phone(request.customer().phone())
+                        .build());
+            } else {
+                // if found by ID, retrieve the customer
+                customer = customerRepository
+                        .findById(request.customer().id())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.NOT_FOUND,
+                                "Customer not found with ID: "
+                                        + request.customer().id()));
+            }
         }
         try {
             ServiceCatalog serviceCatalog = serviceCatalogRepository
@@ -102,6 +110,17 @@ public class OrderServiceImpl implements OrderService {
                             "Model not found with code: " + request.vehicle().modelCode()));
             Order order = insertOrder(request);
 
+            if (ObjectUtils.isNotNull(request.vehicle().licensePlate())) {
+                vehicleRepository
+                        .findByLicensePlate(request.vehicle().licensePlate())
+                        .ifPresent(existingVehicle -> {
+                            throw new BusinessException(
+                                    HttpStatus.BAD_REQUEST,
+                                    "Vehicle with license plate "
+                                            + request.vehicle().licensePlate()
+                                            + " already exists.");
+                        });
+            }
             Vehicle vehicle = Vehicle.builder()
                     .licensePlate(request.vehicle().licensePlate())
                     .brand(brand)
@@ -139,10 +158,14 @@ public class OrderServiceImpl implements OrderService {
                             && StringUtils.isNotNullOrEmpty(
                                     basicOrderRequest.customer().phone()))) {
                 // if not found by ID, create a new customer
-                customer = customerRepository.save(Customer.builder()
+                var isExistPhoneNumber = customerRepository.findByPhone(
+                        basicOrderRequest.customer().phone());
+
+                customer = isExistPhoneNumber.orElseGet(() -> customerRepository.save(Customer.builder()
                         .customerName(basicOrderRequest.customer().name())
                         .phone(basicOrderRequest.customer().phone())
-                        .build());
+                        .build()));
+
             } else {
                 // if found by ID, retrieve the customer
                 if (!isBlankUUID(basicOrderRequest.customer().id())) {
@@ -241,6 +264,13 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(
                         HttpStatus.NOT_FOUND,
                         "Model not found with code: " + request.vehicle().modelCode()));
+        var vehicleResult =
+                vehicleRepository.findByLicensePlate(request.vehicle().licensePlate());
+
+        if (vehicleResult.isPresent()) {
+            vehicle = vehicleResult.get();
+        }
+
         vehicle.setBrand(brand);
         vehicle.setModel(model);
         ObjectUtils.setIfNotNull(request.vehicle().licensePlate(), vehicle::setLicensePlate);
