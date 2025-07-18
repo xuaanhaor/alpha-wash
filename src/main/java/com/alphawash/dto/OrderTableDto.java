@@ -49,7 +49,7 @@ public class OrderTableDto {
     @Data
     public static class EmployeeDTO {
         private Long id;
-        private String employeeName;
+        private String name;
     }
 
     @Data
