@@ -21,7 +21,13 @@ public class ObjectUtils<T> {
     }
 
     public static <T> void setIfNotNull(T value, Consumer<T> setter) {
-        if (value != null) {
+        if (value == null) return;
+
+        if (value instanceof String str) {
+            if (!str.isBlank()) {
+                setter.accept(value);
+            }
+        } else {
             setter.accept(value);
         }
     }

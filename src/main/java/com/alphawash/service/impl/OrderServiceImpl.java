@@ -71,28 +71,11 @@ public class OrderServiceImpl implements OrderService {
         Customer customer = null;
         if (ObjectUtils.isNotNull(request.customer())) {
             if (!isBlankUUID(request.customer().id())) {
-                var customerOptional =
-                        customerRepository.findById(request.customer().id());
-                if (customerOptional.isPresent()) {
-                    customer = customerOptional.get();
-                } else {
-                    var customerPhoneOptional =
-                            customerRepository.findByPhone(request.customer().phone());
-                    // if found by phone, use the existing customer
-                    // if not found by ID or phone, create a new customer
-                    customer = customerPhoneOptional.orElseGet(() -> customerRepository.save(Customer.builder()
-                            .customerName(request.customer().name())
-                            .phone(request.customer().phone())
-                            .build()));
-                }
-            } else {
-                // if found by ID, retrieve the customer
                 customer = customerRepository
                         .findById(request.customer().id())
-                        .orElseThrow(() -> new BusinessException(
-                                HttpStatus.NOT_FOUND,
-                                "Customer not found with ID: "
-                                        + request.customer().id()));
+                        .orElseGet(() -> findAndCreateCustomerByPhone(request));
+            } else {
+                findAndCreateCustomerByPhone(request);
             }
         }
         try {
@@ -116,32 +99,45 @@ public class OrderServiceImpl implements OrderService {
 
             Vehicle vehicle = null;
             if (ObjectUtils.isNotNull(request.vehicle().licensePlate())) {
-                var vehicleOptional =
-                        vehicleRepository.findByLicensePlate(request.vehicle().licensePlate());
-                if (vehicleOptional.isPresent()) {
-                    vehicle = vehicleOptional.get();
-                } else {
-                    vehicle = Vehicle.builder()
-                            .licensePlate(request.vehicle().licensePlate())
-                            .brand(brand)
-                            .model(model)
-                            .customer(customer)
-                            .build();
-                    vehicleRepository.save(vehicle);
-                }
+                vehicle = saveVehicle(request, brand, model, customer);
             }
 
-            OrderDetail orderDetail = OrderDetail.builder()
+            orderDetailRepository.save(OrderDetail.builder()
                     .order(order)
                     .employeeId(request.information().employeeId())
                     .vehicle(vehicle)
                     .serviceCatalog(serviceCatalog)
                     .note(order.getNote())
-                    .build();
-            orderDetailRepository.save(orderDetail);
+                    .build());
         } catch (Exception e) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to create order: " + e.getMessage());
         }
+    }
+
+    private Customer findAndCreateCustomerByPhone(BasicOrderRequest request) {
+        if (StringUtils.isNotNullOrEmpty(request.customer().phone())) {
+            return customerRepository.findByPhone(request.customer().phone()).orElseGet(() -> createCustomer(request));
+        }
+        return createCustomer(request);
+    }
+
+    private Vehicle saveVehicle(BasicOrderRequest request, Brand brand, Model model, Customer customer) {
+        return vehicleRepository
+                .findByLicensePlate(request.vehicle().licensePlate())
+                .orElseGet(() -> vehicleRepository.save(Vehicle.builder()
+                        .licensePlate(request.vehicle().licensePlate())
+                        .brand(brand)
+                        .model(model)
+                        .customer(customer)
+                        .build()));
+    }
+
+    private Customer createCustomer(BasicOrderRequest request) {
+        var newCustomer = Customer.builder()
+                .customerName(request.customer().name())
+                .phone(request.customer().phone())
+                .build();
+        return customerRepository.save(newCustomer);
     }
 
     @Override
