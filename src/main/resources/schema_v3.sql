@@ -174,6 +174,7 @@ CREATE TABLE order_detail
     order_id             UUID REFERENCES orders (id)                   NOT NULL,
     employee_id          TEXT,
     service_catalog_code VARCHAR(20) REFERENCES service_catalog (code) NOT NULL,
+    status               VARCHAR(20) DEFAULT 'PENDING',
     vehicle_id           UUID REFERENCES vehicle (id)                  NOT NULL,
     note                 TEXT,
     delete_flag          BOOLEAN     DEFAULT FALSE,

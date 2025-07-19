@@ -23,6 +23,9 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "employee_id")
     private String employeeId;
 
+    @Column(name = "status")
+    private String status;
+
     @ManyToOne
     @JoinColumn(name = "service_catalog_code", referencedColumnName = "code")
     private ServiceCatalog serviceCatalog;
