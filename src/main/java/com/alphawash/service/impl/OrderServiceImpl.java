@@ -1,5 +1,6 @@
 package com.alphawash.service.impl;
 
+import com.alphawash.constant.OrderStatus;
 import com.alphawash.converter.OrderConverter;
 import com.alphawash.dto.OrderTableDto;
 import com.alphawash.entity.Brand;
@@ -27,7 +28,6 @@ import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -107,6 +107,10 @@ public class OrderServiceImpl implements OrderService {
                     .employeeId(request.information().employeeId())
                     .vehicle(vehicle)
                     .serviceCatalog(serviceCatalog)
+                    .status(
+                            StringUtils.isNotNullOrEmpty(request.information().status())
+                                    ? request.information().status()
+                                    : OrderStatus.PENDING.getValue())
                     .note(order.getNote())
                     .build());
         } catch (Exception e) {
@@ -149,31 +153,13 @@ public class OrderServiceImpl implements OrderService {
                 .findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Order not found with ID: " + id));
         Customer customer = null;
-        if (!Objects.isNull(basicOrderRequest.customer())) {
-            if (isBlankUUID(basicOrderRequest.customer().id())
-                    && (StringUtils.isNotNullOrEmpty(
-                                    basicOrderRequest.customer().name())
-                            && StringUtils.isNotNullOrEmpty(
-                                    basicOrderRequest.customer().phone()))) {
-                // if not found by ID, create a new customer
-                var isExistPhoneNumber = customerRepository.findByPhone(
-                        basicOrderRequest.customer().phone());
-
-                customer = isExistPhoneNumber.orElseGet(() -> customerRepository.save(Customer.builder()
-                        .customerName(basicOrderRequest.customer().name())
-                        .phone(basicOrderRequest.customer().phone())
-                        .build()));
-
+        if (ObjectUtils.isNotNull(basicOrderRequest.customer())) {
+            if (!isBlankUUID(basicOrderRequest.customer().id())) {
+                customer = customerRepository
+                        .findById(basicOrderRequest.customer().id())
+                        .orElseGet(() -> findAndCreateCustomerByPhone(basicOrderRequest));
             } else {
-                // if found by ID, retrieve the customer
-                if (!isBlankUUID(basicOrderRequest.customer().id())) {
-                    customer = customerRepository
-                            .findById(basicOrderRequest.customer().id())
-                            .orElseThrow(() -> new BusinessException(
-                                    HttpStatus.NOT_FOUND,
-                                    "Customer not found with ID: "
-                                            + basicOrderRequest.customer().id()));
-                }
+                findAndCreateCustomerByPhone(basicOrderRequest);
             }
         }
 
@@ -196,14 +182,14 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to update order: " + e.getMessage());
         }
-        return 0;
+        return 1;
     }
 
     private Order insertOrder(BasicOrderRequest request, Customer customer) {
         Order order = Order.builder()
                 .date(request.information().date())
                 .customer(customer)
-                .checkinTime(request.information().checkInTime())
+                .checkinTime(request.information().checkinTime())
                 .paymentType(request.information().paymentType())
                 .paymentStatus(request.information().paymentStatus())
                 .tip(request.information().tip() != null ? request.information().tip() : BigDecimal.ZERO)
@@ -220,7 +206,8 @@ public class OrderServiceImpl implements OrderService {
 
     private void updateOrderRequest(BasicOrderRequest request, Order order) {
         ObjectUtils.setIfNotNull(request.information().date(), order::setDate);
-        ObjectUtils.setIfNotNull(request.information().checkInTime(), order::setCheckinTime);
+        ObjectUtils.setIfNotNull(request.information().checkinTime(), order::setCheckinTime);
+        ObjectUtils.setIfNotNull(request.information().checkoutTime(), order::setCheckoutTime);
         ObjectUtils.setIfNotNull(request.information().paymentStatus(), order::setPaymentStatus);
         ObjectUtils.setIfNotNull(request.information().paymentType(), order::setPaymentType);
         ObjectUtils.setIfNotNull(request.information().tip(), order::setTip);
@@ -228,8 +215,6 @@ public class OrderServiceImpl implements OrderService {
         ObjectUtils.setIfNotNull(request.information().vat(), order::setVat);
         ObjectUtils.setIfNotNull(request.information().totalPrice(), order::setTotalPrice);
         ObjectUtils.setIfNotNull(request.information().note(), order::setNote);
-        order.setUpdatedAt(DateTimeUtils.getCurrentDate());
-        order.setExclusiveKey(order.getExclusiveKey() + 1);
         orderRepository.save(order);
     }
 
@@ -246,9 +231,10 @@ public class OrderServiceImpl implements OrderService {
 
         ObjectUtils.setIfNotNull(request.information().employeeId(), orderDetail::setEmployeeId);
         ObjectUtils.setIfNotNull(request.information().note(), orderDetail::setNote);
+        ObjectUtils.setIfNotNull(request.information().status(), orderDetail::setStatus);
+
         orderDetail.setOrder(order);
         orderDetail.setVehicle(vehicle);
-        orderDetail.setUpdatedAt(DateTimeUtils.getCurrentDate());
         orderDetailRepository.save(orderDetail);
     }
 

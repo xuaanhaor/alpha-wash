@@ -6,8 +6,8 @@ import java.time.LocalTime;
 
 public record BasicInformationRequest(
         LocalDateTime date,
-        LocalTime checkInTime,
-        LocalTime checkOutTime,
+        LocalTime checkinTime,
+        LocalTime checkoutTime,
         String paymentType,
         String paymentStatus,
         BigDecimal tip,
@@ -15,4 +15,5 @@ public record BasicInformationRequest(
         BigDecimal vat,
         BigDecimal totalPrice,
         String employeeId,
+        String status,
         String note) {}
