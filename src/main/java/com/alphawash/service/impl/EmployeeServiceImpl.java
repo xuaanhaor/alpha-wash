@@ -1,13 +1,18 @@
 package com.alphawash.service.impl;
 
+import com.alphawash.constant.ErrorConst;
 import com.alphawash.converter.EmployeeConverter;
 import com.alphawash.dto.EmployeeDto;
 import com.alphawash.entity.Employee;
+import com.alphawash.exception.BusinessException;
 import com.alphawash.repository.EmployeeRepository;
+import com.alphawash.request.EmployeeRequest;
 import com.alphawash.service.EmployeeService;
-import com.alphawash.util.PatchHelper;
+import com.alphawash.util.ObjectUtils;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,28 +34,50 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto create(EmployeeDto dto) {
-        Employee saved = employeeRepository.save(employeeConverter.toEntity(dto));
-        return employeeConverter.toDto(saved);
+    @Transactional
+    public EmployeeDto create(EmployeeRequest request) {
+        try {
+            Employee saved = employeeRepository.save(Employee.builder()
+                    .name(request.name())
+                    .phone(request.phone())
+                    .note(request.note())
+                    .build());
+            return employeeConverter.toDto(saved);
+        } catch (Exception e) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to create new employee: " + e.getMessage());
+        }
     }
 
     @Override
-    public EmployeeDto update(Long id, EmployeeDto patchData) {
-        return employeeRepository
+    @Transactional
+    public EmployeeDto update(Long id, EmployeeRequest request) {
+        var employeeOptional = employeeRepository
                 .findById(id)
-                .map(existing -> {
-                    EmployeeDto currentDto = employeeConverter.toDto(existing);
-                    PatchHelper.applyPatch(patchData, currentDto);
-                    existing.setName(currentDto.getName());
-                    existing.setPhone(currentDto.getPhone());
-                    existing.setNote(currentDto.getNote());
-                    return employeeConverter.toDto(employeeRepository.save(existing));
-                })
-                .orElse(null);
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, ErrorConst.E004.formatted(id)));
+        var result = updateEmployee(request, employeeOptional);
+        return employeeConverter.toDto(result);
+    }
+
+    private Employee updateEmployee(EmployeeRequest request, Employee employee) {
+        try {
+            ObjectUtils.setIfNotNull(request.phone(), employee::setPhone);
+            ObjectUtils.setIfNotNull(request.name(), employee::setName);
+            ObjectUtils.setIfNotNull(request.note(), employee::setNote);
+            return employeeRepository.save(employee);
+        } catch (Exception e) {
+            throw new BusinessException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update employee: " + e.getMessage());
+        }
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        employeeRepository.deleteById(id);
+        try {
+            employeeRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new BusinessException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete employee: " + e.getMessage());
+        }
     }
 }

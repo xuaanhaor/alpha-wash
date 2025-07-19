@@ -50,8 +50,7 @@ public class EmployeeController {
     @ApiResponse(responseCode = "200", description = "Employee created successfully")
     @PostMapping(INSERT_ENDPOINT)
     public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest request) {
-        EmployeeDto dto = EmployeeConverter.INSTANCE.fromRequest(request);
-        EmployeeDto saved = employeeService.create(dto);
+        EmployeeDto saved = employeeService.create(request);
         return ResponseEntity.ok(EmployeeConverter.INSTANCE.toResponse(saved));
     }
 
@@ -64,8 +63,7 @@ public class EmployeeController {
     @PatchMapping(UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<EmployeeResponse> updateEmployee(
             @PathVariable("id") Long id, @RequestBody EmployeeRequest request) {
-        EmployeeDto dto = EmployeeConverter.INSTANCE.fromRequest(request);
-        EmployeeDto updated = employeeService.update(id, dto);
+        EmployeeDto updated = employeeService.update(id, request);
         return updated != null
                 ? ResponseEntity.ok(EmployeeConverter.INSTANCE.toResponse(updated))
                 : ResponseEntity.notFound().build();
