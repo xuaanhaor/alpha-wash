@@ -1,5 +1,5 @@
 # Stage 1: Builder
-FROM gradle:8.4.1-jdk17-alpine AS builder
+FROM openjdk:17-alpine AS builder
 
 WORKDIR /app
 
@@ -13,8 +13,7 @@ RUN ./gradlew dependencies --no-daemon || true
 
 # Copy full source code
 COPY . .
-
-# build the JAR file
+# Build jar file
 RUN ./gradlew bootJar --no-daemon -x test
 
 # Stage 2: Runner
@@ -22,19 +21,14 @@ FROM eclipse-temurin:17-jre-alpine
 
 ENV TZ=Asia/Ho_Chi_Minh
 
-# Install Postgres client (for pg_isready)
-RUN apk add --no-cache postgresql-client bash
+RUN apk add --no-cache postgresql-client
 
+# Copy the built jar file and healthcheck script
 WORKDIR /app
-
-# Copy built jar from builder stage
 COPY --from=builder /app/build/libs/*.jar app.jar
-
-# Copy and setup the healthcheck script
 COPY script/data-healthcheck.sh /data-healthcheck.sh
 RUN chmod +x /data-healthcheck.sh
 
 EXPOSE 8080
 
-# Run healthcheck + app
-ENTRYPOINT ["/bin/bash", "-c", "/data-healthcheck.sh && exec java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["/bin/sh", "-c", "/data-healthcheck.sh && java $JAVA_OPTS -jar /app/app.jar"]
