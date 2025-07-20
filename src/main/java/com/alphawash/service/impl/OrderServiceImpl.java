@@ -190,6 +190,7 @@ public class OrderServiceImpl implements OrderService {
                 .date(request.information().date())
                 .customer(customer)
                 .checkinTime(request.information().checkinTime())
+                .checkoutTime(request.information().checkoutTime())
                 .paymentType(request.information().paymentType())
                 .paymentStatus(request.information().paymentStatus())
                 .tip(request.information().tip() != null ? request.information().tip() : BigDecimal.ZERO)
