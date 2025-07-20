@@ -11,5 +11,6 @@ public class ModelFromEntityDto {
     private Long id;
     private String code;
     private String modelName;
+    private BrandDto brand;
     private String size;
 }
