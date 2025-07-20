@@ -71,89 +71,89 @@ $$;
 CREATE OR REPLACE FUNCTION get_full_orders()
     RETURNS TABLE
             (
-                order_id            UUID,
-                order_date          TIMESTAMP,
-                check_in            TIME,
-                check_out           TIME,
-                note                TEXT,
-                payment_status      VARCHAR,
-                payment_type        VARCHAR,
-                tip                 NUMERIC,
-                vat                 NUMERIC,
-                discount            NUMERIC,
-                total_price         NUMERIC,
-                customer_id         UUID,
-                customer_name       VARCHAR,
-                customer_phone      VARCHAR,
-                employee_ids        TEXT,
-                status_order_detail VARCHAR,
-                note_order_detail   TEXT,
-                vehicle_id          UUID,
-                license_plate       VARCHAR,
-                image_url           TEXT,
-                brand_id            INT,
-                brand_code          VARCHAR,
-                brand_name          VARCHAR,
-                model_id            INT,
-                model_code          VARCHAR,
-                model_name          VARCHAR,
-                model_size          VARCHAR,
-                service_id          INT,
-                service_code        VARCHAR,
-                service_name        VARCHAR,
-                service_type_code   VARCHAR,
-                service_catalog_id  INT,
+                order_id             UUID,
+                order_date           TIMESTAMP,
+                check_in             TIME,
+                check_out            TIME,
+                note                 TEXT,
+                payment_status       VARCHAR,
+                payment_type         VARCHAR,
+                tip                  NUMERIC,
+                vat                  NUMERIC,
+                discount             NUMERIC,
+                total_price          NUMERIC,
+                customer_id          UUID,
+                customer_name        VARCHAR,
+                customer_phone       VARCHAR,
+                employee_ids         TEXT,
+                status_order_detail  VARCHAR,
+                note_order_detail    TEXT,
+                vehicle_id           UUID,
+                license_plate        VARCHAR,
+                image_url            TEXT,
+                brand_id             INT,
+                brand_code           VARCHAR,
+                brand_name           VARCHAR,
+                model_id             INT,
+                model_code           VARCHAR,
+                model_name           VARCHAR,
+                model_size           VARCHAR,
+                service_id           INT,
+                service_code         VARCHAR,
+                service_name         VARCHAR,
+                service_type_code    VARCHAR,
+                service_catalog_id   INT,
                 service_catalog_code VARCHAR,
-                service_price       NUMERIC,
-                service_size        VARCHAR
+                service_price        NUMERIC,
+                service_size         VARCHAR
             )
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT o.id             AS order_id,
-               o.date           AS order_date,
-               o.checkin_time   AS check_in,
-               o.checkout_time  AS check_out,
-               o.note::TEXT     AS note,
-               o.payment_status AS payment_status,
-               o.payment_type   AS payment_type,
-               o.tip            AS tip,
+        SELECT o.id                 AS order_id,
+               o.date               AS order_date,
+               o.checkin_time       AS check_in,
+               o.checkout_time      AS check_out,
+               o.note::TEXT         AS note,
+               o.payment_status     AS payment_status,
+               o.payment_type       AS payment_type,
+               o.tip                AS tip,
                o.vat,
                o.discount,
                o.total_price,
-               c.id             AS customer_id,
+               c.id                 AS customer_id,
                c.customer_name,
-               c.phone          AS customer_phone,
+               c.phone              AS customer_phone,
                od.employee_id::TEXT AS employee_ids,
-               od.status        AS status_order_detail,
-               od.note::TEXT    AS note_order_detail,
-               v.id             AS vehicle_id,
+               od.status            AS status_order_detail,
+               od.note::TEXT        AS note_order_detail,
+               v.id                 AS vehicle_id,
                v.license_plate,
                v.image_url::TEXT,
-               b.id::INT        AS brand_id,
-               b.code           AS brand_code,
+               b.id::INT            AS brand_id,
+               b.code               AS brand_code,
                b.brand_name,
-               m.id::INT        AS model_id,
-               m.code           AS model_code,
+               m.id::INT            AS model_id,
+               m.code               AS model_code,
                m.model_name,
-               m.size           AS model_size,
-               s.id::INT        AS service_id,
-               s.code           AS service_code,
+               m.size               AS model_size,
+               s.id::INT            AS service_id,
+               s.code               AS service_code,
                s.service_name,
-               s.service_type_code AS service_type_code,
-               sc.id::INT       AS service_catalog_id,
-               sc.code          AS service_catalog_code,
-               sc.price         AS service_price,
-               sc.size::VARCHAR AS service_size
+               s.service_type_code  AS service_type_code,
+               sc.id::INT           AS service_catalog_id,
+               sc.code              AS service_catalog_code,
+               sc.price             AS service_price,
+               sc.size::VARCHAR     AS service_size
         FROM orders o
-        LEFT JOIN customer c ON o.customer_id = c.id
-        LEFT JOIN order_detail od ON od.order_id = o.id
-        LEFT JOIN vehicle v ON v.id = od.vehicle_id
-        LEFT JOIN brands b ON b.code = v.brand_code
-        LEFT JOIN model m ON m.code = v.model_code
-        LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-        LEFT JOIN service s ON s.code = sc.service_code
+                 LEFT JOIN customer c ON o.customer_id = c.id
+                 LEFT JOIN order_detail od ON od.order_id = o.id
+                 LEFT JOIN vehicle v ON v.id = od.vehicle_id
+                 LEFT JOIN brands b ON b.code = v.brand_code
+                 LEFT JOIN model m ON m.code = v.model_code
+                 LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
+                 LEFT JOIN service s ON s.code = sc.service_code
         WHERE o.delete_flag = FALSE;
 END;
 $$ LANGUAGE plpgsql;
@@ -254,41 +254,41 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
     RETURNS TABLE
             (
-                order_id            UUID,
-                order_date          TIMESTAMP,
-                check_in            TIME,
-                check_out           TIME,
-                note                TEXT,
-                payment_status      VARCHAR,
-                payment_type        VARCHAR,
-                tip                 NUMERIC,
-                vat                 NUMERIC,
-                discount            NUMERIC,
-                total_price         NUMERIC,
-                customer_id         UUID,
-                customer_name       VARCHAR,
-                customer_phone      VARCHAR,
-                employee_ids        TEXT,
-                status_order_detail VARCHAR,
-                note_order_detail   TEXT,
-                vehicle_id          UUID,
-                license_plate       VARCHAR,
-                image_url           TEXT,
-                brand_id            INT,
-                brand_code          VARCHAR,
-                brand_name          VARCHAR,
-                model_id            INT,
-                model_code          VARCHAR,
-                model_name          VARCHAR,
-                model_size          VARCHAR,
-                service_id          INT,
-                service_code        VARCHAR,
-                service_name        VARCHAR,
-                service_type_code   VARCHAR,
-                service_catalog_id  INT,
+                order_id             UUID,
+                order_date           TIMESTAMP,
+                check_in             TIME,
+                check_out            TIME,
+                note                 TEXT,
+                payment_status       VARCHAR,
+                payment_type         VARCHAR,
+                tip                  NUMERIC,
+                vat                  NUMERIC,
+                discount             NUMERIC,
+                total_price          NUMERIC,
+                customer_id          UUID,
+                customer_name        VARCHAR,
+                customer_phone       VARCHAR,
+                employee_ids         TEXT,
+                status_order_detail  VARCHAR,
+                note_order_detail    TEXT,
+                vehicle_id           UUID,
+                license_plate        VARCHAR,
+                image_url            TEXT,
+                brand_id             INT,
+                brand_code           VARCHAR,
+                brand_name           VARCHAR,
+                model_id             INT,
+                model_code           VARCHAR,
+                model_name           VARCHAR,
+                model_size           VARCHAR,
+                service_id           INT,
+                service_code         VARCHAR,
+                service_name         VARCHAR,
+                service_type_code    VARCHAR,
+                service_catalog_id   INT,
                 service_catalog_code VARCHAR,
-                service_price       NUMERIC,
-                service_size        VARCHAR
+                service_price        NUMERIC,
+                service_size         VARCHAR
             )
 AS
 $$
@@ -330,13 +330,14 @@ BEGIN
                sc.price             AS service_price,
                sc.size::VARCHAR     AS service_size
         FROM orders o
-            LEFT JOIN customer c ON o.customer_id = c.id
-            LEFT JOIN order_detail od ON od.order_id = o.id
-            LEFT JOIN vehicle v ON v.id = od.vehicle_id
-            LEFT JOIN brands b ON b.code = v.brand_code
-            LEFT JOIN model m ON m.code = v.model_code
-            LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-            LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE AND o.id = p_order_id;
+                 LEFT JOIN customer c ON o.customer_id = c.id
+                 LEFT JOIN order_detail od ON od.order_id = o.id
+                 LEFT JOIN vehicle v ON v.id = od.vehicle_id
+                 LEFT JOIN brands b ON b.code = v.brand_code
+                 LEFT JOIN model m ON m.code = v.model_code
+                 LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
+                 LEFT JOIN service s ON s.code = sc.service_code
+        WHERE o.delete_flag = FALSE
+          AND o.id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;

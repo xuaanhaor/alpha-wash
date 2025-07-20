@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Data backup and temporary files ###
+/pgdata-backup
