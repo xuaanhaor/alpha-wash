@@ -16,4 +16,8 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query(value = "SELECT * FROM get_customer_vehicle_by_phone(:p_customer_phone)", nativeQuery = true)
     List<CustomerVehicleFlatDto> findCustomerWithVehicleByPhone(@Param("p_customer_phone") String phone);
+
+    @Query(value = "SELECT * FROM get_customer_vehicle_by_license_plate(:p_customer_license_plate)", nativeQuery = true)
+    List<CustomerVehicleFlatDto> findCustomerWithVehicleByLicensePlate(
+            @Param("p_customer_license_plate") String licensePlate);
 }

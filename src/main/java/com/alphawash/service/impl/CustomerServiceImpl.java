@@ -1,5 +1,6 @@
 package com.alphawash.service.impl;
 
+import com.alphawash.constant.RegexConstant;
 import com.alphawash.converter.CustomerConverter;
 import com.alphawash.dto.CustomerDto;
 import com.alphawash.dto.CustomerVehicleDto;
@@ -69,27 +70,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerVehicleResponse findCustomerVehicleByPhone(String phone) {
-        List<CustomerVehicleFlatDto> flatList = customerRepository.findCustomerWithVehicleByPhone(phone);
+    public CustomerVehicleResponse findCustomerVehicleByPhoneOrLicensePlate(String phoneOrLicensePlate) {
+        List<CustomerVehicleFlatDto> flatList = null;
+        if (phoneOrLicensePlate.matches(RegexConstant.PHONE_REGEX)) {
+            flatList = customerRepository.findCustomerWithVehicleByPhone(phoneOrLicensePlate);
+        }
 
-        //        Map<UUID, CustomerVehicleResponse> vehicleMap = new LinkedHashMap<>();
-        //
-        //        for (CustomerVehicleFlatDto flat : flatList) {
-        //            vehicleMap.computeIfAbsent(flat.getId(), id -> new CustomerVehicleResponse(
-        //                    flat.getId(),
-        //                    flat.getCustomerName(),
-        //                    flat.getPhone(),
-        //                    new ArrayList<>()
-        //            )).getVehicles().add(new CustomerVehicleDto(
-        //                    flat.getBrandCode(),
-        //                    flat.getBrandName(),
-        //                    flat.getModelCode(),
-        //                    flat.getModelName(),
-        //                    flat.getLicensePlate()
-        //            ));
-        //        }
-        //
-        //        return new ArrayList<>(grouped.values());
+        if (phoneOrLicensePlate.matches(RegexConstant.LICENSE_PLATE_REGEX)) {
+            flatList = customerRepository.findCustomerWithVehicleByLicensePlate(phoneOrLicensePlate);
+        }
 
         if (CollectionUtils.isNotEmpty(flatList)) {
             var first = flatList.get(0);

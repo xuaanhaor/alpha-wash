@@ -250,6 +250,42 @@ $$ LANGUAGE plpgsql;
 
 ---
 
+CREATE OR REPLACE FUNCTION get_customer_vehicle_by_license_plate(p_customer_license_plate VARCHAR)
+    RETURNS TABLE
+            (
+                id            UUID,
+                phone         VARCHAR,
+                customer_name VARCHAR,
+                brand_code    VARCHAR,
+                brand_name    VARCHAR,
+                model_code    VARCHAR,
+                model_name    VARCHAR,
+                license_plate VARCHAR
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT c.id,
+               c.phone,
+               c.customer_name,
+               v.brand_code,
+               b.brand_name,
+               v.model_code,
+               m.model_name,
+               v.license_plate
+        FROM customer c
+                 LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
+                 LEFT JOIN brands b ON v.brand_code = b.code
+                 LEFT JOIN model m ON v.model_code = m.code
+        WHERE v.license_plate = p_customer_license_plate
+          AND v.delete_flag = false
+          AND c.delete_flag = false;
+END;
+$$ LANGUAGE plpgsql;
+
+---
+
 
 CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
     RETURNS TABLE
@@ -339,5 +375,49 @@ BEGIN
                  LEFT JOIN service s ON s.code = sc.service_code
         WHERE o.delete_flag = FALSE
           AND o.id = p_order_id;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_vehicle_by_order_id(p_order_id UUID)
+    RETURNS TABLE
+            (
+                id            UUID,
+                license_plate VARCHAR,
+                customer_id   UUID,
+                brand_code    VARCHAR,
+                model_code    VARCHAR,
+                image_url     TEXT,
+                note          TEXT,
+                delete_flag   BOOLEAN,
+                created_by    VARCHAR,
+                updated_by    VARCHAR,
+                created_at    TIMESTAMP,
+                updated_at    TIMESTAMP,
+                exclusive_key INT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT v.id,
+               v.license_plate,
+               v.customer_id,
+               v.brand_code,
+               v.model_code,
+               v.image_url::TEXT,
+               v.note,
+               v.delete_flag,
+               v.created_by,
+               v.updated_by,
+               v.created_at,
+               v.updated_at,
+               v.exclusive_key
+        FROM orders o
+                 JOIN order_detail od ON o.id = od.order_id
+                 JOIN vehicle v ON od.vehicle_id = v.id
+        WHERE o.id = p_order_id
+          AND o.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
