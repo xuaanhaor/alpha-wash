@@ -1,5 +1,4 @@
 -- brands
-INSERT INTO brands(code, brand_name) VALUES ('B0001', 'Mazda');
 INSERT INTO brands(code, brand_name) VALUES ('B0001','Mazda');
 INSERT INTO brands(code, brand_name) VALUES ('B0002','GAC');
 INSERT INTO brands(code, brand_name) VALUES ('B0003','Volvo');

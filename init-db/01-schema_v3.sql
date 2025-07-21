@@ -16,7 +16,7 @@ CREATE TABLE service_type
     updated_by        VARCHAR(50),
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key     INT,
+    exclusive_key     INT       DEFAULT 0,
     PRIMARY KEY (id, code)
 );
 
@@ -33,7 +33,7 @@ CREATE TABLE service
     updated_by        VARCHAR(50),
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key     INT,
+    exclusive_key     INT       DEFAULT 0,
     PRIMARY KEY (id, code)
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE service_catalog
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id, code)
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE employee
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -78,7 +78,7 @@ CREATE TABLE employee_skill
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -93,7 +93,7 @@ CREATE TABLE customer
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -107,7 +107,7 @@ CREATE TABLE brands
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id, code)
 );
 
@@ -123,7 +123,7 @@ CREATE TABLE model
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id, code)
 );
 CREATE TABLE vehicle
@@ -140,7 +140,7 @@ CREATE TABLE vehicle
     updated_by    VARCHAR(50),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT,
+    exclusive_key INT       DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -164,7 +164,7 @@ CREATE TABLE orders
     updated_by     VARCHAR(50),
     created_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key  INT,
+    exclusive_key  INT         DEFAULT 0,
     PRIMARY KEY (id)
 );
 
@@ -182,6 +182,6 @@ CREATE TABLE order_detail
     updated_by           VARCHAR(50),
     created_at           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key        INT,
+    exclusive_key        INT         DEFAULT 0,
     PRIMARY KEY (id)
 );

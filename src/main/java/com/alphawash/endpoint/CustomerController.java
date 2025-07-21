@@ -90,9 +90,9 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/by-phone-with-vehicles")
+    @GetMapping("/by-phone-or-plate")
     public ResponseEntity<CustomerVehicleResponse> findCustomerVehicleByPhone(@RequestParam String phone) {
-        CustomerVehicleResponse result = customerService.findCustomerVehicleByPhone(phone);
+        CustomerVehicleResponse result = customerService.findCustomerVehicleByPhoneOrLicensePlate(phone);
         return ResponseEntity.ok(result);
     }
 }
