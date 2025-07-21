@@ -1,0 +1,10 @@
+# This script is used to launch the application with the specified parameters.
+launch.ps1
+.idea
+/.gradle
+/build
+/.github
+.gitignore
+/script/build-to-exe-alpha.bat
+/script/exec.bat
+/script/exec.vbs

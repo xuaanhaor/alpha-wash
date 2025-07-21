@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # wait-for-postgres.sh
 echo "🔍 Waiting for PostgreSQL to be ready..."
