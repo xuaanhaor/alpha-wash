@@ -34,7 +34,7 @@ public class OrderConverter {
         // Customer
         OrderTableDto.CustomerDTO customer = new OrderTableDto.CustomerDTO();
         customer.setId((UUID) row[i++]);
-        customer.setCustomerName((String) row[i++]);
+        customer.setName((String) row[i++]);
         customer.setPhone((String) row[i++]);
         order.setCustomer(customer);
 
@@ -127,7 +127,7 @@ public class OrderConverter {
 
                 OrderTableDto.CustomerDTO customer = new OrderTableDto.CustomerDTO();
                 customer.setId((UUID) row[i++]);
-                customer.setCustomerName((String) row[i++]);
+                customer.setName((String) row[i++]);
                 customer.setPhone((String) row[i++]);
                 order.setCustomer(customer);
 

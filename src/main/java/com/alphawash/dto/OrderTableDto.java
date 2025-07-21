@@ -31,7 +31,7 @@ public class OrderTableDto {
     @Data
     public static class CustomerDTO {
         private UUID id;
-        private String customerName;
+        private String name;
         private String phone;
     }
 
