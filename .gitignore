@@ -38,3 +38,6 @@ out/
 
 ### Data backup and temporary files ###
 /pgdata-backup
+
+### Alpha wash file ###
+alpha.exe
