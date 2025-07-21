@@ -11,8 +11,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CustomerVehicleResponse {
-    private UUID customerId;
-    private String customerName;
+    private UUID id;
+    private String name;
     private String phone;
     List<CustomerVehicleDto> vehicles;
 }

@@ -27,6 +27,6 @@ public interface CustomerConverter {
 
     List<CustomerResponse> toResponse(List<CustomerDto> dtos);
 
-    @Mapping(target = "customerId", source = "id")
+    @Mapping(target = "id", source = "id")
     CustomerVehicleResponse toCustomerVehicleResp(Customer customer);
 }
