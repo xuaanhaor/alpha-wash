@@ -12,10 +12,16 @@ Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch v�
 **Build-tool**: Gradle 8.14.2\
 **Framework**:  Spring Framework 3.4.7
 
-### Guildline chạy server
+### Guildline chạy server (để code)
 
 1. Cài đặt Java 17 (https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 2. Chạy lệnh `./gradlew :bootRun` ( Không cần tải gradle nếu chỉ chạy server )
+
+### Guideline chạy server bằng Docker (Recommended)
+
+1. Dùng lệnh `docker-compose up --build` để build image (Khi thay đổi code thì nên chạy lệnh này)
+2. Các lần sau nếu code không thay đổi thì chỉ cần chạy `docker-compose up` là được
+3. Dừng server `docker-compose down`
 
 ### Build file jar
 1. Build file jar `./gradlew :bootJar`
