@@ -28,8 +28,8 @@ public class VehicleController {
     }
 
     @PostMapping(Constant.INSERT_ENDPOINT)
-    public ResponseEntity<List<VehicleDto>> insert() {
-        var result = vehicleService.search();
+    public ResponseEntity<VehicleDto> insert(@RequestBody VehicleRequest request) {
+        var result = vehicleService.insert(request);
         return ResponseEntity.ok(result);
     }
 
