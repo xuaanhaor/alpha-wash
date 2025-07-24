@@ -1,5 +1,6 @@
 package com.alphawash.dto;
 
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Data
@@ -10,5 +11,11 @@ public class EmployeeDto {
     private Long id;
     private String name;
     private String phone;
+    private String bankName;
+    private String bankAccount;
+    private LocalDateTime dateOfBirth;
+    private String identityNumber;
+    private LocalDateTime joinDate;
+    private LocalDateTime workStatus;
     private String note;
 }
