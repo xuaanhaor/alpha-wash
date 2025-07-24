@@ -40,6 +40,12 @@ public class EmployeeServiceImpl implements EmployeeService {
             Employee saved = employeeRepository.save(Employee.builder()
                     .name(request.name())
                     .phone(request.phone())
+                    .bankName(request.bankName())
+                    .bankAccount(request.bankAccount())
+                    .dateOfBirth(request.dateOfBirth())
+                    .identityNumber(request.identityNumber())
+                    .joinDate(request.joinDate())
+                    .workStatus(request.workStatus())
                     .note(request.note())
                     .build());
             return employeeConverter.toDto(saved);
@@ -60,13 +66,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private Employee updateEmployee(EmployeeRequest request, Employee employee) {
         try {
-            ObjectUtils.setIfNotNull(request.phone(), employee::setPhone);
             ObjectUtils.setIfNotNull(request.name(), employee::setName);
+            ObjectUtils.setIfNotNull(request.phone(), employee::setPhone);
+            ObjectUtils.setIfNotNull(request.bankName(), employee::setBankName);
+            ObjectUtils.setIfNotNull(request.bankAccount(), employee::setBankAccount);
+            ObjectUtils.setIfNotNull(request.dateOfBirth(), employee::setDateOfBirth);
+            ObjectUtils.setIfNotNull(request.identityNumber(), employee::setIdentityNumber);
+            ObjectUtils.setIfNotNull(request.joinDate(), employee::setJoinDate);
+            ObjectUtils.setIfNotNull(request.workStatus(), employee::setWorkStatus);
             ObjectUtils.setIfNotNull(request.note(), employee::setNote);
             return employeeRepository.save(employee);
         } catch (Exception e) {
-            throw new BusinessException(
-                    HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update employee: " + e.getMessage());
+            throw new BusinessException(HttpStatus.CONFLICT, "Failed to update employee: " + e.getMessage());
         }
     }
 
