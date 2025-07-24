@@ -55,16 +55,22 @@ CREATE TABLE service_catalog
 
 CREATE TABLE employee
 (
-    id            SERIAL,
-    name          VARCHAR(50)        NOT NULL,
-    phone         VARCHAR(10) UNIQUE NOT NULL,
-    note          TEXT,
-    delete_flag   BOOLEAN   DEFAULT FALSE,
-    created_by    VARCHAR(50),
-    updated_by    VARCHAR(50),
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT       DEFAULT 0,
+    id              SERIAL,
+    name            VARCHAR(50)        NOT NULL,
+    phone           VARCHAR(10) UNIQUE NOT NULL,
+    bank_name       VARCHAR(50),
+    bank_account    VARCHAR(20),
+    date_of_birth   TIMESTAMP,
+    identity_number VARCHAR(15),
+    join_date       TIMESTAMP,
+    work_status     VARCHAR(50),
+    note            TEXT,
+    delete_flag     BOOLEAN   DEFAULT FALSE,
+    created_by      VARCHAR(50),
+    updated_by      VARCHAR(50),
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key   INT       DEFAULT 0,
     PRIMARY KEY (id)
 );
 

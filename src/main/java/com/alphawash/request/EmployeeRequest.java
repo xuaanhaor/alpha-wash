@@ -1,6 +1,14 @@
 package com.alphawash.request;
 
-import lombok.Builder;
+import java.time.LocalDateTime;
 
-@Builder
-public record EmployeeRequest(String name, String phone, String note) {}
+public record EmployeeRequest(
+        String name,
+        String phone,
+        String bankName,
+        String bankAccount,
+        LocalDateTime dateOfBirth,
+        String identityNumber,
+        LocalDateTime joinDate,
+        LocalDateTime workStatus,
+        String note) {}
