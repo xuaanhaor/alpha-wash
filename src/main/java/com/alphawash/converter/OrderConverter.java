@@ -1,177 +1,213 @@
 package com.alphawash.converter;
 
 import com.alphawash.dto.*;
-import com.alphawash.entity.Employee;
 import com.alphawash.repository.EmployeeRepository;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
-@Component
 public class OrderConverter {
 
-    public OrderConverter() {}
+    private final EmployeeRepository employeeRepository;
 
-    public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
-        Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
-        Set<Long> allEmployeeIds = new HashSet<>();
+    public OrderConverter(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
 
-        // Bước 1: gom tất cả employee ID
-        for (Object[] row : rows) {
-            String empStr = (String) row[19];
-            if (empStr != null && !empStr.isBlank()) {
-                for (String idStr : empStr.split(",")) {
-                    try {
-                        allEmployeeIds.add(Long.parseLong(idStr.trim()));
-                    } catch (NumberFormatException ignored) {
-                    }
+    public OrderTableDto mapFromSingleRow(Object[] row) {
+        int i = 0;
+
+        OrderTableDto order = new OrderTableDto();
+        order.setId((UUID) row[i++]);
+        order.setOrderDate((Timestamp) row[i++]);
+        order.setCheckIn((Time) row[i++]);
+        order.setCheckOut((Time) row[i++]);
+        order.setNote((String) row[i++]);
+        order.setPaymentStatus((String) row[i++]);
+        order.setPaymentType((String) row[i++]);
+        order.setTip((BigDecimal) row[i++]);
+        order.setVat((BigDecimal) row[i++]);
+        order.setDiscount((BigDecimal) row[i++]);
+        order.setDeleteFlag((Boolean) row[i++]);
+        order.setTotalPrice((BigDecimal) row[i++]);
+
+        // Customer
+        OrderTableDto.CustomerDTO customer = new OrderTableDto.CustomerDTO();
+        customer.setId((UUID) row[i++]);
+        customer.setName((String) row[i++]);
+        customer.setPhone((String) row[i++]);
+        order.setCustomer(customer);
+
+        // Employees
+        List<OrderTableDto.EmployeeDTO> employees = new ArrayList<>();
+        String employeeStr = (String) row[i++];
+        if (employeeStr != null && !employeeStr.isBlank()) {
+            for (String empIdStr : employeeStr.split(",")) {
+                try {
+                    Long empId = Long.parseLong(empIdStr.trim());
+                    employeeRepository.findById(empId).ifPresent(emp -> {
+                        OrderTableDto.EmployeeDTO dto = new OrderTableDto.EmployeeDTO();
+                        dto.setId(emp.getId());
+                        dto.setName(emp.getName());
+                        employees.add(dto);
+                    });
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
 
-        // Bước 2: lấy map nhân viên
-        Map<Long, Employee> employeeMap = employeeRepository.findAllById(allEmployeeIds).stream()
-                .collect(Collectors.toMap(Employee::getId, Function.identity()));
+        String status = (String) row[i++];
+        String detailNote = (String) row[i++];
+
+        // Vehicle
+        OrderTableDto.VehicleDTO vehicle = new OrderTableDto.VehicleDTO();
+        vehicle.setId((UUID) row[i++]);
+        vehicle.setLicensePlate((String) row[i++]);
+        vehicle.setImageUrl((String) row[i++]);
+        vehicle.setBrandId(toLong(row[i++]));
+        vehicle.setBrandCode((String) row[i++]);
+        vehicle.setBrandName((String) row[i++]);
+        vehicle.setModelId(toLong(row[i++]));
+        vehicle.setModelCode((String) row[i++]);
+        vehicle.setModelName((String) row[i++]);
+        vehicle.setSize((String) row[i++]);
+
+        // Service
+        OrderTableDto.ServiceDTO service = new OrderTableDto.ServiceDTO();
+        service.setId(toLong(row[i++]));
+        service.setServiceCode((String) row[i++]);
+        service.setServiceName((String) row[i++]);
+        service.setServiceTypeCode((String) row[i++]);
+
+        // Catalog
+        OrderTableDto.ServiceCatalogDTO catalog = new OrderTableDto.ServiceCatalogDTO();
+        catalog.setId(toLong(row[i++]));
+        catalog.setServiceCatalogCode((String) row[i++]);
+        catalog.setPrice((BigDecimal) row[i++]);
+        catalog.setSize((String) row[i++]);
+
+        service.setServiceCatalog(catalog);
+
+        // Detail
+        OrderTableDto.OrderDetailDTO detail = new OrderTableDto.OrderDetailDTO();
+        detail.setEmployees(employees);
+        detail.setStatus(status);
+        detail.setNote(detailNote);
+        detail.setVehicle(vehicle);
+        detail.setService(service);
+
+        // Set vào order
+        order.setOrderDetails(Collections.singletonList(detail));
+
+        return order;
+    }
+
+    public List<OrderTableDto> mapFromRawObjectList(List<Object[]> rows) {
+        Map<UUID, OrderTableDto> orderMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
             int i = 0;
+
             UUID orderId = (UUID) row[i++];
-            String orderCode = (String) row[i++];
-            Timestamp date = (Timestamp) row[i++];
-            Time checkIn = (Time) row[i++];
-            Time checkOut = (Time) row[i++];
-            String paymentStatus = (String) row[i++];
-            String paymentType = (String) row[i++];
-            BigDecimal tip = (BigDecimal) row[i++];
-            BigDecimal vat = (BigDecimal) row[i++];
-            BigDecimal discount = (BigDecimal) row[i++];
-            BigDecimal totalPrice = (BigDecimal) row[i++];
-            String orderNote = (String) row[i++];
-            Boolean deleteFlag = (Boolean) row[i++];
+            OrderTableDto order = orderMap.get(orderId);
 
-            UUID customerId = (UUID) row[i++];
-            String customerName = (String) row[i++];
-            String customerPhone = (String) row[i++];
+            if (order == null) {
+                order = new OrderTableDto();
+                order.setId(orderId);
+                order.setOrderDate((Timestamp) row[i++]);
+                order.setCheckIn((Time) row[i++]);
+                order.setCheckOut((Time) row[i++]);
+                order.setNote((String) row[i++]);
+                order.setPaymentStatus((String) row[i++]);
+                order.setPaymentType((String) row[i++]);
+                order.setTip((BigDecimal) row[i++]);
+                order.setVat((BigDecimal) row[i++]);
+                order.setDiscount((BigDecimal) row[i++]);
+                order.setDeleteFlag((Boolean) row[i++]);
+                order.setTotalPrice((BigDecimal) row[i++]);
 
-            String detailCode = (String) row[i++];
-            String status = (String) row[i++];
-            String detailNote = (String) row[i++];
+                OrderTableDto.CustomerDTO customer = new OrderTableDto.CustomerDTO();
+                customer.setId((UUID) row[i++]);
+                customer.setName((String) row[i++]);
+                customer.setPhone((String) row[i++]);
+                order.setCustomer(customer);
+
+                order.setOrderDetails(new ArrayList<>());
+                orderMap.put(orderId, order);
+            } else {
+                i += 8; // đã đọc 8 trường customer
+            }
+
+            // employee_ids
             String employeeStr = (String) row[i++];
-
-            UUID vehicleId = (UUID) row[i++];
-            String licensePlate = (String) row[i++];
-            String imageUrl = (String) row[i++];
-            Long brandId = ((Number) row[i++]).longValue();
-            String brandName = (String) row[i++];
-            String brandCode = (String) row[i++];
-            Long modelId = ((Number) row[i++]).longValue();
-            String modelName = (String) row[i++];
-            String modelCode = (String) row[i++];
-            String size = (String) row[i++];
-
-            Long serviceId = ((Number) row[i++]).longValue();
-            String serviceCode = (String) row[i++];
-            String serviceName = (String) row[i++];
-            String serviceTypeCode = (String) row[i++];
-
-            Long scId = ((Number) row[i++]).longValue();
-            String scCode = (String) row[i++];
-            BigDecimal scPrice = (BigDecimal) row[i++];
-            String scSize = (String) row[i++];
-
-            // === ORDER ===
-            OrderFullDto order = orderMap.computeIfAbsent(orderId, id -> {
-                OrderFullDto dto = new OrderFullDto();
-                dto.setId(id);
-                dto.setCode(orderCode);
-                dto.setDate(date);
-                dto.setCheckIn(checkIn);
-                dto.setCheckOut(checkOut);
-                dto.setPaymentStatus(paymentStatus);
-                dto.setPaymentType(paymentType);
-                dto.setTip(tip);
-                dto.setVat(vat);
-                dto.setDiscount(discount);
-                dto.setTotalPrice(totalPrice);
-                dto.setNote(orderNote);
-                dto.setDeleteFlag(deleteFlag);
-                OrderFullDto.CustomerDTO c = new OrderFullDto.CustomerDTO();
-                c.setId(customerId);
-                c.setName(customerName);
-                c.setPhone(customerPhone);
-                dto.setCustomer(c);
-                dto.setOrderDetails(new ArrayList<>());
-                return dto;
-            });
-
-            // === ORDER DETAIL ===
-            OrderFullDto.OrderDetailDTO detail = order.getOrderDetails().stream()
-                    .filter(d -> d.getCode().equals(detailCode))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        OrderFullDto.OrderDetailDTO d = new OrderFullDto.OrderDetailDTO();
-                        d.setCode(detailCode);
-                        d.setStatus(status);
-                        d.setNote(detailNote);
-
-                        OrderFullDto.VehicleDTO vehicle = new OrderFullDto.VehicleDTO();
-                        vehicle.setId(vehicleId);
-                        vehicle.setLicensePlate(licensePlate);
-                        vehicle.setImageUrl(imageUrl);
-                        vehicle.setBrandId(brandId);
-                        vehicle.setBrandCode(brandCode);
-                        vehicle.setBrandName(brandName);
-                        vehicle.setModelId(modelId);
-                        vehicle.setModelCode(modelCode);
-                        vehicle.setModelName(modelName);
-                        vehicle.setSize(size);
-                        d.setVehicle(vehicle);
-
-                        d.setEmployees(new ArrayList<>());
-                        d.setService(new ArrayList<>());
-                        order.getOrderDetails().add(d);
-                        return d;
-                    });
-
-            // === EMPLOYEES ===
+            List<OrderTableDto.EmployeeDTO> employees = new ArrayList<>();
             if (employeeStr != null && !employeeStr.isBlank()) {
                 for (String empIdStr : employeeStr.split(",")) {
                     try {
                         Long empId = Long.parseLong(empIdStr.trim());
-                        if (detail.getEmployees().stream()
-                                .noneMatch(e -> e.getId().equals(empId))) {
-                            Employee emp = employeeMap.get(empId);
-                            if (emp != null) {
-                                OrderFullDto.EmployeeDTO dto = new OrderFullDto.EmployeeDTO();
-                                dto.setId(emp.getId());
-                                dto.setName(emp.getName());
-                                detail.getEmployees().add(dto);
-                            }
-                        }
+                        employeeRepository.findById(empId).ifPresent(emp -> {
+                            OrderTableDto.EmployeeDTO dto = new OrderTableDto.EmployeeDTO();
+                            dto.setId(emp.getId());
+                            dto.setName(emp.getName());
+                            employees.add(dto);
+                        });
                     } catch (NumberFormatException ignored) {
                     }
                 }
             }
+            // tiến độ thi công
+            String status = (String) row[i++];
+            // note đơn chi tiết
+            String note = (String) row[i++];
+            // vehicle
+            OrderTableDto.VehicleDTO vehicle = new OrderTableDto.VehicleDTO();
+            vehicle.setId((UUID) row[i++]);
+            vehicle.setLicensePlate((String) row[i++]);
+            vehicle.setImageUrl((String) row[i++]);
+            vehicle.setBrandId(toLong(row[i++])); // fix kiểu
+            vehicle.setBrandCode((String) row[i++]);
+            vehicle.setBrandName((String) row[i++]);
+            vehicle.setModelId(toLong(row[i++])); // fix kiểu
+            vehicle.setModelCode((String) row[i++]);
+            vehicle.setModelName((String) row[i++]);
+            vehicle.setSize((String) row[i++]);
 
-            // === SERVICE ===
-            OrderFullDto.ServiceDTO service = new OrderFullDto.ServiceDTO();
-            service.setId(serviceId);
-            service.setServiceCode(serviceCode);
-            service.setServiceName(serviceName);
-            service.setServiceTypeCode(serviceTypeCode);
-            OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
-            sc.setId(scId);
-            sc.setCode(scCode);
-            sc.setPrice(scPrice);
-            sc.setSize(scSize);
-            service.setServiceCatalog(sc);
-            detail.getService().add(service);
+            // === service ===
+            OrderTableDto.ServiceDTO service = new OrderTableDto.ServiceDTO();
+            service.setId(toLong(row[i++])); // index 20
+            service.setServiceCode((String) row[i++]); // index 21
+            service.setServiceName((String) row[i++]); // index 21
+            service.setServiceTypeCode((String) row[i++]); // index 22
+
+            // === service_catalog ===
+            OrderTableDto.ServiceCatalogDTO catalog = new OrderTableDto.ServiceCatalogDTO();
+            catalog.setId(toLong(row[i++])); // index 22
+            catalog.setServiceCatalogCode((String) row[i++]); // index 23
+            catalog.setPrice((BigDecimal) row[i++]); // index 23
+            catalog.setSize((String) row[i++]); // index 24
+
+            // link catalog vào service
+            service.setServiceCatalog(catalog);
+
+            // detail
+            OrderTableDto.OrderDetailDTO detail = new OrderTableDto.OrderDetailDTO();
+            detail.setStatus(status);
+            detail.setNote(note);
+            detail.setEmployees(employees);
+            detail.setVehicle(vehicle);
+            detail.setService(service);
+
+            order.getOrderDetails().add(detail);
         }
 
         return new ArrayList<>(orderMap.values());
+    }
+
+    private Long toLong(Object obj) {
+        if (obj instanceof Number n) {
+            return n.longValue();
+        }
+        return null;
     }
 }
