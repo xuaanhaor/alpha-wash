@@ -1,21 +1,19 @@
 package com.alphawash.service;
 
-import com.alphawash.dto.OrderFullDto;
-import com.alphawash.request.OrderCreateRequest;
-import com.alphawash.request.OrderUpdateRequest;
+import com.alphawash.dto.OrderTableDto;
+import com.alphawash.request.BasicOrderRequest;
+import com.alphawash.request.UpdateBasicOrderRequest;
 import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    List<OrderFullDto> getAllOrders();
+    List<OrderTableDto> getAllOrders();
 
-    OrderFullDto getOrderById(UUID id);
+    OrderTableDto getFullOrderById(UUID orderId);
 
-    OrderFullDto getOrderByCode(String code);
+    void createOrder(BasicOrderRequest request);
 
-    String createOrder(OrderCreateRequest request);
-
-    void updateOrder(OrderUpdateRequest request);
+    int updateOrderById(UpdateBasicOrderRequest request);
 
     void cancelOrderById(UUID orderId);
 }
