@@ -27,7 +27,9 @@ import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,6 +65,19 @@ public class OrderServiceImpl implements OrderService {
         }
         OrderConverter converter = new OrderConverter(employeeRepository);
         return converter.mapFromSingleRow(result.get(0));
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrderById(UUID orderId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Order not found with ID: " + orderId);
+        }
+        Order order = optionalOrder.get();
+        order.setDeleteFlag(true);
+        order.setUpdatedAt(DateTimeUtils.getCurrentDate());
+        orderRepository.save(order);
     }
 
     @Override
@@ -265,6 +280,7 @@ public class OrderServiceImpl implements OrderService {
         vehicle.setUpdatedAt(DateTimeUtils.getCurrentDate());
         vehicleRepository.save(vehicle);
     }
+
 
     private boolean isBlankUUID(UUID uuid) {
         return uuid == null || uuid.toString().trim().isEmpty();

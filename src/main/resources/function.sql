@@ -68,6 +68,7 @@ $$;
 --
 
 
+
 CREATE OR REPLACE FUNCTION get_full_orders()
     RETURNS TABLE
             (
@@ -81,6 +82,7 @@ CREATE OR REPLACE FUNCTION get_full_orders()
                 tip                 NUMERIC,
                 vat                 NUMERIC,
                 discount            NUMERIC,
+                order_delete_flag   BOOLEAN,
                 total_price         NUMERIC,
                 customer_id         UUID,
                 customer_name       VARCHAR,
@@ -121,6 +123,7 @@ BEGIN
                o.tip            AS tip,
                o.vat,
                o.discount,
+			   o.delete_flag AS order_delete_flag,
                o.total_price,
                c.id             AS customer_id,
                c.customer_name,
@@ -153,10 +156,10 @@ BEGIN
         LEFT JOIN brands b ON b.code = v.brand_code
         LEFT JOIN model m ON m.code = v.model_code
         LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-        LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE;
+        LEFT JOIN service s ON s.code = sc.service_code;
 END;
 $$ LANGUAGE plpgsql;
+
 
 ------
 
@@ -300,6 +303,7 @@ CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
                 tip                 NUMERIC,
                 vat                 NUMERIC,
                 discount            NUMERIC,
+                order_delete_flag   BOOLEAN,
                 total_price         NUMERIC,
                 customer_id         UUID,
                 customer_name       VARCHAR,
@@ -340,6 +344,7 @@ BEGIN
                o.tip,
                o.vat,
                o.discount,
+               o.delete_flag AS order_delete_flag,
                o.total_price,
                c.id                 AS customer_id,
                c.customer_name,
@@ -373,7 +378,7 @@ BEGIN
             LEFT JOIN model m ON m.code = v.model_code
             LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
             LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE AND o.id = p_order_id;
+        WHERE o.id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;
 
