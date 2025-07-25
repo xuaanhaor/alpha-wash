@@ -75,4 +75,10 @@ public class OrderController {
         orderService.cancelOrderById(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping(Constant.CANCEL_ENDPOINT + Constant.ID_PATH_PARAMETER)
+    public ResponseEntity<Void> cancelOrder(@PathVariable("id") UUID id) {
+        orderService.cancelOrderById(id);
+        return ResponseEntity.ok().build();
+    }
 }
