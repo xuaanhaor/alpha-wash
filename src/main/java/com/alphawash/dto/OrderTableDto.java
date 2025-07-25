@@ -21,6 +21,7 @@ public class OrderTableDto {
     private BigDecimal tip;
     private BigDecimal vat;
     private BigDecimal discount;
+    private Boolean deleteFlag;
     private BigDecimal totalPrice;
     private String note;
 
