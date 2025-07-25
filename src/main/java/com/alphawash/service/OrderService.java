@@ -7,15 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    List<OrderFullDto> getAllOrders();
+    List<OrderTableDto> getAllOrders();
 
-    OrderFullDto getOrderById(UUID id);
+    OrderTableDto getFullOrderById(UUID orderId);
 
-    OrderFullDto getOrderByCode(String code);
+    void createOrder(BasicOrderRequest request);
 
-    String createOrder(OrderCreateRequest request);
-
-    void updateOrder(OrderUpdateRequest request);
+    int updateOrderById(UpdateBasicOrderRequest request);
 
     void cancelOrderById(UUID orderId);
 }
