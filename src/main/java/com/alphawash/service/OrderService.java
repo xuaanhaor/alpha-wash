@@ -14,4 +14,6 @@ public interface OrderService {
     void createOrder(BasicOrderRequest request);
 
     int updateOrderById(UpdateBasicOrderRequest request);
+
+    void cancelOrderById(UUID orderId);
 }

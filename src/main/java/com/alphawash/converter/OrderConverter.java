@@ -29,6 +29,7 @@ public class OrderConverter {
         order.setTip((BigDecimal) row[i++]);
         order.setVat((BigDecimal) row[i++]);
         order.setDiscount((BigDecimal) row[i++]);
+        order.setDeleteFlag((Boolean) row[i++]);
         order.setTotalPrice((BigDecimal) row[i++]);
 
         // Customer
@@ -123,6 +124,7 @@ public class OrderConverter {
                 order.setTip((BigDecimal) row[i++]);
                 order.setVat((BigDecimal) row[i++]);
                 order.setDiscount((BigDecimal) row[i++]);
+                order.setDeleteFlag((Boolean) row[i++]);
                 order.setTotalPrice((BigDecimal) row[i++]);
 
                 OrderTableDto.CustomerDTO customer = new OrderTableDto.CustomerDTO();
