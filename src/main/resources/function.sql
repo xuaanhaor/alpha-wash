@@ -426,3 +426,33 @@ BEGIN
           AND o.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
+
+--
+
+CREATE TABLE IF NOT EXISTS daily_sequence
+(
+    date_code      VARCHAR(10) PRIMARY KEY,
+    current_number INT DEFAULT 0
+);
+
+CREATE OR REPLACE FUNCTION generate_osd_code()
+    RETURNS TEXT AS
+$$
+DECLARE
+    today_code    VARCHAR(10);
+    seq_number    INT;
+    padded_number TEXT;
+BEGIN
+    today_code := TO_CHAR(CURRENT_DATE, 'DDMMYYYY');
+    INSERT INTO daily_sequence(date_code, current_number)
+    VALUES (today_code, 1)
+    ON CONFLICT (date_code)
+        DO UPDATE SET current_number = daily_sequence.current_number + 1;
+    SELECT current_number
+    INTO seq_number
+    FROM daily_sequence
+    WHERE date_code = today_code;
+    padded_number := LPAD(seq_number::TEXT, 3, '0');
+    RETURN 'OSD' || today_code || padded_number;
+END;
+$$ LANGUAGE plpgsql;
