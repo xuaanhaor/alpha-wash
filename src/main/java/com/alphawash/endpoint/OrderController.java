@@ -56,12 +56,9 @@ public class OrderController {
     }
 
     @PostMapping(Constant.API_CREATE_ORDER)
-    public ResponseEntity<String> createOrder(@RequestBody OrderCreateRequest request) {
-        String code = orderService.createOrder(request);
-        if (code == null || code.isEmpty()) {
-            return ResponseEntity.badRequest().body("Không thể tạo đơn hàng");
-        }
-        return ResponseEntity.ok(code);
+    public ResponseEntity<Void> createOrder(@RequestBody OrderCreateRequest request) {
+        orderService.createOrder(request);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping(Constant.UPDATE_ENDPOINT)
@@ -71,12 +68,6 @@ public class OrderController {
     }
     //
     @PatchMapping(Constant.CANCEL_ENDPOINT + Constant.ID_PATH_PARAMETER)
-    public ResponseEntity<Void> cancelOrder(@PathVariable("id") UUID id) {
-        orderService.cancelOrderById(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping(Constant.CANCEL_ENDPOINT + Constant.ID_PATH_PARAMETER)
     public ResponseEntity<Void> cancelOrder(@PathVariable("id") UUID id) {
         orderService.cancelOrderById(id);
         return ResponseEntity.ok().build();
