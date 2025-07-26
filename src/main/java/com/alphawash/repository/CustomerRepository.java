@@ -20,4 +20,8 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @Query(value = "SELECT * FROM get_customer_vehicle_by_license_plate(:p_customer_license_plate)", nativeQuery = true)
     List<CustomerVehicleFlatDto> findCustomerWithVehicleByLicensePlate(
             @Param("p_customer_license_plate") String licensePlate);
+
+    Optional<Object> findByIdAndDeleteFlagFalse(UUID id);
+
+    Optional<Customer> findByCustomerNameAndDeleteFlagFalse(String customerName);
 }

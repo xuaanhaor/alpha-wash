@@ -1,6 +1,6 @@
 package com.alphawash.response;
 
-import com.alphawash.dto.OrderTableDto;
+import com.alphawash.dto.OrderFullDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class OrderServiceDetailResponse {
     private String id;
     private String order;
     private String employeeId;
-    private OrderTableDto.ServiceCatalogDTO serviceCatalog;
+    private OrderFullDto.ServiceCatalogDTO serviceCatalog;
     private String status;
     private String note;
     private String vehicle;
