@@ -286,7 +286,6 @@ $$ LANGUAGE plpgsql;
 
 ---
 
-
 CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
     RETURNS TABLE
             (
@@ -419,5 +418,81 @@ BEGIN
                  JOIN vehicle v ON od.vehicle_id = v.id
         WHERE o.id = p_order_id
           AND o.delete_flag = false;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_daily_revenue_by_service_type_full_range(p_start_date DATE, p_end_date DATE, p_order_status VARCHAR)
+    RETURNS TABLE
+            (
+                order_date        DATE,
+                service_type_code VARCHAR(20),
+                service_name      VARCHAR,
+                service_type_name VARCHAR,
+                net_revenue       NUMERIC,
+                gross_revenue     NUMERIC
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT DATE(o.date)                    AS order_date,
+               st.code                         AS service_type_code,
+               s.service_name                  AS service_name,
+               st.service_type_name            AS service_type_name,
+               SUM(COALESCE(o.total_price, 0)) AS net_revenue,
+               SUM(
+                           COALESCE(o.total_price, 0)
+                           - COALESCE(o.discount, 0)
+                   )                           AS gross_revenue
+        FROM orders o
+                 JOIN order_detail od ON od.order_id = o.id AND od.delete_flag = FALSE
+                 JOIN service_catalog sc ON sc.code = od.service_catalog_code AND sc.delete_flag = FALSE
+                 JOIN service s ON s.code = sc.service_code AND s.delete_flag = FALSE
+                 JOIN service_type st ON st.code = s.service_type_code AND st.delete_flag = FALSE
+        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
+          AND o.delete_flag = FALSE
+          AND o.payment_status = p_order_status
+        GROUP BY DATE(o.date), st.code, st.service_type_name, s.service_name
+        ORDER BY order_date, service_type_code;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_favorite_service(p_start_date DATE, p_end_date DATE)
+    RETURNS TABLE
+            (
+                service_code  VARCHAR,
+                service_name  VARCHAR,
+                usage_count   BIGINT,
+                total_revenue NUMERIC
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT s.code         AS service_code,
+               s.service_name AS service_name,
+               COUNT(1)       AS usage_count,
+               SUM(sc.price)  AS total_revenue
+        FROM order_detail od
+                 JOIN service_catalog sc
+                      ON sc.code = od.service_catalog_code
+                          AND sc.delete_flag = FALSE
+                 JOIN service s
+                      ON s.code = sc.service_code
+                          AND s.delete_flag = FALSE
+                 JOIN orders o
+                      ON o.id = od.order_id
+                          AND o.delete_flag = FALSE
+                          AND o.payment_status = 'DONE'
+        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
+          AND od.delete_flag = FALSE
+        GROUP BY s.code, s.service_name
+        ORDER BY usage_count DESC,
+                 total_revenue DESC
+        LIMIT 5;
 END;
 $$ LANGUAGE plpgsql;

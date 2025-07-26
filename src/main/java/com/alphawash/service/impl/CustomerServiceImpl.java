@@ -7,6 +7,7 @@ import com.alphawash.dto.CustomerVehicleDto;
 import com.alphawash.dto.CustomerVehicleFlatDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.repository.CustomerRepository;
+import com.alphawash.request.CustomerRequest;
 import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
 import com.alphawash.util.CollectionUtils;
@@ -38,9 +39,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDto create(CustomerDto dto) {
-        Customer saved = customerRepository.save(CustomerConverter.INSTANCE.toEntity(dto));
-        return CustomerConverter.INSTANCE.toDto(saved);
+    public CustomerDto create(CustomerRequest request) {
+        Customer customer = customerRepository.save(Customer.builder()
+                .customerName(request.customerName())
+                .phone(request.phone())
+                .note(request.note())
+                .build());
+        return CustomerConverter.INSTANCE.toDto(customer);
     }
 
     @Override
