@@ -19,7 +19,7 @@ public class Customer extends BaseEntity {
     @Column(name = "customer_name")
     private String customerName;
 
-    @Column(name = "phone", unique = true, nullable = false)
+    @Column(name = "phone", unique = true)
     private String phone;
 
     @Column(columnDefinition = "TEXT")

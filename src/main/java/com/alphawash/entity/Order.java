@@ -19,6 +19,9 @@ public class Order extends BaseEntity {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;

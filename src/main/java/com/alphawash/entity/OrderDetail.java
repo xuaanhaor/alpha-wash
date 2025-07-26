@@ -16,8 +16,11 @@ public class OrderDetail extends BaseEntity {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "code", unique = true, nullable = false)
+    private String code;
+
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_code", referencedColumnName = "code", nullable = false)
     private Order order;
 
     @Column(name = "employee_id")
@@ -25,10 +28,6 @@ public class OrderDetail extends BaseEntity {
 
     @Column(name = "status")
     private String status;
-
-    @ManyToOne
-    @JoinColumn(name = "service_catalog_code", referencedColumnName = "code")
-    private ServiceCatalog serviceCatalog;
 
     @Column(name = "note")
     private String note;
