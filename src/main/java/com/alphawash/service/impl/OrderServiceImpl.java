@@ -1,39 +1,24 @@
 package com.alphawash.service.impl;
 
-import com.alphawash.constant.OrderStatus;
 import com.alphawash.converter.OrderConverter;
-import com.alphawash.dto.OrderTableDto;
-import com.alphawash.entity.Brand;
-import com.alphawash.entity.Customer;
-import com.alphawash.entity.Model;
-import com.alphawash.entity.Order;
-import com.alphawash.entity.OrderDetail;
-import com.alphawash.entity.ServiceCatalog;
-import com.alphawash.entity.Vehicle;
+import com.alphawash.dto.OrderFullDto;
+import com.alphawash.entity.*;
 import com.alphawash.exception.BusinessException;
-import com.alphawash.repository.BrandRepository;
-import com.alphawash.repository.CustomerRepository;
-import com.alphawash.repository.EmployeeRepository;
-import com.alphawash.repository.ModelRepository;
-import com.alphawash.repository.OrderDetailRepository;
-import com.alphawash.repository.OrderRepository;
-import com.alphawash.repository.ServiceCatalogRepository;
-import com.alphawash.repository.VehicleRepository;
-import com.alphawash.request.BasicOrderRequest;
-import com.alphawash.request.UpdateBasicOrderRequest;
+import com.alphawash.repository.*;
+import com.alphawash.request.OrderCreateRequest;
+import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.service.OrderService;
 import com.alphawash.util.DateTimeUtils;
 import com.alphawash.util.ObjectUtils;
-import com.alphawash.util.StringUtils;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,24 +32,287 @@ public class OrderServiceImpl implements OrderService {
     private final BrandRepository brandRepository;
     private final VehicleRepository vehicleRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final OrderServiceDtlRepository orderServiceDtlRepository;
+    private final OrderConverter orderConverter;
 
     @Override
-    public List<OrderTableDto> getAllOrders() {
-        List<Object[]> rawData = orderRepository.getAllOrdersRaw();
+    public List<OrderFullDto> getAllOrders() {
+        List<Object[]> rawData = orderRepository.getAllOrderRaw();
+        return orderConverter.mapToOrderFullDto(rawData, employeeRepository);
+    }
 
-        OrderConverter converter = new OrderConverter(employeeRepository);
-        return converter.mapFromRawObjectList(rawData);
+    public OrderFullDto getOrderByCode(String code) {
+        List<Object[]> rows = orderRepository.findFullByCode(code);
+        List<OrderFullDto> result = orderConverter.mapToOrderFullDto(rows, employeeRepository);
+        return result.isEmpty() ? null : result.get(0);
+    }
+
+    public OrderFullDto getOrderById(UUID id) {
+        List<Object[]> rows = orderRepository.findFullById(id);
+        List<OrderFullDto> result = orderConverter.mapToOrderFullDto(rows, employeeRepository);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
-    public OrderTableDto getFullOrderById(UUID orderId) {
-        List<Object[]> result = orderRepository.getFullOrderById(orderId);
-
-        if (result == null || result.isEmpty()) {
-            return null; // hoặc throw NotFoundException
+    @Transactional(rollbackFor = Exception.class)
+    public void createOrder(OrderCreateRequest request) {
+        // ===== 1. Kiểm tra khách hàng nếu có =====
+        UUID customerId = request.customerId();
+        Customer customer = null;
+        if (customerId != null) {
+            customer = customerRepository
+                    .findById(customerId)
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
         }
-        OrderConverter converter = new OrderConverter(employeeRepository);
-        return converter.mapFromSingleRow(result.get(0));
+
+        // ===== 2. Kiểm tra hoặc tạo mới xe =====
+        if (request.licensePlate() == null || request.licensePlate().isBlank()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
+        }
+        Vehicle vehicle =
+                vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
+
+        if (vehicle == null) {
+            // Nếu xe mới thì bắt buộc phải có brandCode + modelCode
+            if (request.brandCode() == null || request.modelCode() == null) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng xe hoặc dòng xe");
+            }
+
+            Brand brand = brandRepository
+                    .findByCode(request.brandCode())
+                    .orElseThrow(() -> new BusinessException(
+                            HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + request.brandCode()));
+
+            Model model = modelRepository
+                    .findByCode(request.modelCode())
+                    .orElseThrow(() -> new BusinessException(
+                            HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + request.modelCode()));
+
+            vehicle = Vehicle.builder()
+                    .licensePlate(request.licensePlate())
+                    .brand(brand)
+                    .model(model)
+                    .customer(customer)
+                    .imageUrl(request.imageUrl())
+                    .note(request.vehicleNote())
+                    .build();
+
+            vehicleRepository.save(vehicle);
+        }
+
+        // ===== 3. Tạo đơn hàng =====
+        Order order = new Order();
+        order.setCode(generateOrderCode());
+        order.setCustomer(customer);
+        order.setDate(request.date());
+        order.setCheckinTime(request.checkInTime());
+        order.setCheckoutTime(request.checkOutTime());
+        order.setPaymentStatus(request.paymentStatus());
+        order.setPaymentType(request.paymentType());
+        order.setVat(request.vat());
+        order.setTip(request.tip());
+        order.setDiscount(request.discount());
+        order.setNote(request.note());
+        orderRepository.save(order);
+
+        // ===== 4. Xử lý từng chi tiết đơn hàng =====
+        BigDecimal totalServicePrice = BigDecimal.ZERO;
+
+        for (OrderCreateRequest.OrderDetailRequest detailReq : request.orderDetails()) {
+            OrderDetail detail = new OrderDetail();
+            detail.setCode(generateOrderDetailCode());
+            detail.setOrder(order);
+            detail.setVehicle(vehicle);
+            detail.setStatus(detailReq.status());
+            detail.setNote(detailReq.note());
+
+            String employeeStr =
+                    detailReq.employeeIds().stream().map(String::valueOf).collect(Collectors.joining(","));
+            detail.setEmployeeId(employeeStr);
+
+            orderDetailRepository.save(detail);
+
+            // ===== 5. Gán các dịch vụ cho từng chi tiết =====
+            for (String scCode : detailReq.serviceCatalogCodes()) {
+                ServiceCatalog sc = serviceCatalogRepository
+                        .findByCode(scCode)
+                        .orElseThrow(() ->
+                                new BusinessException(HttpStatus.BAD_REQUEST, "Gói dịch vụ không tồn tại: " + scCode));
+
+                OrderServiceDtl osd = new OrderServiceDtl();
+                osd.setCode(generateOrderServiceDtlCode());
+                osd.setOrderDetail(detail);
+                osd.setServiceCatalogCode(scCode);
+                orderServiceDtlRepository.save(osd);
+
+                totalServicePrice = totalServicePrice.add(sc.getPrice());
+            }
+        }
+
+        // ===== 6. Tính lại tổng tiền và xác minh =====
+        // Tính VAT và Discount dựa trên phần trăm
+        BigDecimal vatAmount = totalServicePrice.multiply(request.vat()).divide(BigDecimal.valueOf(100));
+        BigDecimal discountAmount =
+                totalServicePrice.multiply(request.discount()).divide(BigDecimal.valueOf(100));
+
+        // Tổng tiền dự kiến
+        BigDecimal totalExpected =
+                totalServicePrice.add(vatAmount).add(request.tip()).subtract(discountAmount);
+
+        // So sánh với client gửi lên
+        if (totalExpected.compareTo(request.totalPrice()) != 0) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST, "Tổng tiền không khớp: " + totalExpected + " ≠ " + request.totalPrice());
+        }
+
+        order.setTotalPrice(totalExpected);
+        orderRepository.save(order);
+    }
+
+    public String generateOrderCode() {
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        long count = orderRepository.countByDate(LocalDate.now()) + 1;
+        return "O" + datePart + "-" + String.format("%03d", count);
+    }
+
+    public String generateOrderDetailCode() {
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        long count = orderDetailRepository.countByDay(LocalDate.now()) + 1;
+        return "OD-" + datePart + "-" + String.format("%03d", count);
+    }
+
+    public String generateOrderServiceDtlCode() {
+        return orderServiceDtlRepository.generateOrderServiceDtlSequenceCode();
+    }
+
+    @Override
+    @Transactional
+    public void updateOrder(OrderUpdateRequest request) {
+        // 1. Lấy đơn hàng
+        Order order = orderRepository
+                .findById(request.orderId())
+                .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Đơn hàng không tồn tại"));
+
+        // 2. Lấy khách hàng nếu có
+        Customer customer = null;
+        UUID customerId = request.customerId();
+        if (customerId != null) {
+            customer = customerRepository
+                    .findById(customerId)
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
+        }
+        order.setCustomer(customer);
+
+        // 3. Lấy hoặc tạo mới xe
+        if (request.licensePlate() == null || request.licensePlate().isBlank()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
+        }
+        Vehicle vehicle =
+                vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
+        if (vehicle == null) {
+            if (request.brandCode() == null || request.modelCode() == null) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng hoặc dòng xe khi tạo mới xe");
+            }
+
+            Brand brand = brandRepository
+                    .findByCode(request.brandCode())
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại"));
+            Model model = modelRepository
+                    .findByCode(request.modelCode())
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại"));
+
+            vehicle = Vehicle.builder()
+                    .licensePlate(request.licensePlate())
+                    .brand(brand)
+                    .model(model)
+                    .customer(customer)
+                    .build();
+        }
+
+        // Nếu là xe cũ và người dùng muốn cập nhật thêm thông tin xe
+        ObjectUtils.setIfNotNull(request.imageUrl(), vehicle::setImageUrl);
+        ObjectUtils.setIfNotNull(request.vehicleNote(), vehicle::setNote);
+        vehicleRepository.save(vehicle);
+
+        // 4. Cập nhật order
+        ObjectUtils.setIfNotNull(request.paymentStatus(), order::setPaymentStatus);
+        ObjectUtils.setIfNotNull(request.paymentType(), order::setPaymentType);
+        ObjectUtils.setIfNotNull(request.checkInTime(), order::setCheckinTime);
+        ObjectUtils.setIfNotNull(request.checkOutTime(), order::setCheckoutTime);
+        ObjectUtils.setIfNotNull(request.vat(), order::setVat);
+        ObjectUtils.setIfNotNull(request.tip(), order::setTip);
+        ObjectUtils.setIfNotNull(request.discount(), order::setDiscount);
+        ObjectUtils.setIfNotNull(request.note(), order::setNote);
+
+        orderRepository.save(order);
+
+        BigDecimal totalServicePrice = BigDecimal.ZERO;
+
+        // 5. Duyệt từng order detail
+        for (OrderUpdateRequest.OrderDetailUpdateRequest detailReq : request.orderDetails()) {
+            OrderDetail detail = orderDetailRepository
+                    .findByCode(detailReq.orderDetailCode())
+                    .orElseThrow(() -> new BusinessException(
+                            HttpStatus.BAD_REQUEST, "Chi tiết đơn hàng không tồn tại: " + detailReq.orderDetailCode()));
+
+            detail.setVehicle(vehicle); // Cập nhật lại xe
+
+            ObjectUtils.setIfNotNull(detailReq.status(), detail::setStatus);
+            ObjectUtils.setIfNotNull(detailReq.note(), detail::setNote);
+
+            if (detailReq.employeeIds() != null && !detailReq.employeeIds().isEmpty()) {
+                String employeeStr =
+                        detailReq.employeeIds().stream().map(String::valueOf).collect(Collectors.joining(","));
+                detail.setEmployeeId(employeeStr);
+            }
+
+            orderDetailRepository.save(detail);
+
+            // 6. Cập nhật dịch vụ
+            if (detailReq.serviceCatalogCodes() != null
+                    && !detailReq.serviceCatalogCodes().isEmpty()) {
+                List<OrderServiceDtl> existingServices =
+                        orderServiceDtlRepository.findByOrderDetailCode(detail.getCode());
+
+                Set<String> existingScCodes = existingServices.stream()
+                        .map(OrderServiceDtl::getServiceCatalogCode)
+                        .collect(Collectors.toSet());
+
+                Set<String> requestScCodes = new HashSet<>(detailReq.serviceCatalogCodes());
+
+                // 1. Xoá cái không còn
+                Set<String> codesToRemove = new HashSet<>(existingScCodes);
+                codesToRemove.removeAll(requestScCodes);
+
+                if (!codesToRemove.isEmpty()) {
+                    orderServiceDtlRepository.deleteByOrderDetailCodeAndServiceCatalogCodes(
+                            detail.getCode(), codesToRemove);
+                }
+
+                // 2. Thêm cái mới
+                Set<String> codesToAdd = new HashSet<>(requestScCodes);
+                codesToAdd.removeAll(existingScCodes);
+
+                for (String scCode : codesToAdd) {
+                    ServiceCatalog sc = serviceCatalogRepository
+                            .findByCode(scCode)
+                            .orElseThrow(() -> new BusinessException(
+                                    HttpStatus.BAD_REQUEST, "Gói dịch vụ không tồn tại: " + scCode));
+
+                    OrderServiceDtl osd = OrderServiceDtl.builder()
+                            .code(generateOrderServiceDtlCode())
+                            .orderDetail(detail)
+                            .serviceCatalogCode(scCode)
+                            .build();
+
+                    orderServiceDtlRepository.save(osd);
+                    totalServicePrice = totalServicePrice.add(sc.getPrice());
+                }
+            }
+        }
+
+        order.setTotalPrice(request.totalPrice());
+        orderRepository.save(order);
     }
 
     @Override
@@ -78,211 +326,5 @@ public class OrderServiceImpl implements OrderService {
         order.setDeleteFlag(true);
         order.setUpdatedAt(DateTimeUtils.getCurrentDate());
         orderRepository.save(order);
-    }
-
-    @Override
-    @Transactional
-    public void createOrder(BasicOrderRequest request) {
-        Customer customer = null;
-        if (ObjectUtils.isNotNull(request.customer())) {
-            if (!isBlankUUID(request.customer().id())) {
-                customer = customerRepository
-                        .findById(request.customer().id())
-                        .orElseGet(() -> findAndCreateCustomerByPhone(request));
-            } else {
-                findAndCreateCustomerByPhone(request);
-            }
-        }
-        try {
-            ServiceCatalog serviceCatalog = serviceCatalogRepository
-                    .findByCode(request.service().serviceCatalogCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND,
-                            "Service catalog not found with code: "
-                                    + request.service().serviceCatalogCode()));
-            Brand brand = brandRepository
-                    .findByCode(request.vehicle().brandCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND,
-                            "Brand not found with code: " + request.vehicle().brandCode()));
-            Model model = modelRepository
-                    .findByCode(request.vehicle().modelCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND,
-                            "Model not found with code: " + request.vehicle().modelCode()));
-            Order order = insertOrder(request, customer);
-
-            Vehicle vehicle = null;
-            if (ObjectUtils.isNotNull(request.vehicle().licensePlate())) {
-                vehicle = saveVehicle(request, brand, model, customer);
-            }
-
-            orderDetailRepository.save(OrderDetail.builder()
-                    .order(order)
-                    .employeeId(request.information().employeeId())
-                    .vehicle(vehicle)
-                    .serviceCatalog(serviceCatalog)
-                    .status(
-                            StringUtils.isNotNullOrEmpty(request.information().status())
-                                    ? request.information().status()
-                                    : OrderStatus.PENDING.getValue())
-                    .note(order.getNote())
-                    .build());
-        } catch (Exception e) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to create order: " + e.getMessage());
-        }
-    }
-
-    private Customer findAndCreateCustomerByPhone(BasicOrderRequest request) {
-        if (StringUtils.isNotNullOrEmpty(request.customer().phone())) {
-            return customerRepository.findByPhone(request.customer().phone()).orElseGet(() -> createCustomer(request));
-        }
-        return createCustomer(request);
-    }
-
-    private Vehicle saveVehicle(BasicOrderRequest request, Brand brand, Model model, Customer customer) {
-        return vehicleRepository
-                .findByLicensePlate(request.vehicle().licensePlate())
-                .orElseGet(() -> vehicleRepository.save(Vehicle.builder()
-                        .licensePlate(request.vehicle().licensePlate())
-                        .brand(brand)
-                        .model(model)
-                        .customer(customer)
-                        .build()));
-    }
-
-    private Customer createCustomer(BasicOrderRequest request) {
-        var newCustomer = Customer.builder()
-                .customerName(request.customer().name())
-                .phone(request.customer().phone())
-                .build();
-        return customerRepository.save(newCustomer);
-    }
-
-    @Override
-    @Transactional
-    public int updateOrderById(UpdateBasicOrderRequest request) {
-        UUID id = request.id();
-        BasicOrderRequest basicOrderRequest = request.request();
-        Order order = orderRepository
-                .findById(id)
-                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "Order not found with ID: " + id));
-        Customer customer = null;
-        if (ObjectUtils.isNotNull(basicOrderRequest.customer())) {
-            if (!isBlankUUID(basicOrderRequest.customer().id())) {
-                customer = customerRepository
-                        .findById(basicOrderRequest.customer().id())
-                        .orElseGet(() -> findAndCreateCustomerByPhone(basicOrderRequest));
-            } else {
-                findAndCreateCustomerByPhone(basicOrderRequest);
-            }
-        }
-
-        try {
-            updateOrderRequest(basicOrderRequest, order);
-            OrderDetail orderDetail = orderDetailRepository
-                    .findByOrderId(order.getId())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND, "Order detail not found for order ID: " + order.getId()));
-            Vehicle vehicle = null;
-            if (basicOrderRequest.vehicle() != null) {
-                vehicle = orderRepository
-                        .findVehicleByOrderId(order.getId())
-                        .orElseThrow(() -> new BusinessException(
-                                HttpStatus.NOT_FOUND, "Vehicle not found for order ID: " + order.getId()));
-                updateVehicle(basicOrderRequest, vehicle, customer);
-            }
-            updateOrderDetail(basicOrderRequest, orderDetail, order, vehicle);
-
-        } catch (Exception e) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to update order: " + e.getMessage());
-        }
-        return 1;
-    }
-
-    private Order insertOrder(BasicOrderRequest request, Customer customer) {
-        Order order = Order.builder()
-                .date(request.information().date())
-                .customer(customer)
-                .checkinTime(request.information().checkinTime())
-                .checkoutTime(request.information().checkoutTime())
-                .paymentType(request.information().paymentType())
-                .paymentStatus(request.information().paymentStatus())
-                .tip(request.information().tip() != null ? request.information().tip() : BigDecimal.ZERO)
-                .discount(
-                        request.information().discount() != null
-                                ? request.information().discount()
-                                : BigDecimal.ZERO)
-                .vat(request.information().vat())
-                .totalPrice(request.information().totalPrice())
-                .note(request.information().note())
-                .build();
-        return orderRepository.save(order);
-    }
-
-    private void updateOrderRequest(BasicOrderRequest request, Order order) {
-        ObjectUtils.setIfNotNull(request.information().date(), order::setDate);
-        ObjectUtils.setIfNotNull(request.information().checkinTime(), order::setCheckinTime);
-        ObjectUtils.setIfNotNull(request.information().checkoutTime(), order::setCheckoutTime);
-        ObjectUtils.setIfNotNull(request.information().paymentStatus(), order::setPaymentStatus);
-        ObjectUtils.setIfNotNull(request.information().paymentType(), order::setPaymentType);
-        ObjectUtils.setIfNotNull(request.information().tip(), order::setTip);
-        ObjectUtils.setIfNotNull(request.information().discount(), order::setDiscount);
-        ObjectUtils.setIfNotNull(request.information().vat(), order::setVat);
-        ObjectUtils.setIfNotNull(request.information().totalPrice(), order::setTotalPrice);
-        ObjectUtils.setIfNotNull(request.information().note(), order::setNote);
-        orderRepository.save(order);
-    }
-
-    private void updateOrderDetail(BasicOrderRequest request, OrderDetail orderDetail, Order order, Vehicle vehicle) {
-        if (StringUtils.isNotNullOrEmpty(request.service().serviceCatalogCode())) {
-            ServiceCatalog serviceCatalog = serviceCatalogRepository
-                    .findByCode(request.service().serviceCatalogCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.NOT_FOUND,
-                            "Service catalog not found with code: "
-                                    + request.service().serviceCatalogCode()));
-            orderDetail.setServiceCatalog(serviceCatalog);
-        }
-
-        ObjectUtils.setIfNotNull(request.information().employeeId(), orderDetail::setEmployeeId);
-        ObjectUtils.setIfNotNull(request.information().note(), orderDetail::setNote);
-        ObjectUtils.setIfNotNull(request.information().status(), orderDetail::setStatus);
-
-        orderDetail.setOrder(order);
-        orderDetail.setVehicle(vehicle);
-        orderDetailRepository.save(orderDetail);
-    }
-
-    private void updateVehicle(BasicOrderRequest request, Vehicle vehicle, Customer customer) {
-        Brand brand = brandRepository
-                .findByCode(request.vehicle().brandCode())
-                .orElseThrow(() -> new BusinessException(
-                        HttpStatus.NOT_FOUND,
-                        "Brand not found with code: " + request.vehicle().brandCode()));
-        Model model = modelRepository
-                .findByCode(request.vehicle().modelCode())
-                .orElseThrow(() -> new BusinessException(
-                        HttpStatus.NOT_FOUND,
-                        "Model not found with code: " + request.vehicle().modelCode()));
-        var vehicleResult =
-                vehicleRepository.findByLicensePlate(request.vehicle().licensePlate());
-
-        if (vehicleResult.isPresent()) {
-            vehicle = vehicleResult.get();
-        }
-
-        vehicle.setBrand(brand);
-        vehicle.setModel(model);
-        ObjectUtils.setIfNotNull(request.vehicle().licensePlate(), vehicle::setLicensePlate);
-        ObjectUtils.setIfNotNull(request.vehicle().note(), vehicle::setNote);
-        ObjectUtils.setIfNotNull(customer, vehicle::setCustomer);
-        vehicle.setUpdatedAt(DateTimeUtils.getCurrentDate());
-        vehicleRepository.save(vehicle);
-    }
-
-
-    private boolean isBlankUUID(UUID uuid) {
-        return uuid == null || uuid.toString().trim().isEmpty();
     }
 }
