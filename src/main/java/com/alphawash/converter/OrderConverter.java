@@ -165,7 +165,7 @@ public class OrderConverter {
             service.setServiceTypeCode(serviceTypeCode);
             OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
             sc.setId(scId);
-            sc.setServiceCatalogCode(scCode);
+            sc.setCode(scCode);
             sc.setPrice(scPrice);
             sc.setSize(scSize);
             service.setServiceCatalog(sc);
