@@ -8,6 +8,7 @@ import com.alphawash.dto.CustomerVehicleFlatDto;
 import com.alphawash.entity.Customer;
 import com.alphawash.exception.BusinessException;
 import com.alphawash.repository.CustomerRepository;
+import com.alphawash.request.CustomerRequest;
 import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
 import com.alphawash.util.CollectionUtils;
@@ -41,20 +42,24 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDto create(CustomerDto dto) {
+    public CustomerDto create(CustomerRequest request) {
         // Kiểm tra xem tên khách hàng có tồn tại hay không
         if (customerRepository
-                .findByCustomerNameAndDeleteFlagFalse(dto.getCustomerName())
+                .findByCustomerNameAndDeleteFlagFalse(request.customerName())
                 .isPresent()) {
             throw new BusinessException(
-                    HttpStatus.CONFLICT, "Tên khách hàng đã tồn tại trong hệ thống: " + dto.getCustomerName());
+                    HttpStatus.CONFLICT, "Tên khách hàng đã tồn tại trong hệ thống: " + request.customerName());
         }
         // Kiểm tra xem khách hàng đã tồn tại hay chưa
-        if (customerRepository.findByPhone(dto.getPhone()).isPresent()) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Khách hàng đã tồn tại trong hệ thống: " + dto.getPhone());
+        if (customerRepository.findByPhone(request.phone()).isPresent()) {
+            throw new BusinessException(
+                    HttpStatus.CONFLICT, "Khách hàng đã tồn tại trong hệ thống: " + request.phone());
         }
-        // Chuyển đổi DTO sang Entity và lưu vào cơ sở dữ liệu
-        Customer saved = customerRepository.save(CustomerConverter.INSTANCE.toEntity(dto));
+        Customer saved = customerRepository.save(Customer.builder()
+                .customerName(request.customerName())
+                .phone(request.phone())
+                .note(request.note())
+                .build());
         return CustomerConverter.INSTANCE.toDto(saved);
     }
 
