@@ -6,7 +6,9 @@ import com.alphawash.dto.CustomerDto;
 import com.alphawash.dto.CustomerVehicleDto;
 import com.alphawash.dto.CustomerVehicleFlatDto;
 import com.alphawash.entity.Customer;
+import com.alphawash.exception.BusinessException;
 import com.alphawash.repository.CustomerRepository;
+import com.alphawash.request.CustomerRequest;
 import com.alphawash.response.CustomerVehicleResponse;
 import com.alphawash.service.CustomerService;
 import com.alphawash.util.CollectionUtils;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,12 +37,29 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository
                 .findById(id)
                 .map(CustomerConverter.INSTANCE::toDto)
-                .orElse(null);
+                .orElseThrow(
+                        () -> new BusinessException(HttpStatus.NOT_FOUND, "Không tìm thấy khách hàng với ID: " + id));
     }
 
     @Override
-    public CustomerDto create(CustomerDto dto) {
-        Customer saved = customerRepository.save(CustomerConverter.INSTANCE.toEntity(dto));
+    public CustomerDto create(CustomerRequest request) {
+        // Kiểm tra xem tên khách hàng có tồn tại hay không
+        if (customerRepository
+                .findByCustomerNameAndDeleteFlagFalse(request.customerName())
+                .isPresent()) {
+            throw new BusinessException(
+                    HttpStatus.CONFLICT, "Tên khách hàng đã tồn tại trong hệ thống: " + request.customerName());
+        }
+        // Kiểm tra xem khách hàng đã tồn tại hay chưa
+        if (customerRepository.findByPhone(request.phone()).isPresent()) {
+            throw new BusinessException(
+                    HttpStatus.CONFLICT, "Khách hàng đã tồn tại trong hệ thống: " + request.phone());
+        }
+        Customer saved = customerRepository.save(Customer.builder()
+                .customerName(request.customerName())
+                .phone(request.phone())
+                .note(request.note())
+                .build());
         return CustomerConverter.INSTANCE.toDto(saved);
     }
 
@@ -49,10 +69,35 @@ public class CustomerServiceImpl implements CustomerService {
                 .findById(id)
                 .map(existing -> {
                     CustomerDto currentDto = CustomerConverter.INSTANCE.toDto(existing);
+
+                    // Kiểm tra trùng tên (nếu tên thay đổi)
+                    if (patchData.getCustomerName() != null
+                            && !patchData.getCustomerName().equalsIgnoreCase(existing.getCustomerName())) {
+
+                        customerRepository
+                                .findByCustomerNameAndDeleteFlagFalse(patchData.getCustomerName())
+                                .ifPresent(duplicate -> {
+                                    throw new BusinessException(
+                                            HttpStatus.CONFLICT,
+                                            "Tên khách hàng đã tồn tại: " + patchData.getCustomerName());
+                                });
+                    }
+
+                    // Kiểm tra trùng số điện thoại (nếu thay đổi)
+                    if (patchData.getPhone() != null && !patchData.getPhone().equals(existing.getPhone())) {
+
+                        customerRepository.findByPhone(patchData.getPhone()).ifPresent(duplicate -> {
+                            throw new BusinessException(
+                                    HttpStatus.CONFLICT, "Số điện thoại đã tồn tại: " + patchData.getPhone());
+                        });
+                    }
+
+                    // Áp dụng patch
                     PatchHelper.applyPatch(patchData, currentDto);
                     existing.setCustomerName(currentDto.getCustomerName());
                     existing.setPhone(currentDto.getPhone());
                     existing.setNote(currentDto.getNote());
+
                     return CustomerConverter.INSTANCE.toDto(customerRepository.save(existing));
                 })
                 .orElse(null);
@@ -60,7 +105,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void delete(UUID id) {
-        customerRepository.deleteById(id);
+        customerRepository
+                .findById(id)
+                .ifPresentOrElse(
+                        customer -> {
+                            customer.setDeleteFlag(true);
+                            customerRepository.save(customer);
+                        },
+                        () -> {
+                            throw new BusinessException(
+                                    HttpStatus.NOT_FOUND, "Không tìm thấy khách hàng để xóa với ID: " + id);
+                        });
     }
 
     @Override

@@ -68,6 +68,7 @@ $$;
 --
 
 
+
 CREATE OR REPLACE FUNCTION get_full_orders()
     RETURNS TABLE
             (
@@ -81,6 +82,7 @@ CREATE OR REPLACE FUNCTION get_full_orders()
                 tip                 NUMERIC,
                 vat                 NUMERIC,
                 discount            NUMERIC,
+                order_delete_flag   BOOLEAN,
                 total_price         NUMERIC,
                 customer_id         UUID,
                 customer_name       VARCHAR,
@@ -121,6 +123,7 @@ BEGIN
                o.tip            AS tip,
                o.vat,
                o.discount,
+			   o.delete_flag AS order_delete_flag,
                o.total_price,
                c.id             AS customer_id,
                c.customer_name,
@@ -153,10 +156,10 @@ BEGIN
         LEFT JOIN brands b ON b.code = v.brand_code
         LEFT JOIN model m ON m.code = v.model_code
         LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-        LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE;
+        LEFT JOIN service s ON s.code = sc.service_code;
 END;
 $$ LANGUAGE plpgsql;
+
 
 ------
 
@@ -300,6 +303,7 @@ CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
                 tip                 NUMERIC,
                 vat                 NUMERIC,
                 discount            NUMERIC,
+                order_delete_flag   BOOLEAN,
                 total_price         NUMERIC,
                 customer_id         UUID,
                 customer_name       VARCHAR,
@@ -340,6 +344,7 @@ BEGIN
                o.tip,
                o.vat,
                o.discount,
+               o.delete_flag AS order_delete_flag,
                o.total_price,
                c.id                 AS customer_id,
                c.customer_name,
@@ -373,7 +378,7 @@ BEGIN
             LEFT JOIN model m ON m.code = v.model_code
             LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
             LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE AND o.id = p_order_id;
+        WHERE o.id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -419,5 +424,35 @@ BEGIN
             JOIN vehicle v ON od.vehicle_id = v.id
         WHERE o.id = p_order_id
           AND o.delete_flag = false;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE TABLE IF NOT EXISTS daily_sequence
+(
+    date_code      VARCHAR(10) PRIMARY KEY,
+    current_number INT DEFAULT 0
+);
+
+CREATE OR REPLACE FUNCTION generate_osd_code()
+    RETURNS TEXT AS
+$$
+DECLARE
+    today_code    VARCHAR(10);
+    seq_number    INT;
+    padded_number TEXT;
+BEGIN
+    today_code := TO_CHAR(CURRENT_DATE, 'DDMMYYYY');
+    INSERT INTO daily_sequence(date_code, current_number)
+    VALUES (today_code, 1)
+    ON CONFLICT (date_code)
+        DO UPDATE SET current_number = daily_sequence.current_number + 1;
+    SELECT current_number
+    INTO seq_number
+    FROM daily_sequence
+    WHERE date_code = today_code;
+    padded_number := LPAD(seq_number::TEXT, 3, '0');
+    RETURN 'OSD' || today_code || padded_number;
 END;
 $$ LANGUAGE plpgsql;

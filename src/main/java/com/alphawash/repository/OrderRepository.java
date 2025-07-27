@@ -2,6 +2,7 @@ package com.alphawash.repository;
 
 import com.alphawash.entity.Order;
 import com.alphawash.entity.Vehicle;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,16 +10,198 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface OrderRepository extends JpaRepository<Order, UUID> {
-
-    @Query(value = "SELECT * FROM get_full_orders()", nativeQuery = true)
-    List<Object[]> getAllOrdersRaw();
+public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT * FROM get_vehicle_by_order_id(:p_order_id)", nativeQuery = true)
     Optional<Vehicle> findVehicleByOrderId(@Param("p_order_id") UUID orderId);
 
     Optional<Order> findById(UUID id);
 
-    @Query(value = "SELECT * FROM get_full_order_by_id(?1)", nativeQuery = true)
-    List<Object[]> getFullOrderById(UUID orderId);
+    @Query(
+            value = "SELECT \n" + "    o.id AS order_id,                         \n"
+                    + "    o.code AS order_code,                     \n"
+                    + "    o.date,                                   \n"
+                    + "    o.checkin_time,                           \n"
+                    + "    o.checkout_time,                          \n"
+                    + "    o.payment_status,                         \n"
+                    + "    o.payment_type,                           \n"
+                    + "    o.tip,                                    \n"
+                    + "    o.vat,                                    \n"
+                    + "    o.discount,                               \n"
+                    + "    o.total_price,                            \n"
+                    + "    o.note AS order_note,                     \n"
+                    + "    o.delete_flag,                            \n"
+                    + "\n"
+                    + "    c.id AS customer_id,                      \n"
+                    + "    c.customer_name,                          \n"
+                    + "    c.phone,                                  \n"
+                    + "\n"
+                    + "    od.code AS order_detail_code,             \n"
+                    + "    od.status,                                \n"
+                    + "    od.note AS order_detail_note,             \n"
+                    + "    od.employee_id,                           \n"
+                    + "\n"
+                    + "    v.id AS vehicle_id,                       \n"
+                    + "    v.license_plate,                          \n"
+                    + "    v.image_url,                              \n"
+                    + "\n"
+                    + "    b.id AS brand_id,                         \n"
+                    + "    b.brand_name,                             \n"
+                    + "    b.code AS brand_code,                     \n"
+                    + "\n"
+                    + "    m.id AS model_id,                         \n"
+                    + "    m.model_name,                             \n"
+                    + "    m.code AS model_code,                     \n"
+                    + "    m.size,                                   \n"
+                    + "\n"
+                    + "    s.id AS service_id,                       \n"
+                    + "    s.code AS service_code,                   \n"
+                    + "    s.service_name,                           \n"
+                    + "    s.service_type_code,                      \n"
+                    + "\n"
+                    + "    sc.id AS service_catalog_id,              \n"
+                    + "    sc.code AS service_catalog_code,          \n"
+                    + "    sc.price,                                 \n"
+                    + "    sc.size AS service_catalog_size           \n"
+                    + "\n"
+                    + "FROM orders o\n"
+                    + "JOIN customer c ON c.id = o.customer_id\n"
+                    + "JOIN order_detail od ON od.order_code = o.code\n"
+                    + "JOIN vehicle v ON v.id = od.vehicle_id\n"
+                    + "JOIN brands b ON b.code = v.brand_code\n"
+                    + "JOIN model m ON m.code = v.model_code\n"
+                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "\n"
+                    + "ORDER BY o.created_at DESC;",
+            nativeQuery = true)
+    List<Object[]> getAllOrderRaw();
+
+    @Query(
+            value = "SELECT \n" + "    o.id AS order_id,\n"
+                    + "    o.code AS order_code,\n"
+                    + "    o.date,\n"
+                    + "    o.checkin_time,\n"
+                    + "    o.checkout_time,\n"
+                    + "    o.payment_status,\n"
+                    + "    o.payment_type,\n"
+                    + "    o.tip,\n"
+                    + "    o.vat,\n"
+                    + "    o.discount,\n"
+                    + "    o.total_price,\n"
+                    + "    o.note AS order_note,\n"
+                    + "    o.delete_flag,\n"
+                    + "\n"
+                    + "    c.id AS customer_id,\n"
+                    + "    c.customer_name,\n"
+                    + "    c.phone,\n"
+                    + "\n"
+                    + "    od.code AS order_detail_code,\n"
+                    + "    od.status,\n"
+                    + "    od.note AS order_detail_note,\n"
+                    + "    od.employee_id,\n"
+                    + "\n"
+                    + "    v.id AS vehicle_id,\n"
+                    + "    v.license_plate,\n"
+                    + "    v.image_url,\n"
+                    + "\n"
+                    + "    b.id AS brand_id,\n"
+                    + "    b.brand_name,\n"
+                    + "    b.code AS brand_code,\n"
+                    + "\n"
+                    + "    m.id AS model_id,\n"
+                    + "    m.model_name,\n"
+                    + "    m.code AS model_code,\n"
+                    + "    m.size,\n"
+                    + "\n"
+                    + "    s.id AS service_id,\n"
+                    + "    s.code AS service_code,\n"
+                    + "    s.service_name,\n"
+                    + "    s.service_type_code,\n"
+                    + "\n"
+                    + "    sc.id AS service_catalog_id,\n"
+                    + "    sc.code AS service_catalog_code,\n"
+                    + "    sc.price,\n"
+                    + "    sc.size AS service_catalog_size\n"
+                    + "\n"
+                    + "FROM orders o\n"
+                    + "JOIN customer c ON c.id = o.customer_id\n"
+                    + "JOIN order_detail od ON od.order_code = o.code\n"
+                    + "JOIN vehicle v ON v.id = od.vehicle_id\n"
+                    + "JOIN brands b ON b.code = v.brand_code\n"
+                    + "JOIN model m ON m.code = v.model_code\n"
+                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "\n"
+                    + "WHERE o.code = :code\n"
+                    + "ORDER BY o.created_at DESC;",
+            nativeQuery = true)
+    List<Object[]> findFullByCode(@Param("code") String code);
+
+    @Query(
+            value = "SELECT \n" + "    o.id AS order_id,\n"
+                    + "    o.code AS order_code,\n"
+                    + "    o.date,\n"
+                    + "    o.checkin_time,\n"
+                    + "    o.checkout_time,\n"
+                    + "    o.payment_status,\n"
+                    + "    o.payment_type,\n"
+                    + "    o.tip,\n"
+                    + "    o.vat,\n"
+                    + "    o.discount,\n"
+                    + "    o.total_price,\n"
+                    + "    o.note AS order_note,\n"
+                    + "    o.delete_flag,\n"
+                    + "\n"
+                    + "    c.id AS customer_id,\n"
+                    + "    c.customer_name,\n"
+                    + "    c.phone,\n"
+                    + "\n"
+                    + "    od.code AS order_detail_code,\n"
+                    + "    od.status,\n"
+                    + "    od.note AS order_detail_note,\n"
+                    + "    od.employee_id,\n"
+                    + "\n"
+                    + "    v.id AS vehicle_id,\n"
+                    + "    v.license_plate,\n"
+                    + "    v.image_url,\n"
+                    + "\n"
+                    + "    b.id AS brand_id,\n"
+                    + "    b.brand_name,\n"
+                    + "    b.code AS brand_code,\n"
+                    + "\n"
+                    + "    m.id AS model_id,\n"
+                    + "    m.model_name,\n"
+                    + "    m.code AS model_code,\n"
+                    + "    m.size,\n"
+                    + "\n"
+                    + "    s.id AS service_id,\n"
+                    + "    s.code AS service_code,\n"
+                    + "    s.service_name,\n"
+                    + "    s.service_type_code,\n"
+                    + "\n"
+                    + "    sc.id AS service_catalog_id,\n"
+                    + "    sc.code AS service_catalog_code,\n"
+                    + "    sc.price,\n"
+                    + "    sc.size AS service_catalog_size\n"
+                    + "\n"
+                    + "FROM orders o\n"
+                    + "JOIN customer c ON c.id = o.customer_id\n"
+                    + "JOIN order_detail od ON od.order_code = o.code\n"
+                    + "JOIN vehicle v ON v.id = od.vehicle_id\n"
+                    + "JOIN brands b ON b.code = v.brand_code\n"
+                    + "JOIN model m ON m.code = v.model_code\n"
+                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "\n"
+                    + "WHERE o.id = :id\n"
+                    + "ORDER BY o.created_at DESC;",
+            nativeQuery = true)
+    List<Object[]> findFullById(@Param("id") UUID id);
+
+    @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = :date", nativeQuery = true)
+    long countByDate(@Param("date") LocalDate date);
 }

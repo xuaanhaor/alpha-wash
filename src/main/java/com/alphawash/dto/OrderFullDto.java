@@ -10,12 +10,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-public class OrderTableDto {
+public class OrderFullDto {
     private UUID id;
-    private Timestamp orderDate;
+    private String code;
+    private Timestamp date;
     private Time checkIn;
     private Time checkOut;
-
     private String paymentStatus;
     private String paymentType;
     private BigDecimal tip;
@@ -23,9 +23,8 @@ public class OrderTableDto {
     private BigDecimal discount;
     private BigDecimal totalPrice;
     private String note;
-
     private CustomerDTO customer;
-
+    private Boolean deleteFlag;
     private List<OrderDetailDTO> orderDetails;
 
     @Data
@@ -39,9 +38,10 @@ public class OrderTableDto {
     @Setter
     @Data
     public static class OrderDetailDTO {
+        private String code;
         private List<EmployeeDTO> employees;
         private VehicleDTO vehicle;
-        private ServiceDTO service;
+        private List<ServiceDTO> service;
         private String status;
         private String note;
     }
@@ -78,7 +78,7 @@ public class OrderTableDto {
     @Data
     public static class ServiceCatalogDTO {
         private Long id;
-        private String serviceCatalogCode;
+        private String code;
         private BigDecimal price;
         private String size;
     }

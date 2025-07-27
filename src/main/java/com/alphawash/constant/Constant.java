@@ -6,7 +6,9 @@ public class Constant {
     public static final String SEARCH_ENDPOINT = "/search";
     public static final String INSERT_ENDPOINT = "/insert";
     public static final String UPDATE_ENDPOINT = "/update";
+    public static final String CANCEL_ENDPOINT = "/cancel";
     public static final String DELETE_ENDPOINT = "/delete";
+    public static final String CODE_PATH_PARAMETER = "/code/{code}";
     public static final String ID_PATH_PARAMETER = "/{id}";
     public static final String DELETE_WITH_PATH_PARAMETER = DELETE_ENDPOINT + "/{id}";
     public static final String UPDATE_WITH_PATH_PARAMETER = UPDATE_ENDPOINT + "/{id}";
@@ -21,6 +23,7 @@ public class Constant {
     public static final String API_SERVICE_TYPE = API + "/service-type";
     public static final String API_SERVICE_CATEGORY = "/by-service-id";
     public static final String API_VEHICLE = API + "/vehicle";
+    public static final String API_REVENUE = API + "/revenue";
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
     public static final String API_BRAND_WITH_MODELS = "/brands/with-models";
     public static final String API_CREATE_ORDER = "/create-order";

@@ -52,8 +52,7 @@ public class CustomerController {
     @ApiResponse(responseCode = "200", description = "Customer created successfully")
     @PostMapping(INSERT_ENDPOINT)
     public ResponseEntity<CustomerResponse> create(@RequestBody CustomerRequest request) {
-        CustomerDto dto = CustomerConverter.INSTANCE.fromRequest(request);
-        CustomerDto saved = customerService.create(dto);
+        CustomerDto saved = customerService.create(request);
         return ResponseEntity.ok(CustomerConverter.INSTANCE.toResponse(saved));
     }
 
