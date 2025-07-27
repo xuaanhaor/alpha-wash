@@ -8,8 +8,10 @@ import com.alphawash.repository.*;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.service.OrderService;
+import com.alphawash.util.CollectionUtils;
 import com.alphawash.util.DateTimeUtils;
 import com.alphawash.util.ObjectUtils;
+import com.alphawash.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -182,7 +184,7 @@ public class OrderServiceImpl implements OrderService {
         // 2. Lấy khách hàng nếu có
         Customer customer = null;
         UUID customerId = request.customerId();
-        if (customerId != null) {
+        if (!StringUtils.isUUIDNullOrBlank(customerId)) {
             customer = customerRepository
                     .findById(customerId)
                     .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
@@ -190,13 +192,13 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(customer);
 
         // 3. Lấy hoặc tạo mới xe
-        if (request.licensePlate() == null || request.licensePlate().isBlank()) {
+        if (StringUtils.isNullOrBlank(request.licensePlate())) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
         }
         Vehicle vehicle =
                 vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
-        if (vehicle == null) {
-            if (request.brandCode() == null || request.modelCode() == null) {
+        if (ObjectUtils.isNull(vehicle)) {
+            if (StringUtils.isNullOrBlank(request.brandCode()) || StringUtils.isNullOrBlank(request.modelCode())) {
                 throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng hoặc dòng xe khi tạo mới xe");
             }
 
@@ -255,8 +257,7 @@ public class OrderServiceImpl implements OrderService {
             orderDetailRepository.save(detail);
 
             // 6. Cập nhật dịch vụ
-            if (detailReq.serviceCatalogCodes() != null
-                    && !detailReq.serviceCatalogCodes().isEmpty()) {
+            if (CollectionUtils.isNotEmpty(detailReq.serviceCatalogCodes())) {
                 List<OrderServiceDtl> existingServices =
                         orderServiceDtlRepository.findByOrderDetailCode(detail.getCode());
 
