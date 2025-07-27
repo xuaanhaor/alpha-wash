@@ -56,9 +56,12 @@ public class OrderController {
     }
 
     @PostMapping(Constant.API_CREATE_ORDER)
-    public ResponseEntity<Void> createOrder(@RequestBody OrderCreateRequest request) {
-        orderService.createOrder(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> createOrder(@RequestBody OrderCreateRequest request) {
+        String code = orderService.createOrder(request);
+        if (code == null || code.isEmpty()) {
+            return ResponseEntity.badRequest().body("Không thể tạo đơn hàng");
+        }
+        return ResponseEntity.ok(code);
     }
 
     @PatchMapping(Constant.UPDATE_ENDPOINT)
