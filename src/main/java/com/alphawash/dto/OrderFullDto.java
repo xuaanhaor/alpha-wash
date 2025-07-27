@@ -78,7 +78,7 @@ public class OrderFullDto {
     @Data
     public static class ServiceCatalogDTO {
         private Long id;
-        private String serviceCatalogCode;
+        private String code;
         private BigDecimal price;
         private String size;
     }
