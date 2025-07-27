@@ -150,22 +150,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // ===== 6. Tính lại tổng tiền và xác minh =====
-        // Tính VAT và Discount dựa trên phần trăm
-        BigDecimal vatAmount = totalServicePrice.multiply(request.vat()).divide(BigDecimal.valueOf(100));
-        BigDecimal discountAmount =
-                totalServicePrice.multiply(request.discount()).divide(BigDecimal.valueOf(100));
-
-        // Tổng tiền dự kiến
-        BigDecimal totalExpected =
-                totalServicePrice.add(vatAmount).add(request.tip()).subtract(discountAmount);
-
-        // So sánh với client gửi lên
-        if (totalExpected.compareTo(request.totalPrice()) != 0) {
-            throw new BusinessException(
-                    HttpStatus.BAD_REQUEST, "Tổng tiền không khớp: " + totalExpected + " ≠ " + request.totalPrice());
-        }
-
-        order.setTotalPrice(totalExpected);
+        order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
     }
 
