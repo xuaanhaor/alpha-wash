@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String createOrder(OrderCreateRequest request) {
+    public UUID createOrder(OrderCreateRequest request) {
         // ===== 1. Kiểm tra khách hàng nếu có =====
         UUID customerId = request.customerId();
         Customer customer = null;
@@ -154,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
         // ===== 6. Tính lại tổng tiền và xác minh =====
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
-        return order.getCode();
+        return order.getId();
     }
 
     public String generateOrderCode() {

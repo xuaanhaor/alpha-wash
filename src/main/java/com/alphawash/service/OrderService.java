@@ -13,7 +13,7 @@ public interface OrderService {
 
     OrderFullDto getOrderByCode(String code);
 
-    String createOrder(OrderCreateRequest request);
+    UUID createOrder(OrderCreateRequest request);
 
     void updateOrder(OrderUpdateRequest request);
 
