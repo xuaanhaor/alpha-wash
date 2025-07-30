@@ -184,7 +184,7 @@ public class OrderServiceImpl implements OrderService {
         // 2. Lấy khách hàng nếu có
         Customer customer = null;
         UUID customerId = request.customerId();
-        if (!StringUtils.isUUIDNullOrBlank(customerId)) {
+        if (customerId != null && !StringUtils.isUUIDNullOrBlank(customerId)) {
             customer = customerRepository
                     .findById(customerId)
                     .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
