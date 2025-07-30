@@ -10,5 +10,5 @@ public record EmployeeRequest(
         LocalDateTime dateOfBirth,
         String identityNumber,
         LocalDateTime joinDate,
-        LocalDateTime workStatus,
+        String workStatus,
         String note) {}
