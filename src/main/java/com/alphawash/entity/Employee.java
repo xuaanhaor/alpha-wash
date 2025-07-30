@@ -38,7 +38,7 @@ public class Employee extends BaseEntity {
     private LocalDateTime joinDate;
 
     @Column(name = "work_status")
-    private LocalDateTime workStatus;
+    private String workStatus;
 
     @Column(columnDefinition = "TEXT")
     private String note;
