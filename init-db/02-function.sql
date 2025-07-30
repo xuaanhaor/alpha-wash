@@ -81,6 +81,7 @@ CREATE OR REPLACE FUNCTION get_full_orders()
                 tip                  NUMERIC,
                 vat                  NUMERIC,
                 discount             NUMERIC,
+                order_delete_flag    BOOLEAN,
                 total_price          NUMERIC,
                 customer_id          UUID,
                 customer_name        VARCHAR,
@@ -121,6 +122,7 @@ BEGIN
                o.tip                AS tip,
                o.vat,
                o.discount,
+               o.delete_flag        AS order_delete_flag,
                o.total_price,
                c.id                 AS customer_id,
                c.customer_name,
@@ -153,10 +155,10 @@ BEGIN
                  LEFT JOIN brands b ON b.code = v.brand_code
                  LEFT JOIN model m ON m.code = v.model_code
                  LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
-                 LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE;
+                 LEFT JOIN service s ON s.code = sc.service_code;
 END;
 $$ LANGUAGE plpgsql;
+
 
 ------
 
@@ -286,6 +288,7 @@ $$ LANGUAGE plpgsql;
 
 ---
 
+
 CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
     RETURNS TABLE
             (
@@ -299,6 +302,7 @@ CREATE OR REPLACE FUNCTION get_full_order_by_id(p_order_id UUID)
                 tip                  NUMERIC,
                 vat                  NUMERIC,
                 discount             NUMERIC,
+                order_delete_flag    BOOLEAN,
                 total_price          NUMERIC,
                 customer_id          UUID,
                 customer_name        VARCHAR,
@@ -339,6 +343,7 @@ BEGIN
                o.tip,
                o.vat,
                o.discount,
+               o.delete_flag        AS order_delete_flag,
                o.total_price,
                c.id                 AS customer_id,
                c.customer_name,
@@ -372,8 +377,7 @@ BEGIN
                  LEFT JOIN model m ON m.code = v.model_code
                  LEFT JOIN service_catalog sc ON sc.code = od.service_catalog_code
                  LEFT JOIN service s ON s.code = sc.service_code
-        WHERE o.delete_flag = FALSE
-          AND o.id = p_order_id;
+        WHERE o.id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -423,76 +427,30 @@ $$ LANGUAGE plpgsql;
 
 --
 
-CREATE OR REPLACE FUNCTION get_daily_revenue_by_service_type_full_range(p_start_date DATE, p_end_date DATE, p_order_status VARCHAR)
-    RETURNS TABLE
-            (
-                order_date        DATE,
-                service_type_code VARCHAR(20),
-                service_name      VARCHAR,
-                service_type_name VARCHAR,
-                net_revenue       NUMERIC,
-                gross_revenue     NUMERIC
-            )
-AS
-$$
-BEGIN
-    RETURN QUERY
-        SELECT DATE(o.date)                    AS order_date,
-               st.code                         AS service_type_code,
-               s.service_name                  AS service_name,
-               st.service_type_name            AS service_type_name,
-               SUM(COALESCE(o.total_price, 0)) AS net_revenue,
-               SUM(
-                           COALESCE(o.total_price, 0)
-                           - COALESCE(o.discount, 0)
-                   )                           AS gross_revenue
-        FROM orders o
-                 JOIN order_detail od ON od.order_id = o.id AND od.delete_flag = FALSE
-                 JOIN service_catalog sc ON sc.code = od.service_catalog_code AND sc.delete_flag = FALSE
-                 JOIN service s ON s.code = sc.service_code AND s.delete_flag = FALSE
-                 JOIN service_type st ON st.code = s.service_type_code AND st.delete_flag = FALSE
-        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
-          AND o.delete_flag = FALSE
-          AND o.payment_status = p_order_status
-        GROUP BY DATE(o.date), st.code, st.service_type_name, s.service_name
-        ORDER BY order_date, service_type_code;
-END;
-$$ LANGUAGE plpgsql;
+CREATE TABLE IF NOT EXISTS daily_sequence
+(
+    date_code      VARCHAR(10) PRIMARY KEY,
+    current_number INT DEFAULT 0
+);
 
---
-
-CREATE OR REPLACE FUNCTION get_favorite_service(p_start_date DATE, p_end_date DATE)
-    RETURNS TABLE
-            (
-                service_code  VARCHAR,
-                service_name  VARCHAR,
-                usage_count   BIGINT,
-                total_revenue NUMERIC
-            )
-AS
+CREATE OR REPLACE FUNCTION generate_osd_code()
+    RETURNS TEXT AS
 $$
+DECLARE
+    today_code    VARCHAR(10);
+    seq_number    INT;
+    padded_number TEXT;
 BEGIN
-    RETURN QUERY
-        SELECT s.code         AS service_code,
-               s.service_name AS service_name,
-               COUNT(1)       AS usage_count,
-               SUM(sc.price)  AS total_revenue
-        FROM order_detail od
-                 JOIN service_catalog sc
-                      ON sc.code = od.service_catalog_code
-                          AND sc.delete_flag = FALSE
-                 JOIN service s
-                      ON s.code = sc.service_code
-                          AND s.delete_flag = FALSE
-                 JOIN orders o
-                      ON o.id = od.order_id
-                          AND o.delete_flag = FALSE
-                          AND o.payment_status = 'DONE'
-        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
-          AND od.delete_flag = FALSE
-        GROUP BY s.code, s.service_name
-        ORDER BY usage_count DESC,
-                 total_revenue DESC
-        LIMIT 5;
+    today_code := TO_CHAR(CURRENT_DATE, 'DDMMYYYY');
+    INSERT INTO daily_sequence(date_code, current_number)
+    VALUES (today_code, 1)
+    ON CONFLICT (date_code)
+        DO UPDATE SET current_number = daily_sequence.current_number + 1;
+    SELECT current_number
+    INTO seq_number
+    FROM daily_sequence
+    WHERE date_code = today_code;
+    padded_number := LPAD(seq_number::TEXT, 3, '0');
+    RETURN 'OSD' || today_code || padded_number;
 END;
 $$ LANGUAGE plpgsql;
