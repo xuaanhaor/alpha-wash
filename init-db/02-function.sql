@@ -600,23 +600,27 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_basic_services()
     RETURNS TABLE
             (
-                service_type_code VARCHAR,
-                service_type_name VARCHAR,
-                service_code      VARCHAR,
-                service_name      VARCHAR,
-                price             NUMERIC,
-                duration          VARCHAR,
-                size              VARCHAR,
-                note              TEXT
+                service_id           BIGINT,
+                service_type_code    VARCHAR,
+                service_type_name    VARCHAR,
+                service_code         VARCHAR,
+                service_name         VARCHAR,
+                service_catalog_code VARCHAR,
+                price                NUMERIC,
+                duration             VARCHAR,
+                size                 VARCHAR,
+                note                 TEXT
             )
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT st.code              AS service_type_code,
+        SELECT sc.id                AS service_id,
+               st.code              AS service_type_code,
                st.service_type_name AS service_type_name,
                s.code               AS service_code,
                s.service_name       AS service_name,
+               sc.code              AS service_catalog_code,
                sc.price,
                s.duration,
                sc.size,
@@ -625,6 +629,47 @@ BEGIN
                  JOIN service_type st ON s.service_type_code = st.code
                  JOIN service_catalog sc ON s.code = sc.service_code
         WHERE s.delete_flag = false
+          AND st.delete_flag = false
+          AND sc.delete_flag = false
+        ORDER BY st.code, s.code;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_basic_service_by_code(p_service_code VARCHAR)
+    RETURNS TABLE
+            (
+                service_id           BIGINT,
+                service_type_code    VARCHAR,
+                service_type_name    VARCHAR,
+                service_code         VARCHAR,
+                service_name         VARCHAR,
+                service_catalog_code VARCHAR,
+                price                NUMERIC,
+                duration             VARCHAR,
+                size                 VARCHAR,
+                note                 TEXT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT sc.id                AS service_id,
+               st.code              AS service_type_code,
+               st.service_type_name AS service_type_name,
+               s.code               AS service_code,
+               s.service_name       AS service_name,
+               sc.code              AS service_catalog_code,
+               sc.price,
+               s.duration,
+               sc.size,
+               s.note::text
+        FROM service s
+                 JOIN service_type st ON s.service_type_code = st.code
+                 JOIN service_catalog sc ON s.code = sc.service_code
+        WHERE s.code = p_service_code
+          AND s.delete_flag = false
           AND st.delete_flag = false
           AND sc.delete_flag = false
         ORDER BY st.code, s.code;
