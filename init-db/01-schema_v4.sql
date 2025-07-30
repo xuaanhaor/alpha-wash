@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS alphawash_db;
+DROP TABLE IF EXISTS alphawash_db_v4;
 
-CREATE DATABASE alphawash_db;
+CREATE DATABASE alphawash_db_v4;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -92,7 +92,7 @@ CREATE TABLE customer
 (
     id            UUID      DEFAULT uuid_generate_v4(),
     customer_name VARCHAR(100),
-    phone         VARCHAR(10) UNIQUE NOT NULL,
+    phone         VARCHAR(10) UNIQUE,
     NOTE          TEXT,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
@@ -154,6 +154,7 @@ CREATE TABLE vehicle
 CREATE TABLE orders
 (
     id             UUID        DEFAULT uuid_generate_v4(),
+    code           VARCHAR(20) UNIQUE NOT NULL,
     customer_id    UUID,
     date           TIMESTAMP,
     checkin_time   TIME,
@@ -171,23 +172,37 @@ CREATE TABLE orders
     created_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     exclusive_key  INT         DEFAULT 0,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id, code)
 );
 
 CREATE TABLE order_detail
 (
-    id                   UUID        DEFAULT uuid_generate_v4(),
-    order_id             UUID REFERENCES orders (id)                   NOT NULL,
-    employee_id          TEXT,
-    service_catalog_code VARCHAR(20) REFERENCES service_catalog (code) NOT NULL,
-    status               VARCHAR(20) DEFAULT 'PENDING',
-    vehicle_id           UUID REFERENCES vehicle (id)                  NOT NULL,
-    note                 TEXT,
-    delete_flag          BOOLEAN     DEFAULT FALSE,
+    id            UUID        DEFAULT uuid_generate_v4(),
+    code          VARCHAR(20) UNIQUE                   NOT NULL,
+    order_code    VARCHAR(20) REFERENCES orders (code) NOT NULL,
+    employee_id   TEXT,
+    status        VARCHAR(20) DEFAULT 'PENDING',
+    vehicle_id    UUID REFERENCES vehicle (id)         NOT NULL,
+    note          TEXT,
+    delete_flag   BOOLEAN     DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT         DEFAULT 0,
+    PRIMARY KEY (id, code)
+);
+
+CREATE TABLE order_service_dtl
+(
+    code                 VARCHAR(20) UNIQUE                         NOT NULL PRIMARY KEY,
+    order_detail_code    VARCHAR(20) REFERENCES order_detail (code) NOT NULL,
+    service_catalog_code VARCHAR(20)                                NOT NULL,
+    delete_flag          BOOLEAN   DEFAULT FALSE,
     created_by           VARCHAR(50),
     updated_by           VARCHAR(50),
-    created_at           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key        INT         DEFAULT 0,
-    PRIMARY KEY (id)
+    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key        INT       DEFAULT 0,
+    UNIQUE (order_detail_code, service_catalog_code)
 );
