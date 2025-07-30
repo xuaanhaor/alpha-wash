@@ -59,7 +59,7 @@ public class OrderController {
     public ResponseEntity<UUID> createOrder(@RequestBody OrderCreateRequest request) {
         UUID id = orderService.createOrder(request);
         if (id == null || id.toString().isEmpty()) {
-            return ResponseEntity.badRequest().build() ;
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(id);
     }
