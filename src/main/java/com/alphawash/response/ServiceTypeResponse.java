@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ServiceTypeResponse {
     private Long id;
+    private String code;
     private String serviceTypeName;
 }

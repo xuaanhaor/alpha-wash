@@ -4,7 +4,9 @@ import static com.alphawash.constant.Constant.*;
 
 import com.alphawash.converter.ServiceConverter;
 import com.alphawash.dto.ServiceDto;
+import com.alphawash.request.CreateBasicServiceRequest;
 import com.alphawash.request.ServiceRequest;
+import com.alphawash.response.BasicServiceResponse;
 import com.alphawash.response.ServiceResponse;
 import com.alphawash.service.ServiceService;
 import com.alphawash.util.ObjectUtils;
@@ -89,5 +91,29 @@ public class ServiceController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         serviceService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get all services")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Get all basic services successfully"),
+        @ApiResponse(responseCode = "404", description = "Service not found"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping(SEARCH_ENDPOINT)
+    public ResponseEntity<List<BasicServiceResponse>> getBasicServices() {
+        var result = serviceService.getAllBasicServices();
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Create new service")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Service created"),
+        @ApiResponse(responseCode = "404", description = "Failed to create service"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping(CREATE_ENDPOINT)
+    public ResponseEntity<BasicServiceResponse> createBasicService(@RequestBody CreateBasicServiceRequest request) {
+        var response = serviceService.createBasicService(request);
+        return ResponseEntity.ok(response);
     }
 }
