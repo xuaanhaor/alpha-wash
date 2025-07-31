@@ -22,6 +22,8 @@ public class DataSourceConfiguration {
             log.info("🌐 URL: {}", conn.getMetaData().getURL());
             log.info("🔄 AutoCommit: {}", conn.getAutoCommit());
             log.info("🧩 Isolation Level: {}", conn.getTransactionIsolation());
+            log.info("🔑 User: {}", conn.getMetaData().getUserName());
+            log.info("🔗 Connection established successfully!");
         } catch (SQLException e) {
             log.error("❌ Failed to establish a connection: {}", e.getMessage());
         }
