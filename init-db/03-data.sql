@@ -354,3 +354,6 @@ INSERT INTO service_catalog(code, size, price, service_code) VALUES ('SC0045','L
 INSERT INTO service_catalog(code, size, price, service_code) VALUES ('SC0046','S','2200000','S0016');
 INSERT INTO service_catalog(code, size, price, service_code) VALUES ('SC0047','M','2200000','S0016');
 INSERT INTO service_catalog(code, size, price, service_code) VALUES ('SC0048','L','2200000','S0016');
+
+INSERT INTO service_sequence_code(code, current_value, max_value) VALUES ('SC', 48, 9999);
+INSERT INTO service_sequence_code(code, current_value, max_value) VALUES ('S', 16, 9999);

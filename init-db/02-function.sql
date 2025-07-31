@@ -427,12 +427,6 @@ $$ LANGUAGE plpgsql;
 
 --
 
-CREATE TABLE IF NOT EXISTS daily_sequence
-(
-    date_code      VARCHAR(10) PRIMARY KEY,
-    current_number INT DEFAULT 0
-);
-
 CREATE OR REPLACE FUNCTION generate_osd_code()
     RETURNS TEXT AS
 $$
@@ -452,5 +446,187 @@ BEGIN
     WHERE date_code = today_code;
     padded_number := LPAD(seq_number::TEXT, 3, '0');
     RETURN 'OSD' || today_code || padded_number;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_daily_revenue_by_service_type_full_range(p_start_date DATE, p_end_date DATE, p_order_status VARCHAR)
+    RETURNS TABLE
+            (
+                order_date        DATE,
+                service_type_code VARCHAR(20),
+                service_name      VARCHAR,
+                service_type_name VARCHAR,
+                net_revenue       NUMERIC,
+                gross_revenue     NUMERIC
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT DATE(o.date)                    AS order_date,
+               st.code                         AS service_type_code,
+               s.service_name                  AS service_name,
+               st.service_type_name            AS service_type_name,
+               SUM(COALESCE(o.total_price, 0)) AS net_revenue,
+               SUM(
+                           COALESCE(o.total_price, 0)
+                           - COALESCE(o.discount, 0)
+                   )                           AS gross_revenue
+        FROM orders o
+                 JOIN order_detail od ON od.order_code = o.code AND od.delete_flag = FALSE
+                 JOIN order_service_dtl osd ON osd.order_detail_code = od.code AND osd.delete_flag = FALSE
+                 JOIN service_catalog sc ON sc.code = osd.service_catalog_code AND sc.delete_flag = FALSE
+                 JOIN service s ON s.code = sc.service_code AND s.delete_flag = FALSE
+                 JOIN service_type st ON st.code = s.service_type_code AND st.delete_flag = FALSE
+        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
+          AND o.delete_flag = FALSE
+          AND o.payment_status = p_order_status
+        GROUP BY DATE(o.date), st.code, st.service_type_name, s.service_name
+        ORDER BY order_date, service_type_code;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_favorite_service(p_start_date DATE, p_end_date DATE)
+    RETURNS TABLE
+            (
+                service_code  VARCHAR,
+                service_name  VARCHAR,
+                usage_count   BIGINT,
+                total_revenue NUMERIC
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT s.code         AS service_code,
+               s.service_name AS service_name,
+               COUNT(1)       AS usage_count,
+               SUM(sc.price)  AS total_revenue
+        FROM order_service_dtl osd
+                 JOIN order_detail od
+                      ON od.code = osd.order_detail_code
+                 JOIN service_catalog sc
+                      ON sc.code = osd.service_catalog_code
+                          AND sc.delete_flag = FALSE
+                 JOIN service s
+                      ON s.code = sc.service_code
+                          AND s.delete_flag = FALSE
+                 JOIN orders o
+                      ON o.code = od.order_code
+                          AND o.delete_flag = FALSE
+                          AND o.payment_status = 'DONE'
+        WHERE DATE(o.date) BETWEEN p_start_date AND p_end_date
+          AND osd.delete_flag = FALSE
+        GROUP BY s.code, s.service_name
+        ORDER BY usage_count DESC,
+                 total_revenue DESC
+        LIMIT 5;
+END;
+$$ LANGUAGE plpgsql;
+
+-- create sequence for service code generation
+
+CREATE OR REPLACE FUNCTION generate_service_sequence_code(p_code TEXT)
+    RETURNS TEXT AS
+$$
+DECLARE
+    next_val INT;
+BEGIN
+    SELECT current_value + 1
+    INTO next_val
+    FROM service_sequence_code
+    WHERE code = p_code
+        FOR UPDATE;
+
+    IF next_val > (SELECT max_value FROM service_sequence_code WHERE code = p_code) THEN
+        RAISE EXCEPTION 'Code limit reached for type %', p_code;
+    END IF;
+
+    UPDATE service_sequence_code
+    SET current_value = next_val
+    WHERE code = p_code;
+
+    RETURN p_code || LPAD(next_val::TEXT, 4, '0');
+END;
+$$ LANGUAGE plpgsql;
+
+
+--
+
+-- CREATE SEQUENCE seq_service_code
+--     START WITH 17
+--     INCREMENT BY 1
+--     MINVALUE 1
+--     MAXVALUE 9999
+--     CYCLE;
+--
+-- CREATE OR REPLACE FUNCTION generate_service_code()
+--     RETURNS TEXT AS
+-- $$
+-- DECLARE
+--     next_val INTEGER;
+-- BEGIN
+--     next_val := nextval('seq_service_code');
+--     RETURN 'S' || LPAD(next_val::TEXT, 4, '0');
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- --
+--
+-- CREATE SEQUENCE seq_service_catalog_code
+--     START WITH 49
+--     INCREMENT BY 1
+--     MINVALUE 1
+--     MAXVALUE 9999
+--     CYCLE;
+--
+-- CREATE OR REPLACE FUNCTION generate_service_catalog_code()
+--     RETURNS TEXT AS
+-- $$
+-- DECLARE
+--     next_val INTEGER;
+-- BEGIN
+--     next_val := nextval('seq_service_catalog_code');
+--     RETURN 'SC' || LPAD(next_val::TEXT, 4, '0');
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_basic_services()
+    RETURNS TABLE
+            (
+                service_type_code VARCHAR,
+                service_type_name VARCHAR,
+                service_code      VARCHAR,
+                service_name      VARCHAR,
+                price             NUMERIC,
+                duration          VARCHAR,
+                size              VARCHAR,
+                note              TEXT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT st.code              AS service_type_code,
+               st.service_type_name AS service_type_name,
+               s.code               AS service_code,
+               s.service_name       AS service_name,
+               sc.price,
+               s.duration,
+               sc.size,
+               s.note::text
+        FROM service s
+                 JOIN service_type st ON s.service_type_code = st.code
+                 JOIN service_catalog sc ON s.code = sc.service_code
+        WHERE s.delete_flag = false
+          AND st.delete_flag = false
+          AND sc.delete_flag = false
+        ORDER BY st.code, s.code;
 END;
 $$ LANGUAGE plpgsql;
