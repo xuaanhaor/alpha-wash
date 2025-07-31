@@ -5,6 +5,7 @@ public class Constant {
     public static final String API = "/api";
     public static final String SEARCH_ENDPOINT = "/search";
     public static final String INSERT_ENDPOINT = "/insert";
+    public static final String CREATE_ENDPOINT = "/create";
     public static final String UPDATE_ENDPOINT = "/update";
     public static final String CANCEL_ENDPOINT = "/cancel";
     public static final String DELETE_ENDPOINT = "/delete";
