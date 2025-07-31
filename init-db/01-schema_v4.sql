@@ -206,3 +206,18 @@ CREATE TABLE order_service_dtl
     exclusive_key        INT       DEFAULT 0,
     UNIQUE (order_detail_code, service_catalog_code)
 );
+
+CREATE TABLE IF NOT EXISTS daily_sequence
+(
+    date_code      VARCHAR(10) PRIMARY KEY,
+    current_number INT DEFAULT 0
+);
+
+
+CREATE TABLE service_sequence_code
+(
+    code          VARCHAR(20),
+    current_value INT NOT NULL,
+    max_value     INT NOT NULL,
+    PRIMARY KEY (code)
+);
