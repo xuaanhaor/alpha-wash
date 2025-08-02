@@ -13,10 +13,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class BasicServiceResponse {
+    private Long serviceId;
     private String serviceTypeCode;
     private String serviceTypeName;
     private String serviceCode;
     private String serviceName;
+    private String serviceCatalogCode;
     private BigDecimal price;
     private String duration;
     private String size;
