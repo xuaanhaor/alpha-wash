@@ -20,3 +20,9 @@ Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch v�
 ### Build file jar
 1. Build file jar `./gradlew :bootJar`
 2. Using Java 17 and run cmd `java -jar build/libs/alphawash-x.x.x-SNAPSHOT.jar` với `x.x.x` là version sau khi build xong file jar, có thể copy tên file ở thư mục `build/libs`
+
+### Guideline chạy server với docker
+1. Cài đặt Docker (bắt buộc)
+2. chạy lệnh `docker-compose up --build`
+3. dùng `docker-compose down` để kết thúc server
+> **Lưu ý**: Không tự ý dùng lệnh `docker-compose down -v` khi đang làm việc với máy ở xưởng
