@@ -6,6 +6,7 @@ import com.alphawash.converter.ServiceConverter;
 import com.alphawash.dto.ServiceDto;
 import com.alphawash.request.CreateBasicServiceRequest;
 import com.alphawash.request.ServiceRequest;
+import com.alphawash.request.UpdateBasicServiceRequest;
 import com.alphawash.response.BasicServiceResponse;
 import com.alphawash.response.ServiceResponse;
 import com.alphawash.service.ServiceService;
@@ -114,6 +115,12 @@ public class ServiceController {
     @PostMapping(CREATE_ENDPOINT)
     public ResponseEntity<BasicServiceResponse> createBasicService(@RequestBody CreateBasicServiceRequest request) {
         var response = serviceService.createBasicService(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(UPDATE_ENDPOINT)
+    public ResponseEntity<BasicServiceResponse> updateBasicService(@RequestBody UpdateBasicServiceRequest request) {
+        var response = serviceService.updateBasicService(request);
         return ResponseEntity.ok(response);
     }
 }

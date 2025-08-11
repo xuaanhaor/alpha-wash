@@ -12,6 +12,7 @@ import com.alphawash.repository.ServiceCatalogRepository;
 import com.alphawash.repository.ServiceRepository;
 import com.alphawash.repository.ServiceTypeRepository;
 import com.alphawash.request.CreateBasicServiceRequest;
+import com.alphawash.request.UpdateBasicServiceRequest;
 import com.alphawash.response.BasicServiceResponse;
 import com.alphawash.service.GenerateSeqService;
 import com.alphawash.service.ServiceService;
@@ -110,6 +111,55 @@ public class ServiceServiceImpl implements ServiceService {
                 .serviceTypeName(service.getServiceName())
                 .serviceCode(service.getCode())
                 .serviceName(service.getServiceName())
+                .serviceCatalogCode(serviceCatalog.getCode())
+                .price(serviceCatalog.getPrice())
+                .duration(service.getDuration())
+                .size(serviceCatalog.getSize().getValue())
+                .note(service.getNote())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public BasicServiceResponse updateBasicService(UpdateBasicServiceRequest request) {
+        if (ObjectUtils.isNull(request)) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Request cannot null");
+        }
+        BasicServiceResponse serviceResponse = serviceRepository
+                .getBasicServiceByServiceCode(request.serviceCode())
+                .orElseThrow(() ->
+                        new BusinessException(HttpStatus.BAD_REQUEST, "Service not found: " + request.serviceCode()));
+        ServiceCatalog serviceCatalog = serviceCatalogRepository
+                .findByCode(serviceResponse.getServiceCatalogCode())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "Error when tried to get service catalog: " + serviceResponse.getServiceCatalogCode()));
+        Service service = serviceRepository
+                .findByCode(request.serviceCode())
+                .orElseThrow(() -> new BusinessException(
+                        HttpStatus.BAD_REQUEST, "Error when trying to get service: " + request.serviceCode()));
+
+        ObjectUtils.setIfNotNull(request.serviceName(), service::setServiceName);
+        ObjectUtils.setIfNotNull(request.duration(), service::setDuration);
+        ObjectUtils.setIfNotNull(request.note(), service::setNote);
+
+        if (StringUtils.isNotNullOrBlank(request.size())) {
+            serviceCatalog.setSize(Size.valueOf(request.size()));
+            serviceCatalogRepository.save(serviceCatalog);
+        }
+        if (request.price() != null) {
+            serviceCatalog.setPrice(request.price());
+            serviceCatalogRepository.save(serviceCatalog);
+        }
+
+        serviceRepository.save(service);
+
+        return BasicServiceResponse.builder()
+                .serviceTypeCode(serviceResponse.getServiceTypeCode())
+                .serviceTypeName(serviceResponse.getServiceTypeName())
+                .serviceCode(service.getCode())
+                .serviceName(service.getServiceName())
+                .serviceCatalogCode(serviceCatalog.getCode())
                 .price(serviceCatalog.getPrice())
                 .duration(service.getDuration())
                 .size(serviceCatalog.getSize().getValue())
