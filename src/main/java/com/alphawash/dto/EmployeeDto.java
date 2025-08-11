@@ -16,6 +16,6 @@ public class EmployeeDto {
     private LocalDateTime dateOfBirth;
     private String identityNumber;
     private LocalDateTime joinDate;
-    private LocalDateTime workStatus;
+    private String workStatus;
     private String note;
 }
