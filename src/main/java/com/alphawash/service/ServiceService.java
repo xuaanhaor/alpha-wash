@@ -2,6 +2,7 @@ package com.alphawash.service;
 
 import com.alphawash.dto.ServiceDto;
 import com.alphawash.request.CreateBasicServiceRequest;
+import com.alphawash.request.UpdateBasicServiceRequest;
 import com.alphawash.response.BasicServiceResponse;
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface ServiceService {
     void delete(Long id);
 
     BasicServiceResponse createBasicService(CreateBasicServiceRequest request);
+
+    BasicServiceResponse updateBasicService(UpdateBasicServiceRequest request);
 }
