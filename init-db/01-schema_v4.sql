@@ -4,7 +4,7 @@ CREATE DATABASE alphawash_db_v4;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE size AS ENUM ('S', 'M', 'L');
+CREATE TYPE size AS ENUM ('S', 'M', 'L', 'XL');
 
 CREATE TABLE service_type
 (
@@ -122,8 +122,9 @@ CREATE TABLE model
     id            SERIAL,
     code          VARCHAR(20) UNIQUE NOT NULL,
     model_name    VARCHAR(50)        NOT NULL,
-    size          VARCHAR(5)         NOT NULL,
+    size          SIZE               NOT NULL,
     brand_code    VARCHAR(20) REFERENCES brands (code),
+    note          TEXT,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
     updated_by    VARCHAR(50),
