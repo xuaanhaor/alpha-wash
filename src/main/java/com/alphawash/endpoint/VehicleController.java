@@ -1,9 +1,12 @@
 package com.alphawash.endpoint;
 
 import com.alphawash.constant.Constant;
+import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
+import com.alphawash.request.BasicCarSizeRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.service.VehicleService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,5 +52,30 @@ public class VehicleController {
     @GetMapping(Constant.ID_PATH_PARAMETER)
     public ResponseEntity<VehicleDto> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(vehicleService.findById(id));
+    }
+
+    @Operation(summary = "Car size list retrieval")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Vehicle found"),
+                @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @GetMapping("/size")
+    public ResponseEntity<List<CarSizeDto>> getCarSizes() {
+        return ResponseEntity.ok(vehicleService.getCarSizes());
+    }
+
+    @Operation(summary = "Update car size")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Vehicle found"),
+                @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+                @ApiResponse(responseCode = "400", description = "Invalid request data"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @PostMapping("/size/update")
+    public ResponseEntity<CarSizeDto> updateCarSize(@RequestBody BasicCarSizeRequest request) {
+        return ResponseEntity.ok(vehicleService.updateCarSize(request));
     }
 }
