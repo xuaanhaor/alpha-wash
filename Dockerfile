@@ -1,28 +1,30 @@
 # Stage 1: Builder
-FROM openjdk:17-alpine AS builder
+FROM arm64v8/eclipse-temurin:17-jdk-focal as builder
 
 WORKDIR /app
 
-# Copy gradle config files
 COPY gradlew build.gradle settings.gradle gradle.properties ./
+RUN chmod +x ./gradlew
+
 COPY gradle ./gradle
 
-RUN chmod +x ./gradlew
+RUN apt-get update && apt-get install -y findutils
+
 RUN ./gradlew dependencies --no-daemon || true
 
-# Copy full source code
 COPY . .
-# Build jar file
+
+RUN chmod +x ./gradlew
 RUN ./gradlew bootJar --no-daemon -x test
 
 # Stage 2: Runner
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jdk-jammy
 
 ENV TZ=Asia/Ho_Chi_Minh
 
-RUN apk add --no-cache postgresql-client && \
-    apk add --no-cache bash && \
-    apk add --no-cache dos2unix
+RUN apt-get update && \
+    apt-get install -y postgresql-client bash dos2unix && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the built jar file and healthcheck script
 WORKDIR /app
