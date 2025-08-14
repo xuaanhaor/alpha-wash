@@ -48,9 +48,9 @@ INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0005','CX-30','M',
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0006','CX-5','M','B0001');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0007','CX-8','L','B0001');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0008','BT-50','L','B0001');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0009','GS8','','B0002');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0009','GS8','M','B0002');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0010','M8','L','B0002');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0011','M6 Pro','','B0002');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0011','M6 Pro','M','B0002');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0012','XC40','M','B0003');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0013','XC60','M','B0003');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0014','XC90','L','B0003');
@@ -68,9 +68,9 @@ INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0025','VF 9','L','
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0026','VF 6','M','B0004');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0027','VF 7','M','B0004');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0028','VF 3','S','B0004');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0029','H6','','B0005');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0030','Karoq','','B0006');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0031','Kodiaq','','B0006');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0029','H6','M','B0005');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0030','Karoq','M','B0006');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0031','Kodiaq','M','B0006');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0032','1500','L','B0007');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0033','DBX','L','B0008');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0034','Lynk & Co 09','L','B0009');
@@ -78,8 +78,8 @@ INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0035','Lynk & Co 0
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0036','Lynk & Co 01','M','B0009');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0037','Lynk & Co 05','M','B0009');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0038','Lynk & Co 03','M','B0009');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0039','Y Plus','','B0010');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0040','ES','','B0010');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0039','Y Plus','S','B0010');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0040','ES','S','B0010');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0041','718','S','B0011');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0042','911','M','B0011');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0043','Taycan','M','B0011');
@@ -121,7 +121,7 @@ INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0078','EQB','M','B
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0079','EQE SUV','L','B0013');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0080','AMG SL','M','B0013');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0081','Maybach EQS SUV','L','B0013');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0082','C5','','B0014');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0082','C5','M','B0014');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0083','2008','M','B0015');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0084','3008','M','B0015');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0085','5008','M','B0015');
@@ -210,7 +210,7 @@ INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0167','Flying Spur
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0168','Bentayga','M','B0031');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0169','Continental','M','B0031');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0170','Levante','M','B0032');
-INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0171','Ghibli','','B0032');
+INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0171','Ghibli','S','B0032');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0172','Quattroporte','M','B0032');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0173','Grecale','M','B0032');
 INSERT INTO model(code, model_name,size,brand_code) VALUES ('M0174','GranTurismo','M','B0032');
