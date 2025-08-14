@@ -1,5 +1,6 @@
 package com.alphawash.entity;
 
+import com.alphawash.constant.Size;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,12 @@ public class Model extends BaseEntity {
     @Column(name = "model_name")
     private String modelName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "size")
-    private String size;
+    private Size size;
+
+    @Column(name = "note")
+    private String note;
 
     @ManyToOne
     @JoinColumn(name = "brand_code", referencedColumnName = "code")

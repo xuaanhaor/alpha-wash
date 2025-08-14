@@ -1,5 +1,6 @@
 package com.alphawash.entity;
 
+import com.alphawash.constant.Constant;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -35,13 +36,15 @@ public class BaseEntity {
 
     @PrePersist
     protected void onCreate() {
+        this.createdBy = Constant.ADMINISTRATOR;
         this.createdAt = LocalDateTime.now();
         this.deleteFlag = false;
-        this.exclusiveKey = 0;
+        this.exclusiveKey = Constant.ZERO;
     }
 
     @PreUpdate
     protected void onUpdate() {
+        this.updatedBy = Constant.ADMINISTRATOR;
         this.exclusiveKey++;
         this.updatedAt = LocalDateTime.now();
     }
