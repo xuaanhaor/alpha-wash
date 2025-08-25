@@ -1,10 +1,12 @@
 package com.alphawash.endpoint;
 
 import com.alphawash.constant.Constant;
+import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.request.BasicCarSizeRequest;
 import com.alphawash.request.VehicleRequest;
+import com.alphawash.response.BasicCustomerVehicleDetailResponse;
 import com.alphawash.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -77,5 +79,16 @@ public class VehicleController {
     @PostMapping("/size/update")
     public ResponseEntity<CarSizeDto> updateCarSize(@RequestBody BasicCarSizeRequest request) {
         return ResponseEntity.ok(vehicleService.updateCarSize(request));
+    }
+
+    @GetMapping("/services-used")
+    public ResponseEntity<List<BasicVehicleServiceUsedSearchDto>> getVehicleServiceUsed() {
+        return ResponseEntity.ok(vehicleService.searchVehicleServiceUsage());
+    }
+
+    @PostMapping("/services-used/detail")
+    public ResponseEntity<BasicCustomerVehicleDetailResponse> getVehicleServiceUsedDetail(
+            @RequestBody UUID customerId) {
+        return ResponseEntity.ok(vehicleService.searchVehicleServiceUsageDetail(customerId));
     }
 }

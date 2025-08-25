@@ -2,32 +2,43 @@ package com.alphawash.service.impl;
 
 import com.alphawash.constant.Size;
 import com.alphawash.converter.VehicleConverter;
+import com.alphawash.dto.BasicVehicleServiceUsedDto;
+import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
+import com.alphawash.dto.VehicleServicesDto;
+import com.alphawash.entity.Customer;
 import com.alphawash.entity.Model;
+import com.alphawash.entity.Vehicle;
 import com.alphawash.exception.BusinessException;
-import com.alphawash.repository.BrandRepository;
+import com.alphawash.repository.CustomerRepository;
 import com.alphawash.repository.ModelRepository;
+import com.alphawash.repository.OrderDetailRepository;
 import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.BasicCarSizeRequest;
 import com.alphawash.request.VehicleRequest;
+import com.alphawash.response.BasicCustomerVehicleDetailResponse;
 import com.alphawash.service.VehicleService;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
 public class VehicleServiceImpl implements VehicleService {
 
     private final VehicleRepository repository;
-    private final BrandRepository brandRepository;
     private final ModelRepository modelRepository;
+    private final CustomerRepository customerRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Override
     public List<VehicleDto> search() {
@@ -119,5 +130,63 @@ public class VehicleServiceImpl implements VehicleService {
                 .size(size)
                 .note(model.getNote())
                 .build();
+    }
+
+    @Override
+    public List<BasicVehicleServiceUsedSearchDto> searchVehicleServiceUsage() {
+        return repository.searchVehicleServiceUsage().stream()
+                .map(row -> {
+                    BasicVehicleServiceUsedSearchDto dto = BasicVehicleServiceUsedSearchDto.builder()
+                            .licensePlate((String) row[0])
+                            .vehicleName((String) row[1])
+                            .customerName((String) row[2])
+                            .phone((String) row[3])
+                            .serviceUsage((Integer) row[4])
+                            .note((String) row[5])
+                            .build();
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public BasicCustomerVehicleDetailResponse searchVehicleServiceUsageDetail(UUID customerId) {
+        Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() ->
+                        new BusinessException(HttpStatus.NOT_FOUND, "Khách hàng không tồn tại với id: " + customerId));
+        List<Vehicle> vehicle = repository.findByCustomerId(customerId);
+        if (!CollectionUtils.isEmpty(vehicle)) {
+            List<BasicVehicleServiceUsedDto> vehicles = new ArrayList<>();
+            vehicle.forEach(v -> {
+                List<VehicleServicesDto> services =
+                        repository.searchVehicleServiceUsageDetail(v.getLicensePlate()).stream()
+                                .map(row -> VehicleServicesDto.builder()
+                                        .serviceName((String) row[0])
+                                        .checkinTime(((Timestamp) row[1])
+                                                .toLocalDateTime()
+                                                .toLocalDate())
+                                        .build())
+                                .toList();
+                vehicles.add(BasicVehicleServiceUsedDto.builder()
+                        .licensePlate(v.getLicensePlate())
+                        .vehicleName(getVehicleName(v))
+                        .services(services)
+                        .build());
+            });
+            return BasicCustomerVehicleDetailResponse.builder()
+                    .customerId(customer.getId())
+                    .customerName(customer.getCustomerName())
+                    .phone(customer.getPhone())
+                    .vehicles(vehicles)
+                    .build();
+        }
+        return null;
+    }
+
+    private String getVehicleName(Vehicle vehicle) {
+        var brand = vehicle.getModel().getBrand().getBrandName();
+        var model = vehicle.getModel().getModelName();
+        return brand + " " + model;
     }
 }

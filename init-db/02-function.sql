@@ -675,3 +675,59 @@ BEGIN
         ORDER BY st.code, s.code;
 END;
 $$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used()
+RETURNS TABLE
+(
+    license_plate VARCHAR,
+    vehicle_name  VARCHAR,
+    customer_name VARCHAR,
+    phone	      VARCHAR,
+    service_usage INT,
+    note	      TEXT
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    select 
+		v.license_plate,
+		CONCAT(b.brand_name, ' ', m.model_name)::VARCHAR as vehicle_name,
+		COALESCE(c.customer_name , 'Chưa cập nhật')::VARCHAR AS customer_name,
+		COALESCE(c.phone , 'Chưa cập nhật')::VARCHAR AS phone,
+		COUNT(od.id)::INT as service_usage,
+		v.note
+	from vehicle v
+	join order_detail od on od.vehicle_id = v.id
+	join orders o on od.order_code = o.code
+	left join customer c on c.id = o.customer_id
+	join model m on v.model_code = m.code
+	join brands b on m.brand_code = b.code 
+	group by v.license_plate, c.customer_name, c.phone, m.model_name, b.brand_name, v.note;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used_detail(p_license_plate VARCHAR)
+RETURNS TABLE
+(
+    service_name VARCHAR,
+    date  		 TIMESTAMP
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    select s.service_name, o.date from 
+	orders o
+	join order_detail od on od.order_code = o.code
+	join vehicle v on od.vehicle_id = v.id
+	join order_service_dtl osd on od.code = osd.order_detail_code
+	join service_catalog sc on osd.service_catalog_code  = sc.code
+	join service s on sc.service_code = s.code
+	where v.license_plate = p_license_plate;
+END;
+$$ LANGUAGE plpgsql;
