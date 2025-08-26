@@ -13,6 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class VehicleServicesDto {
+    private Integer id;
     private String serviceName;
     private LocalDate checkinTime;
 }

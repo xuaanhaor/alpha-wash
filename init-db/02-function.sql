@@ -681,9 +681,11 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used()
 RETURNS TABLE
 (
+    id            INT,
     license_plate VARCHAR,
     vehicle_name  VARCHAR,
     customer_name VARCHAR,
+    customer_id   UUID,
     phone	      VARCHAR,
     service_usage INT,
     note	      TEXT
@@ -692,10 +694,12 @@ AS
 $$
 BEGIN
     RETURN QUERY
-    select 
+    select
+        ROW_NUMBER() OVER (ORDER BY v.license_plate)::INT AS id,
 		v.license_plate,
 		CONCAT(b.brand_name, ' ', m.model_name)::VARCHAR as vehicle_name,
 		COALESCE(c.customer_name , 'Chưa cập nhật')::VARCHAR AS customer_name,
+        c.id AS customer_id,
 		COALESCE(c.phone , 'Chưa cập nhật')::VARCHAR AS phone,
 		COUNT(od.id)::INT as service_usage,
 		v.note
@@ -705,7 +709,7 @@ BEGIN
 	left join customer c on c.id = o.customer_id
 	join model m on v.model_code = m.code
 	join brands b on m.brand_code = b.code 
-	group by v.license_plate, c.customer_name, c.phone, m.model_name, b.brand_name, v.note;
+	group by v.license_plate, c.customer_name, c.id, c.phone, m.model_name, b.brand_name, v.note;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -714,6 +718,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used_detail(p_license_plate VARCHAR)
 RETURNS TABLE
 (
+    id   INT,
     service_name VARCHAR,
     date  		 TIMESTAMP
 )
@@ -721,8 +726,11 @@ AS
 $$
 BEGIN
     RETURN QUERY
-    select s.service_name, o.date from 
-	orders o
+    select
+        ROW_NUMBER() OVER (ORDER BY o.date)::INT AS id,
+        s.service_name,
+        o.date 
+    from orders o
 	join order_detail od on od.order_code = o.code
 	join vehicle v on od.vehicle_id = v.id
 	join order_service_dtl osd on od.code = osd.order_detail_code
