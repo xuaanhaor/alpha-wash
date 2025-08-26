@@ -137,12 +137,14 @@ public class VehicleServiceImpl implements VehicleService {
         return repository.searchVehicleServiceUsage().stream()
                 .map(row -> {
                     BasicVehicleServiceUsedSearchDto dto = BasicVehicleServiceUsedSearchDto.builder()
-                            .licensePlate((String) row[0])
-                            .vehicleName((String) row[1])
-                            .customerName((String) row[2])
-                            .phone((String) row[3])
-                            .serviceUsage((Integer) row[4])
-                            .note((String) row[5])
+                            .id((Integer) row[0])
+                            .licensePlate((String) row[1])
+                            .vehicleName((String) row[2])
+                            .customerName((String) row[3])
+                            .customerId((UUID) row[4])
+                            .phone((String) row[5])
+                            .serviceUsage((Integer) row[6])
+                            .note((String) row[7])
                             .build();
                     return dto;
                 })
@@ -162,8 +164,9 @@ public class VehicleServiceImpl implements VehicleService {
                 List<VehicleServicesDto> services =
                         repository.searchVehicleServiceUsageDetail(v.getLicensePlate()).stream()
                                 .map(row -> VehicleServicesDto.builder()
-                                        .serviceName((String) row[0])
-                                        .checkinTime(((Timestamp) row[1])
+                                        .id((Integer) row[0])
+                                        .serviceName((String) row[1])
+                                        .checkinTime(((Timestamp) row[2])
                                                 .toLocalDateTime()
                                                 .toLocalDate())
                                         .build())
