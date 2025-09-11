@@ -136,7 +136,7 @@ CREATE TABLE model
 CREATE TABLE vehicle
 (
     id            UUID      DEFAULT uuid_generate_v4(),
-    license_plate VARCHAR(8) UNIQUE NOT NULL,
+    license_plate VARCHAR(9) UNIQUE NOT NULL,
     customer_id   UUID REFERENCES customer (id),
     brand_code    VARCHAR(20) REFERENCES brands (code),
     model_code    VARCHAR(20) REFERENCES model (code),
