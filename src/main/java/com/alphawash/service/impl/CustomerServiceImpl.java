@@ -43,13 +43,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto create(CustomerRequest request) {
-        // Kiểm tra xem tên khách hàng có tồn tại hay không
-        if (customerRepository
-                .findByCustomerNameAndDeleteFlagFalse(request.customerName())
-                .isPresent()) {
-            throw new BusinessException(
-                    HttpStatus.CONFLICT, "Tên khách hàng đã tồn tại trong hệ thống: " + request.customerName());
-        }
         // Kiểm tra xem khách hàng đã tồn tại hay chưa
         if (customerRepository.findByPhone(request.phone()).isPresent()) {
             throw new BusinessException(
