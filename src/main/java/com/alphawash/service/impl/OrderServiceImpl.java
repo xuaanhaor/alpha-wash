@@ -227,6 +227,7 @@ public class OrderServiceImpl implements OrderService {
         ObjectUtils.setIfNotNull(request.paymentType(), order::setPaymentType);
         ObjectUtils.setIfNotNull(request.checkInTime(), order::setCheckinTime);
         ObjectUtils.setIfNotNull(request.checkOutTime(), order::setCheckoutTime);
+        ObjectUtils.setIfNotNull(request.date(), order::setDate);
         ObjectUtils.setIfNotNull(request.vat(), order::setVat);
         ObjectUtils.setIfNotNull(request.tip(), order::setTip);
         ObjectUtils.setIfNotNull(request.discount(), order::setDiscount);

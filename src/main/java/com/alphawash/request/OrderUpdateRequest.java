@@ -1,6 +1,8 @@
 package com.alphawash.request;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public record OrderUpdateRequest(
         String paymentType,
         LocalTime checkInTime,
         LocalTime checkOutTime,
+        LocalDateTime date,
         BigDecimal vat,
         BigDecimal tip,
         BigDecimal discount,
