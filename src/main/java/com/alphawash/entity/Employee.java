@@ -1,7 +1,8 @@
 package com.alphawash.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 import lombok.*;
 
 @Entity
@@ -29,13 +30,13 @@ public class Employee extends BaseEntity {
     private String bankAccount;
 
     @Column(name = "date_of_birth")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "identity_number")
     private String identityNumber;
 
     @Column(name = "join_date")
-    private LocalDateTime joinDate;
+    private LocalDate joinDate;
 
     @Column(name = "work_status")
     private String workStatus;

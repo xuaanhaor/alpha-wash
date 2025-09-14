@@ -1,14 +1,14 @@
 package com.alphawash.request;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record EmployeeRequest(
         String name,
         String phone,
         String bankName,
         String bankAccount,
-        LocalDateTime dateOfBirth,
+        LocalDate dateOfBirth,
         String identityNumber,
-        LocalDateTime joinDate,
+        LocalDate joinDate,
         String workStatus,
         String note) {}
