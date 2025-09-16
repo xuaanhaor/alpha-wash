@@ -19,13 +19,9 @@ import com.alphawash.service.ServiceService;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
 import com.alphawash.util.StringUtils;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 
 @org.springframework.stereotype.Service

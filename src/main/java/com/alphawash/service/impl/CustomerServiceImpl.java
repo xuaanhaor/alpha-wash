@@ -15,7 +15,6 @@ import com.alphawash.util.CollectionUtils;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -111,11 +110,11 @@ public class CustomerServiceImpl implements CustomerService {
                         });
     }
 
-    @Override
-    public CustomerVehicleResponse findByPhone(String phone) {
-        Optional<Customer> result = customerRepository.findByPhone(phone);
-        return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
-    }
+    //    @Override
+    //    public CustomerVehicleResponse findByPhone(String phone) {
+    //        Optional<Customer> result = customerRepository.findByPhone(phone);
+    //        return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
+    //    }
 
     @Override
     public CustomerVehicleResponse findCustomerVehicleByPhoneOrLicensePlate(String phoneOrLicensePlate) {

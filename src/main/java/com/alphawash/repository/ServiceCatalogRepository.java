@@ -1,6 +1,5 @@
 package com.alphawash.repository;
 
-import com.alphawash.constant.Size;
 import com.alphawash.entity.ServiceCatalog;
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,13 +40,11 @@ public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, 
 
     Optional<ServiceCatalog> findByCode(String code);
 
-    @Query(value = "SELECT * FROM service_catalog sc " +
-            "WHERE sc.service_code = :serviceCode " +
-            "AND sc.size = :size " +
-            "AND sc.delete_flag = false",
+    @Query(
+            value = "SELECT * FROM service_catalog sc " + "WHERE sc.service_code = :serviceCode "
+                    + "AND sc.size = :size "
+                    + "AND sc.delete_flag = false",
             nativeQuery = true)
     Optional<ServiceCatalog> findByServiceCodeAndSize(
-            @Param("serviceCode") String serviceCode,
-            @Param("size") String size);
-
+            @Param("serviceCode") String serviceCode, @Param("size") String size);
 }

@@ -245,7 +245,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE c.phone ILIKE p_customer_phone
+        WHERE c.phone ILIKE (REPLACE(REPLACE(p_customer_phone, '%', '\%'), '_', '\_') || '%')
           AND c.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
@@ -280,7 +280,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE v.license_plate ILIKE p_customer_license_plate
+        WHERE v.license_plate ILIKE (REPLACE(REPLACE(p_customer_license_plate, '%', '\%'), '_', '\_') || '%')
           AND v.delete_flag = false
           AND c.delete_flag = false;
 END;
@@ -418,7 +418,7 @@ BEGIN
                v.updated_at,
                v.exclusive_key
         FROM orders o
-                 JOIN order_detail od ON o.id = od.order_id
+                 JOIN order_detail od ON o.code = od.order_code
                  JOIN vehicle v ON od.vehicle_id = v.id
         WHERE o.id = p_order_id
           AND o.delete_flag = false;

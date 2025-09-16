@@ -14,7 +14,9 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query(value = "SELECT * FROM get_basic_services()", nativeQuery = true)
     List<BasicServiceResponse> getBasicServices();
 
-    @Query(value = """
+    @Query(
+            value =
+                    """
     SELECT sc.id                AS service_id,
            st.code              AS service_type_code,
            st.service_type_name AS service_type_name,
@@ -34,9 +36,8 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
       AND st.delete_flag = false
       AND sc.delete_flag = false
     ORDER BY st.code, s.code
-    """, nativeQuery = true)
+    """,
+            nativeQuery = true)
     Optional<BasicServiceResponse> getBasicServiceByServiceCode(
-            @Param("p_service_code") String serviceCode,
-            @Param("p_size") String size);
-
+            @Param("p_service_code") String serviceCode, @Param("p_size") String size);
 }
