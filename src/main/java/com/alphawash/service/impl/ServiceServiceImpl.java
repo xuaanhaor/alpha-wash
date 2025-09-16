@@ -19,9 +19,13 @@ import com.alphawash.service.ServiceService;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
 import com.alphawash.util.StringUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 
 @org.springframework.stereotype.Service
@@ -126,7 +130,7 @@ public class ServiceServiceImpl implements ServiceService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Request cannot null");
         }
         BasicServiceResponse serviceResponse = serviceRepository
-                .getBasicServiceByServiceCode(request.serviceCode())
+                .getBasicServiceByServiceCode(request.serviceCode(), request.size())
                 .orElseThrow(() ->
                         new BusinessException(HttpStatus.BAD_REQUEST, "Service not found: " + request.serviceCode()));
         ServiceCatalog serviceCatalog = serviceCatalogRepository
@@ -145,14 +149,13 @@ public class ServiceServiceImpl implements ServiceService {
 
         if (StringUtils.isNotNullOrBlank(request.size())) {
             serviceCatalog.setSize(Size.valueOf(request.size()));
-            serviceCatalogRepository.save(serviceCatalog);
         }
         if (request.price() != null) {
             serviceCatalog.setPrice(request.price());
-            serviceCatalogRepository.save(serviceCatalog);
         }
 
         serviceRepository.save(service);
+        serviceCatalogRepository.save(serviceCatalog);
 
         return BasicServiceResponse.builder()
                 .serviceTypeCode(serviceResponse.getServiceTypeCode())
