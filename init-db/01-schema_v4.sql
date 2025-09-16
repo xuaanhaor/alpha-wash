@@ -208,6 +208,38 @@ CREATE TABLE order_service_dtl
     UNIQUE (order_detail_code, service_catalog_code)
 );
 
+CREATE TABLE service_combo
+(
+    id            SERIAL,
+    code          VARCHAR(20) NOT NULL,
+    combo_name    VARCHAR(200),
+    price         NUMERIC,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE service_combo_dtl
+(
+    id                   SERIAL,
+    code                 varchar(20) UNIQUE NOT NULL,
+    combo_code           VARCHAR(20)        NOT NULL,
+    service_catalog_code VARCHAR(20)        NOT NULL,
+    delete_flag          BOOLEAN   DEFAULT FALSE,
+    created_by           VARCHAR(50),
+    updated_by           VARCHAR(50),
+    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key        INT       DEFAULT 0,
+    PRIMARY KEY (code),
+    UNIQUE (combo_code, service_catalog_code)
+);
+
 CREATE TABLE IF NOT EXISTS daily_sequence
 (
     date_code      VARCHAR(10) PRIMARY KEY,

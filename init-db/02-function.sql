@@ -245,7 +245,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE c.phone = p_customer_phone
+        WHERE c.phone ILIKE p_customer_phone
           AND c.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
@@ -280,7 +280,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE v.license_plate = p_customer_license_plate
+        WHERE v.license_plate ILIKE p_customer_license_plate
           AND v.delete_flag = false
           AND c.delete_flag = false;
 END;
