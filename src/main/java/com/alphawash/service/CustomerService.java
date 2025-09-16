@@ -19,5 +19,5 @@ public interface CustomerService {
 
     //    CustomerVehicleResponse findByPhone(String phone);
 
-    CustomerVehicleResponse findCustomerVehicleByPhoneOrLicensePlate(String phone);
+    List<CustomerVehicleResponse> findCustomerVehicleByPhoneOrLicensePlate(String phone);
 }

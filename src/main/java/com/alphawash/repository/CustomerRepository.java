@@ -24,4 +24,24 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Optional<Object> findByIdAndDeleteFlagFalse(UUID id);
 
     Optional<Customer> findByCustomerNameAndDeleteFlagFalse(String customerName);
+
+    @Query("SELECT new com.alphawash.dto.CustomerVehicleFlatDto("
+            + "c.id, c.phone, c.customerName, v.brand.code, b.brandName, "
+            + "v.model.code, m.modelName, v.licensePlate) "
+            + "FROM Customer c "
+            + "LEFT JOIN Vehicle v ON c.id = v.customer.id AND v.deleteFlag = false "
+            + "LEFT JOIN Brand b ON v.brand.code = b.code "
+            + "LEFT JOIN Model m ON v.model.code = m.code "
+            + "WHERE c.phone LIKE :phonePattern AND c.deleteFlag = false")
+    List<CustomerVehicleFlatDto> findCustomerWithVehicleByPhoneLike(@Param("phonePattern") String phonePattern);
+
+    @Query("SELECT new com.alphawash.dto.CustomerVehicleFlatDto("
+            + "c.id, c.phone, c.customerName, v.brand.code, b.brandName, "
+            + "v.model.code, m.modelName, v.licensePlate) "
+            + "FROM Customer c "
+            + "LEFT JOIN Vehicle v ON c.id = v.customer.id AND v.deleteFlag = false "
+            + "LEFT JOIN Brand b ON v.brand.code = b.code "
+            + "LEFT JOIN Model m ON v.model.code = m.code "
+            + "WHERE UPPER(v.licensePlate) LIKE :platePattern AND c.deleteFlag = false")
+    List<CustomerVehicleFlatDto> findCustomerWithVehicleByLicensePlateLike(@Param("platePattern") String platePattern);
 }
