@@ -18,6 +18,7 @@ public class Constant {
     public static final String API_BRANDS = API + "/brands";
     public static final String API_MODEL = API + "/model";
     public static final String API_ORDERS = API + "/orders";
+    public static final String API_SERVICE_COMBO = API + "/combo";
     public static final String API_ORDER_DETAIL = API + "/order-detail";
     public static final String API_SERVICE = API + "/service";
     public static final String API_SERVICE_CATALOG = API + "/service-catalog";
