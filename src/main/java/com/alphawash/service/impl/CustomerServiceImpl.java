@@ -142,7 +142,7 @@ public class CustomerServiceImpl implements CustomerService {
             // Fuzzy search for partial matches
             if (searchTerm.startsWith("0") && searchTerm.matches("^0\\d*$")) {
                 // Partial phone number (starts with 0, only digits)
-                flatList = customerRepository.findCustomerWithVehicleByPhoneLike(searchTerm + "%");
+                flatList = customerRepository.findCustomerWithVehicleByPhoneLike(searchTerm);
             } else if (searchTerm.matches("^\\d.*[A-Z].*") || searchTerm.matches("^\\d{1,2}[A-Z].*")) {
                 // Partial license plate (starts with digits, contains letters)
                 flatList = customerRepository.findCustomerWithVehicleByLicensePlateLike(searchTerm + "%");

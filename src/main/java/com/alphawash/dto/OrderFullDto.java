@@ -1,5 +1,6 @@
 package com.alphawash.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -13,7 +14,10 @@ import lombok.Setter;
 public class OrderFullDto {
     private UUID id;
     private String code;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "Asia/Ho_Chi_Minh")
     private Timestamp date;
+
     private Time checkIn;
     private Time checkOut;
     private String paymentStatus;
