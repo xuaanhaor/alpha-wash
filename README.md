@@ -26,6 +26,6 @@ Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch v�
 2. chạy lệnh `docker-compose up --build`
 3. dùng `docker-compose down` để kết thúc server
 > **Lưu ý**: Không tự ý dùng lệnh `docker-compose down -v` khi đang làm việc với máy ở xưởng
-
 ### Lệnh build source trước khi gửi MR
 1. `./gradlew :spotlessApply clean build -x test :compileJava`
+
