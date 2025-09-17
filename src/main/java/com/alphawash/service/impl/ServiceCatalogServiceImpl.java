@@ -51,7 +51,11 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
                                 .orElse(null));
                     }
                     return converter.toDto(repository.updateReturning(
-                            currentDto.getSize().name(), currentDto.getPrice(), currentDto.getServiceId(), id));
+                            currentDto.getSize().name(),
+                            currentDto.getPrice(),
+                            currentDto.getServiceId(),
+                            id,
+                            currentDto.getTempPrice()));
                 })
                 .orElse(null);
     }
