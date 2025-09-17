@@ -40,6 +40,9 @@ public class ServiceCatalog extends BaseEntity {
     @Column(name = "price")
     private BigDecimal price;
 
+    @Column(name = "temp_price")
+    private BigDecimal tempPrice;
+
     @ManyToOne
     @JoinColumn(name = "service_code", referencedColumnName = "code")
     private Service service;

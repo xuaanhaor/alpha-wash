@@ -43,6 +43,7 @@ CREATE TABLE service_catalog
     code          VARCHAR(20) UNIQUE                    NOT NULL,
     size          SIZE                                  NOT NULL,
     price         NUMERIC                               NOT NULL,
+    temp_price    NUMERIC,
     service_code  VARCHAR(20) REFERENCES service (code) NOT NULL,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
