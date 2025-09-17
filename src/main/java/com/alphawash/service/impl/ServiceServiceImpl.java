@@ -153,7 +153,6 @@ public class ServiceServiceImpl implements ServiceService {
         serviceRepository.save(service);
         serviceCatalogRepository.save(serviceCatalog);
 
-
         return BasicServiceResponse.builder()
                 .serviceTypeCode(serviceResponse.getServiceTypeCode())
                 .serviceTypeName(serviceResponse.getServiceTypeName())

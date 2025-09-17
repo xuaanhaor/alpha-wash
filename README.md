@@ -28,4 +28,3 @@ Trong thời gian tới, Alpha Wash hướng đến việc mở rộng dịch v�
 > **Lưu ý**: Không tự ý dùng lệnh `docker-compose down -v` khi đang làm việc với máy ở xưởng
 ### Lệnh build source trước khi gửi MR
 1. `./gradlew :spotlessApply clean build -x test :compileJava`
-
