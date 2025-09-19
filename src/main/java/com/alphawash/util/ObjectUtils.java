@@ -20,13 +20,12 @@ public class ObjectUtils<T> {
         return !isEmpty(array);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> void setIfNotNull(T value, Consumer<T> setter) {
         if (value == null) return;
 
         if (value instanceof String str) {
-            if (!str.isBlank()) {
-                setter.accept(value);
-            }
+            setter.accept(str.isBlank() ? null : (T) str);
         } else {
             setter.accept(value);
         }
