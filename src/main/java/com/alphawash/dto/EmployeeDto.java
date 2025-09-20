@@ -1,7 +1,10 @@
 package com.alphawash.dto;
 
-import java.time.LocalDateTime;
-import lombok.*;
+import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -13,9 +16,9 @@ public class EmployeeDto {
     private String phone;
     private String bankName;
     private String bankAccount;
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
     private String identityNumber;
-    private LocalDateTime joinDate;
+    private LocalDate joinDate;
     private String workStatus;
     private String note;
 }

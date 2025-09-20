@@ -10,8 +10,6 @@ import com.alphawash.request.EmployeeRequest;
 import com.alphawash.service.EmployeeService;
 import com.alphawash.util.ObjectUtils;
 import jakarta.transaction.Transactional;
-
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,7 +44,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
             }
 
-            //Check trùng CCCD
+            // Check trùng CCCD
             if (request.identityNumber() != null) {
                 boolean exists = employeeRepository.existsByIdentityNumber(request.identityNumber());
                 if (exists) {
@@ -77,7 +75,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, ErrorConst.E004.formatted(id)));
 
-        //Check trùng phone
+        // Check trùng phone
         if (request.phone() != null) {
             boolean exists = employeeRepository.existsDuplicatePhone(request.phone(), id);
             if (exists) {
@@ -85,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
 
-        //Check trùng CCCD
+        // Check trùng CCCD
         if (request.identityNumber() != null) {
             boolean exists = employeeRepository.existsByIdentityNumberAndIdNot(request.identityNumber(), id);
             if (exists) {
@@ -112,7 +110,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new BusinessException(HttpStatus.CONFLICT, "Cập nhật nhân viên thất bại: " + e.getMessage());
         }
     }
-
 
     @Override
     @Transactional
