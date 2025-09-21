@@ -48,4 +48,15 @@ public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, 
             nativeQuery = true)
     Optional<ServiceCatalog> findByServiceCodeAndSize(
             @Param("serviceCode") String serviceCode, @Param("size") String size);
+
+    @Query(
+            value =
+                    """
+        SELECT *
+        FROM service_catalog sc
+        WHERE sc.service_code = :serviceCode
+          AND sc.delete_flag = false
+    """,
+            nativeQuery = true)
+    List<ServiceCatalog> findByServiceCode(@Param("serviceCode") String serviceCode);
 }
