@@ -9,7 +9,7 @@ CREATE TYPE size AS ENUM ('S', 'M', 'L', 'XL');
 CREATE TABLE service_type
 (
     id                SERIAL,
-    code              VARCHAR(20) UNIQUE NOT NULL,
+    code              VARCHAR(20),
     service_type_name VARCHAR(50),
     delete_flag       BOOLEAN   DEFAULT FALSE,
     created_by        VARCHAR(50),
@@ -17,16 +17,16 @@ CREATE TABLE service_type
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key     INT       DEFAULT 0,
-    PRIMARY KEY (id, code)
+    PRIMARY KEY (code)
 );
 
 CREATE TABLE service
 (
     id                SERIAL,
-    code              VARCHAR(20) UNIQUE NOT NULL,
+    code              VARCHAR(20) UNIQUE,
+    service_type_code VARCHAR(20) REFERENCES service_type (code),
     service_name      VARCHAR(200),
     duration          TEXT,
-    service_type_code VARCHAR(20) REFERENCES service_type (code),
     note              TEXT,
     delete_flag       BOOLEAN   DEFAULT FALSE,
     created_by        VARCHAR(50),
@@ -34,24 +34,25 @@ CREATE TABLE service
     created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key     INT       DEFAULT 0,
-    PRIMARY KEY (id, code)
+    PRIMARY KEY (code, service_type_code)
 );
 
 CREATE TABLE service_catalog
 (
-    id            SERIAL,
-    code          VARCHAR(20) UNIQUE                    NOT NULL,
-    size          SIZE                                  NOT NULL,
-    price         NUMERIC                               NOT NULL,
-    temp_price    NUMERIC,
-    service_code  VARCHAR(20) REFERENCES service (code) NOT NULL,
-    delete_flag   BOOLEAN   DEFAULT FALSE,
-    created_by    VARCHAR(50),
-    updated_by    VARCHAR(50),
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    exclusive_key INT       DEFAULT 0,
-    PRIMARY KEY (id, code)
+    id                    SERIAL,
+    code                  VARCHAR(20),
+    service_code          VARCHAR(20) REFERENCES service (code),
+    size                  SIZE    NOT NULL,
+    size_code             VARCHAR(20),
+    price                 NUMERIC NOT NULL,
+    service_division      INT, -- 0 washing , 1 wrapping
+    delete_flag           BOOLEAN   DEFAULT FALSE,
+    created_by            VARCHAR(50),
+    updated_by            VARCHAR(50),
+    created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key         INT       DEFAULT 0,
+    PRIMARY KEY (code, service_code)
 );
 
 CREATE TABLE employee
@@ -107,7 +108,7 @@ CREATE TABLE customer
 CREATE TABLE brands
 (
     id            SERIAL,
-    code          VARCHAR(20) UNIQUE NOT NULL,
+    code          VARCHAR(20),
     brand_name    VARCHAR(50),
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
@@ -115,16 +116,16 @@ CREATE TABLE brands
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key INT       DEFAULT 0,
-    PRIMARY KEY (id, code)
+    PRIMARY KEY (code)
 );
 
 CREATE TABLE model
 (
     id            SERIAL,
-    code          VARCHAR(20) UNIQUE NOT NULL,
-    model_name    VARCHAR(50)        NOT NULL,
-    size          SIZE               NOT NULL,
+    code          VARCHAR(20) PRIMARY KEY,
     brand_code    VARCHAR(20) REFERENCES brands (code),
+    model_name    VARCHAR(50) NOT NULL,
+    size          SIZE        NOT NULL,
     note          TEXT,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
@@ -132,12 +133,12 @@ CREATE TABLE model
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key INT       DEFAULT 0,
-    PRIMARY KEY (id, code)
+    UNIQUE (code, brand_code)
 );
 CREATE TABLE vehicle
 (
     id            UUID      DEFAULT uuid_generate_v4(),
-    license_plate VARCHAR(8) UNIQUE NOT NULL,
+    license_plate VARCHAR(10) UNIQUE NOT NULL,
     customer_id   UUID REFERENCES customer (id),
     brand_code    VARCHAR(20) REFERENCES brands (code),
     model_code    VARCHAR(20) REFERENCES model (code),
@@ -156,7 +157,7 @@ CREATE TABLE vehicle
 CREATE TABLE orders
 (
     id             UUID        DEFAULT uuid_generate_v4(),
-    code           VARCHAR(20) UNIQUE NOT NULL,
+    code           VARCHAR(20) UNIQUE,
     customer_id    UUID,
     date           TIMESTAMP,
     checkin_time   TIME,
@@ -180,7 +181,7 @@ CREATE TABLE orders
 CREATE TABLE order_detail
 (
     id            UUID        DEFAULT uuid_generate_v4(),
-    code          VARCHAR(20) UNIQUE                   NOT NULL,
+    code          VARCHAR(20),
     order_code    VARCHAR(20) REFERENCES orders (code) NOT NULL,
     employee_id   TEXT,
     status        VARCHAR(20) DEFAULT 'PENDING',
@@ -197,9 +198,9 @@ CREATE TABLE order_detail
 
 CREATE TABLE order_service_dtl
 (
-    code                 VARCHAR(20) UNIQUE                         NOT NULL PRIMARY KEY,
-    order_detail_code    VARCHAR(20) REFERENCES order_detail (code) NOT NULL,
-    service_catalog_code VARCHAR(20)                                NOT NULL,
+    code                 VARCHAR(20) PRIMARY KEY,
+    order_detail_code    VARCHAR(20) NOT NULL,
+    service_catalog_code VARCHAR(20) NOT NULL,
     delete_flag          BOOLEAN   DEFAULT FALSE,
     created_by           VARCHAR(50),
     updated_by           VARCHAR(50),
@@ -212,7 +213,7 @@ CREATE TABLE order_service_dtl
 CREATE TABLE service_combo
 (
     id            SERIAL,
-    code          VARCHAR(20) NOT NULL,
+    code          VARCHAR(20),
     combo_name    VARCHAR(200),
     price         NUMERIC,
     note          TEXT,
@@ -228,17 +229,106 @@ CREATE TABLE service_combo
 CREATE TABLE service_combo_dtl
 (
     id                   SERIAL,
-    code                 varchar(20) UNIQUE NOT NULL,
-    combo_code           VARCHAR(20)        NOT NULL,
-    service_catalog_code VARCHAR(20)        NOT NULL,
+    code                 varchar(20) PRIMARY KEY,
+    combo_code           VARCHAR(20) NOT NULL,
+    service_catalog_code VARCHAR(20) NOT NULL,
     delete_flag          BOOLEAN   DEFAULT FALSE,
     created_by           VARCHAR(50),
     updated_by           VARCHAR(50),
     created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key        INT       DEFAULT 0,
-    PRIMARY KEY (code),
     UNIQUE (combo_code, service_catalog_code)
+);
+
+CREATE TABLE service_wrapping_brand
+(
+    code          VARCHAR(20),
+    brand_name    VARCHAR(50) NOT NULL,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE vehicle_details_position
+(
+    code          VARCHAR(20),
+    position_name VARCHAR(50) NOT NULL,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE service_wrapping_product
+(
+    code          VARCHAR(20),
+    brand_code    VARCHAR(50),
+    product_name  VARCHAR(50) NOT NULL,
+    position_code VARCHAR(50),
+    listed_price  NUMERIC CHECK ( listed_price >= 0 ),
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code, brand_code, position_code)
+);
+
+CREATE TABLE service_wrapping_package
+(
+    code          VARCHAR(20),
+    size_code     VARCHAR(20),
+    package_name  VARCHAR(100),
+    listed_price  NUMERIC CHECK ( listed_price >= 0 ),
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code, size_code)
+);
+
+CREATE TABLE vehicle_size
+(
+    code          VARCHAR(20),
+    size_name     VARCHAR(200) NOT NULL,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE service_wrapping_package_product
+(
+    code          VARCHAR(20) PRIMARY KEY,
+    package_code  VARCHAR(20) NOT NULL,
+    product_code  VARCHAR(20) NOT NULL,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    UNIQUE (package_code, product_code)
 );
 
 CREATE TABLE IF NOT EXISTS daily_sequence
