@@ -24,11 +24,21 @@ public record OrderUpdateRequest(
         BigDecimal discount,
         BigDecimal totalPrice,
         String note,
-        List<OrderDetailUpdateRequest> orderDetails) {
+        List<OrderDetailUpdateRequest> orderDetails
+) {
     public record OrderDetailUpdateRequest(
             String orderDetailCode,
             String status,
             String note,
             List<Long> employeeIds,
-            List<String> serviceCatalogCodes) {}
+            List<ServiceUpdateRequest> services
+    ) {
+    }
+    public record ServiceUpdateRequest(
+            String serviceCatalogCode,
+            BigDecimal adjustedPrice,
+            Boolean adjustedPriceFlag,
+            String adjustedPriceReason
+    ) {
+    }
 }

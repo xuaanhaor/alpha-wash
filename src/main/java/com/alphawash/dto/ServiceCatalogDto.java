@@ -13,6 +13,5 @@ public class ServiceCatalogDto {
     private String code;
     private Size size;
     private BigDecimal price;
-    private BigDecimal tempPrice;
     private Long serviceId;
 }

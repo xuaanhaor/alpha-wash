@@ -54,8 +54,7 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
                             currentDto.getSize().name(),
                             currentDto.getPrice(),
                             currentDto.getServiceId(),
-                            id,
-                            currentDto.getTempPrice()));
+                            id));
                 })
                 .orElse(null);
     }

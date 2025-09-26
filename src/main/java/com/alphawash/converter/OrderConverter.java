@@ -15,14 +15,13 @@ import org.springframework.stereotype.Component;
 public class OrderConverter {
 
     public OrderConverter() {}
-
     public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
         Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
         Set<Long> allEmployeeIds = new HashSet<>();
 
         // Bước 1: gom tất cả employee ID
         for (Object[] row : rows) {
-            String empStr = (String) row[19];
+            String empStr = (String) row[19]; // chú ý index, tùy query
             if (empStr != null && !empStr.isBlank()) {
                 for (String idStr : empStr.split(",")) {
                     try {
@@ -65,20 +64,25 @@ public class OrderConverter {
             UUID vehicleId = (UUID) row[i++];
             String licensePlate = (String) row[i++];
             String imageUrl = (String) row[i++];
-            Long brandId = ((Number) row[i++]).longValue();
+            Long brandId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
             String brandName = (String) row[i++];
             String brandCode = (String) row[i++];
-            Long modelId = ((Number) row[i++]).longValue();
+            Long modelId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
             String modelName = (String) row[i++];
             String modelCode = (String) row[i++];
             String size = (String) row[i++];
 
-            Long serviceId = ((Number) row[i++]).longValue();
+            Long serviceId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
             String serviceCode = (String) row[i++];
             String serviceName = (String) row[i++];
             String serviceTypeCode = (String) row[i++];
 
-            Long scId = ((Number) row[i++]).longValue();
+            // Các cột mới từ order_service_dtl
+            BigDecimal adjustedPrice = (BigDecimal) row[i++];
+            Boolean adjustedPriceFlag = (Boolean) row[i++];
+            String adjustedPriceReason = (String) row[i++];
+
+            Long scId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
             String scCode = (String) row[i++];
             BigDecimal scPrice = (BigDecimal) row[i++];
             String scSize = (String) row[i++];
@@ -142,8 +146,7 @@ public class OrderConverter {
                 for (String empIdStr : employeeStr.split(",")) {
                     try {
                         Long empId = Long.parseLong(empIdStr.trim());
-                        if (detail.getEmployees().stream()
-                                .noneMatch(e -> e.getId().equals(empId))) {
+                        if (detail.getEmployees().stream().noneMatch(e -> e.getId().equals(empId))) {
                             Employee emp = employeeMap.get(empId);
                             if (emp != null) {
                                 OrderFullDto.EmployeeDTO dto = new OrderFullDto.EmployeeDTO();
@@ -152,8 +155,7 @@ public class OrderConverter {
                                 detail.getEmployees().add(dto);
                             }
                         }
-                    } catch (NumberFormatException ignored) {
-                    }
+                    } catch (NumberFormatException ignored) {}
                 }
             }
 
@@ -163,12 +165,17 @@ public class OrderConverter {
             service.setServiceCode(serviceCode);
             service.setServiceName(serviceName);
             service.setServiceTypeCode(serviceTypeCode);
+            service.setAdjustedPrice(adjustedPrice);
+            service.setAdjustedPriceFlag(adjustedPriceFlag);
+            service.setAdjustedPriceReason(adjustedPriceReason);
+
             OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
             sc.setId(scId);
             sc.setCode(scCode);
-            sc.setPrice(scPrice);
+            sc.setListedPrice(scPrice);
             sc.setSize(scSize);
             service.setServiceCatalog(sc);
+
             detail.getService().add(service);
         }
 

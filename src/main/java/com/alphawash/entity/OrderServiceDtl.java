@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(
         name = "order_service_dtl",
@@ -34,4 +36,13 @@ public class OrderServiceDtl {
 
     @Column(name = "service_catalog_code", nullable = false)
     private String serviceCatalogCode;
+
+    @Column(name = "adjusted_price_reason")
+    private String adjustedPriceReason;
+
+    @Column(name = "adjusted_price", precision = 18, scale = 2)
+    private BigDecimal adjustedPrice;
+
+    @Column(name = "adjusted_price_flag")
+    private Boolean adjustedPriceFlag;
 }
