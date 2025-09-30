@@ -107,7 +107,7 @@ public class OrderFullDto {
     public static class ServiceCatalogDTO {
         private Long id;
         private String code;
-        private BigDecimal price;
+        private BigDecimal listedPrice;
         private String size;
     }
 }
