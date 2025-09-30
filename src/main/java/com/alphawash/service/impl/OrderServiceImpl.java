@@ -138,9 +138,9 @@ public class OrderServiceImpl implements OrderService {
             for (OrderCreateRequest.ServiceCreateRequest serviceReq : detailReq.services()) {
                 ServiceCatalog sc = serviceCatalogRepository
                         .findByCode(serviceReq.serviceCatalogCode())
-                        .orElseThrow(() ->
-                                new BusinessException(HttpStatus.BAD_REQUEST,
-                                        "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST,
+                                "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
 
                 OrderServiceDtl osd = new OrderServiceDtl();
                 osd.setCode(generateOrderServiceDtlCode());
@@ -283,7 +283,8 @@ public class OrderServiceImpl implements OrderService {
                 Set<String> codesToRemove = new HashSet<>(existingMap.keySet());
                 codesToRemove.removeAll(requestScCodes);
                 if (!codesToRemove.isEmpty()) {
-                    orderServiceDtlRepository.deleteByOrderDetailCodeAndServiceCatalogCodes(detail.getCode(), codesToRemove);
+                    orderServiceDtlRepository.deleteByOrderDetailCodeAndServiceCatalogCodes(
+                            detail.getCode(), codesToRemove);
                 }
 
                 // 2. Thêm hoặc cập nhật service trong request
@@ -303,8 +304,9 @@ public class OrderServiceImpl implements OrderService {
                     osd.setAdjustedPrice(serviceReq.adjustedPrice());
                     osd.setAdjustedPriceFlag(Boolean.TRUE.equals(serviceReq.adjustedPriceFlag()));
                     osd.setAdjustedPriceReason(
-                            Boolean.TRUE.equals(serviceReq.adjustedPriceFlag()) ? serviceReq.adjustedPriceReason() : null
-                    );
+                            Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())
+                                    ? serviceReq.adjustedPriceReason()
+                                    : null);
 
                     orderServiceDtlRepository.save(osd);
 

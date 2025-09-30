@@ -34,7 +34,7 @@ public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, 
             RETURNING *
             """,
             nativeQuery = true)
-    ServiceCatalog updateReturning(String size, BigDecimal price, Long serviceId, Long id );
+    ServiceCatalog updateReturning(String size, BigDecimal price, Long serviceId, Long id);
 
     List<ServiceCatalog> findByService_Id(Long serviceId);
 

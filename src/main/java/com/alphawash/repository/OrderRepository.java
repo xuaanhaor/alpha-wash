@@ -150,7 +150,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             nativeQuery = true)
     List<Object[]> findFullByCode(@Param("code") String code);
 
-
     @Query(
             value = "SELECT \n"
                     + "    o.id AS order_id,\n"

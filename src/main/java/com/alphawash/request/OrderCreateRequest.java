@@ -23,20 +23,13 @@ public record OrderCreateRequest(
         BigDecimal discount,
         BigDecimal totalPrice,
         String note,
-        List<OrderDetailRequest> orderDetails
-) {
+        List<OrderDetailRequest> orderDetails) {
     public record OrderDetailRequest(
-            List<Long> employeeIds,
-            List<ServiceCreateRequest> services,
-            String status,
-            String note
-    ) {
-    }
+            List<Long> employeeIds, List<ServiceCreateRequest> services, String status, String note) {}
+
     public record ServiceCreateRequest(
             String serviceCatalogCode,
             BigDecimal adjustedPrice,
             Boolean adjustedPriceFlag,
-            String adjustedPriceReason
-    ) {
-    }
+            String adjustedPriceReason) {}
 }

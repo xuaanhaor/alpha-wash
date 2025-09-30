@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class OrderConverter {
 
     public OrderConverter() {}
+
     public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
         Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
         Set<Long> allEmployeeIds = new HashSet<>();
@@ -64,15 +65,18 @@ public class OrderConverter {
             UUID vehicleId = (UUID) row[i++];
             String licensePlate = (String) row[i++];
             String imageUrl = (String) row[i++];
-            Long brandId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
+            Long brandId = row[i] != null ? ((Number) row[i]).longValue() : null;
+            i++;
             String brandName = (String) row[i++];
             String brandCode = (String) row[i++];
-            Long modelId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
+            Long modelId = row[i] != null ? ((Number) row[i]).longValue() : null;
+            i++;
             String modelName = (String) row[i++];
             String modelCode = (String) row[i++];
             String size = (String) row[i++];
 
-            Long serviceId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
+            Long serviceId = row[i] != null ? ((Number) row[i]).longValue() : null;
+            i++;
             String serviceCode = (String) row[i++];
             String serviceName = (String) row[i++];
             String serviceTypeCode = (String) row[i++];
@@ -82,7 +86,8 @@ public class OrderConverter {
             Boolean adjustedPriceFlag = (Boolean) row[i++];
             String adjustedPriceReason = (String) row[i++];
 
-            Long scId = row[i] != null ? ((Number) row[i]).longValue() : null; i++;
+            Long scId = row[i] != null ? ((Number) row[i]).longValue() : null;
+            i++;
             String scCode = (String) row[i++];
             BigDecimal scPrice = (BigDecimal) row[i++];
             String scSize = (String) row[i++];
@@ -146,7 +151,8 @@ public class OrderConverter {
                 for (String empIdStr : employeeStr.split(",")) {
                     try {
                         Long empId = Long.parseLong(empIdStr.trim());
-                        if (detail.getEmployees().stream().noneMatch(e -> e.getId().equals(empId))) {
+                        if (detail.getEmployees().stream()
+                                .noneMatch(e -> e.getId().equals(empId))) {
                             Employee emp = employeeMap.get(empId);
                             if (emp != null) {
                                 OrderFullDto.EmployeeDTO dto = new OrderFullDto.EmployeeDTO();
@@ -155,7 +161,8 @@ public class OrderConverter {
                                 detail.getEmployees().add(dto);
                             }
                         }
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             }
 
