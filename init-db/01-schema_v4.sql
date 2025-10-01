@@ -43,7 +43,6 @@ CREATE TABLE service_catalog
     code          VARCHAR(20) UNIQUE                    NOT NULL,
     size          SIZE                                  NOT NULL,
     price         NUMERIC                               NOT NULL,
-    temp_price    NUMERIC,
     service_code  VARCHAR(20) REFERENCES service (code) NOT NULL,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
@@ -208,6 +207,11 @@ CREATE TABLE order_service_dtl
     exclusive_key        INT       DEFAULT 0,
     UNIQUE (order_detail_code, service_catalog_code)
 );
+
+ALTER TABLE order_service_dtl
+    ADD COLUMN adjusted_price_reason VARCHAR(255),
+    ADD COLUMN adjusted_price NUMERIC(18,2),
+    ADD COLUMN adjusted_price_flag BOOLEAN DEFAULT FALSE;
 
 CREATE TABLE service_combo
 (

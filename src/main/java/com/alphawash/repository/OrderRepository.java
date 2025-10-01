@@ -18,7 +18,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findById(UUID id);
 
     @Query(
-            value = "SELECT \n" + "    o.id AS order_id,                         \n"
+            value = "SELECT \n"
+                    + "    o.id AS order_id,                         \n"
                     + "    o.code AS order_code,                     \n"
                     + "    o.date,                                   \n"
                     + "    o.checkin_time,                           \n"
@@ -59,6 +60,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "    s.service_name,                           \n"
                     + "    s.service_type_code,                      \n"
                     + "\n"
+                    + "    osd.adjusted_price,                       \n"
+                    + "    osd.adjusted_price_flag,                  \n"
+                    + "    osd.adjusted_price_reason,                \n"
+                    + "\n"
                     + "    sc.id AS service_catalog_id,              \n"
                     + "    sc.code AS service_catalog_code,          \n"
                     + "    sc.price,                                 \n"
@@ -79,7 +84,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Object[]> getAllOrderRaw();
 
     @Query(
-            value = "SELECT \n" + "    o.id AS order_id,\n"
+            value = "SELECT \n"
+                    + "    o.id AS order_id,\n"
                     + "    o.code AS order_code,\n"
                     + "    o.date,\n"
                     + "    o.checkin_time,\n"
@@ -119,6 +125,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "    s.code AS service_code,\n"
                     + "    s.service_name,\n"
                     + "    s.service_type_code,\n"
+                    + "\n"
+                    + "    osd.adjusted_price,\n"
+                    + "    osd.adjusted_price_flag,\n"
+                    + "    osd.adjusted_price_reason,\n"
                     + "\n"
                     + "    sc.id AS service_catalog_id,\n"
                     + "    sc.code AS service_catalog_code,\n"
@@ -141,7 +151,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Object[]> findFullByCode(@Param("code") String code);
 
     @Query(
-            value = "SELECT \n" + "    o.id AS order_id,\n"
+            value = "SELECT \n"
+                    + "    o.id AS order_id,\n"
                     + "    o.code AS order_code,\n"
                     + "    o.date,\n"
                     + "    o.checkin_time,\n"
@@ -181,6 +192,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "    s.code AS service_code,\n"
                     + "    s.service_name,\n"
                     + "    s.service_type_code,\n"
+                    + "\n"
+                    + "    osd.adjusted_price,\n"
+                    + "    osd.adjusted_price_flag,\n"
+                    + "    osd.adjusted_price_reason,\n"
                     + "\n"
                     + "    sc.id AS service_catalog_id,\n"
                     + "    sc.code AS service_catalog_code,\n"

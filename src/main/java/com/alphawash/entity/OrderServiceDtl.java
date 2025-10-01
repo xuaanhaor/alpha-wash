@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,4 +35,13 @@ public class OrderServiceDtl {
 
     @Column(name = "service_catalog_code", nullable = false)
     private String serviceCatalogCode;
+
+    @Column(name = "adjusted_price_reason")
+    private String adjustedPriceReason;
+
+    @Column(name = "adjusted_price", precision = 18, scale = 2)
+    private BigDecimal adjustedPrice;
+
+    @Column(name = "adjusted_price_flag")
+    private Boolean adjustedPriceFlag;
 }
