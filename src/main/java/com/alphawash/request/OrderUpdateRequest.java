@@ -30,5 +30,11 @@ public record OrderUpdateRequest(
             String status,
             String note,
             List<Long> employeeIds,
-            List<String> serviceCatalogCodes) {}
+            List<ServiceUpdateRequest> services) {}
+
+    public record ServiceUpdateRequest(
+            String serviceCatalogCode,
+            BigDecimal adjustedPrice,
+            Boolean adjustedPriceFlag,
+            String adjustedPriceReason) {}
 }
