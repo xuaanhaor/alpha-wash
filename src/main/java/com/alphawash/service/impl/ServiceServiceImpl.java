@@ -77,8 +77,11 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
-    public void delete(Long id) {
-        serviceRepository.deleteById(id);
+    public void delete(String code) {
+        serviceRepository.findByCode(code).ifPresent(service -> {
+            service.setDeleteFlag(true);
+            serviceRepository.save(service);
+        });
     }
 
     @Override

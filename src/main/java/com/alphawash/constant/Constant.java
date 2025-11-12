@@ -12,6 +12,7 @@ public class Constant {
     public static final String CODE_PATH_PARAMETER = "/code/{code}";
     public static final String ID_PATH_PARAMETER = "/{id}";
     public static final String DELETE_WITH_PATH_PARAMETER = DELETE_ENDPOINT + "/{id}";
+    public static final String DELETE_WITH_PATH_PARAMETER_CODE = DELETE_ENDPOINT + "/{code}";
     public static final String UPDATE_WITH_PATH_PARAMETER = UPDATE_ENDPOINT + "/{id}";
     public static final String API_EMPLOYEE = API + "/employee";
     public static final String API_CUSTOMER = API + "/customer";

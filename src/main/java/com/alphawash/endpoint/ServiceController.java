@@ -89,9 +89,9 @@ public class ServiceController {
         @ApiResponse(responseCode = "404", description = "Service not found"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @DeleteMapping(DELETE_WITH_PATH_PARAMETER)
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        serviceService.delete(id);
+    @DeleteMapping(DELETE_WITH_PATH_PARAMETER_CODE)
+    public ResponseEntity<Void> delete(@PathVariable String code) {
+        serviceService.delete(code);
         return ResponseEntity.noContent().build();
     }
 

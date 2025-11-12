@@ -18,7 +18,7 @@ public interface ServiceService {
 
     ServiceDto update(Long id, ServiceDto dto);
 
-    void delete(Long id);
+    void delete(String code);
 
     BasicServiceResponse createBasicService(CreateBasicServiceRequest request);
 
