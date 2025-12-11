@@ -22,6 +22,7 @@ import com.alphawash.util.PatchHelper;
 import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,8 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<ServiceDto> getAll() {
         List<Service> services = serviceRepository.findAll().stream()
-                .filter(service -> !service.getDeleteFlag())
+                .filter(Objects::nonNull)
+                .filter(service -> Boolean.FALSE.equals(service.getDeleteFlag()))
                 .collect(Collectors.toList());
         return converter.toDto(services);
     }
