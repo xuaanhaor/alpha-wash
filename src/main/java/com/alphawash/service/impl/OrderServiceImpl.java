@@ -1,23 +1,28 @@
 package com.alphawash.service.impl;
 
+import com.alphawash.constant.PromotionStatus;
 import com.alphawash.converter.OrderConverter;
 import com.alphawash.dto.OrderFullDto;
 import com.alphawash.entity.Brand;
 import com.alphawash.entity.Customer;
+import com.alphawash.entity.CustomerPromotion;
 import com.alphawash.entity.Model;
 import com.alphawash.entity.Order;
 import com.alphawash.entity.OrderDetail;
 import com.alphawash.entity.OrderServiceDtl;
+import com.alphawash.entity.Promotion;
 import com.alphawash.entity.ServiceCatalog;
 import com.alphawash.entity.Vehicle;
 import com.alphawash.exception.BusinessException;
 import com.alphawash.repository.BrandRepository;
+import com.alphawash.repository.CustomerPromotionRepository;
 import com.alphawash.repository.CustomerRepository;
 import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.repository.ModelRepository;
 import com.alphawash.repository.OrderDetailRepository;
 import com.alphawash.repository.OrderRepository;
 import com.alphawash.repository.OrderServiceDtlRepository;
+import com.alphawash.repository.PromotionRepository;
 import com.alphawash.repository.ServiceCatalogRepository;
 import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.OrderCreateRequest;
@@ -29,6 +34,7 @@ import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +62,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderServiceDtlRepository orderServiceDtlRepository;
     private final OrderConverter orderConverter;
+    private final CustomerPromotionRepository customerPromotionRepository;
+    private final PromotionRepository promotionRepository;
 
     @Override
     public List<OrderFullDto> getAllOrders() {
@@ -184,7 +192,77 @@ public class OrderServiceImpl implements OrderService {
         // ===== 6. Lưu tổng tiền đã được tính trên Fe =====
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
+
+        // ===== 7. Nếu có promotionId thì chỉ log lượt sử dụng (tạm thời chưa tính discount) =====
+        if (request.promotionId() != null) {
+
+            if (customerId == null) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Chưa chọn khách hàng nên không áp dụng khuyến mãi được");
+            }
+
+            Promotion promo = promotionRepository.findById(UUID.fromString(request.promotionId()))
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Promotion không tồn tại"));
+
+            // Validate promotion active + check customer eligible (khách cũ / usage limit)
+            validatePromotionActive(promo);
+            validateCustomerEligible(customerId, promo);
+
+            // Log usage vào customer_promotion
+            CustomerPromotion cp = new CustomerPromotion();
+            cp.setCustomerId(customerId);
+            cp.setPromotionId(promo.getId());
+            cp.setOrderCode(order.getCode());
+            cp.setUsedAt(LocalDateTime.now());
+
+            // tạm thời không tính
+            cp.setDiscountAmount(BigDecimal.ZERO);
+            cp.setDiscountPercent(BigDecimal.ZERO);
+
+            customerPromotionRepository.save(cp);
+        }
+
         return order.getId();
+    }
+
+    private void validatePromotionActive(Promotion p) {
+        if (Boolean.TRUE.equals(p.getDeleteFlag())) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Promotion đã bị xóa");
+        }
+        if (p.getStatus() != PromotionStatus.ACTIVE) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Promotion chưa được kích hoạt");
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (p.getStartDate() != null && p.getStartDate().isAfter(now)) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Promotion chưa đến ngày bắt đầu");
+        }
+        if (p.getEndDate() != null && p.getEndDate().isBefore(now)) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Promotion đã hết hạn");
+        }
+    }
+
+    private void validateCustomerEligible(UUID customerId, Promotion promo) {
+
+        // Rule khách cũ: tạm thời dựa vào targetAudience
+        if (requiresOldCustomer(promo)) {
+            boolean isOldCustomer = orderRepository.isOldCustomer(customerId, promo.getStartDate());
+            if (!isOldCustomer) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Khách không phải khách cũ");
+            }
+        }
+
+        // usageLimit (0/null = vô hạn)
+        int limit = promo.getUsageLimit() == null ? 0 : promo.getUsageLimit();
+        if (limit > 0) {
+            long used = customerPromotionRepository.countUsed(customerId, promo.getId());
+            if (used >= limit) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Đã vượt quá số lần sử dụng chương trình");
+            }
+        }
+    }
+
+    private boolean requiresOldCustomer(Promotion p) {
+        String audience = p.getTargetAudience() == null ? "" : p.getTargetAudience().trim().toLowerCase();
+        return audience.contains("khách cũ") || audience.contains("khach cu") || audience.contains("old_customer") || audience.contains("loyal");
     }
 
     public String generateOrderCode() {

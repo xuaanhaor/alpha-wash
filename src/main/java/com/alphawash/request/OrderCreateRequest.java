@@ -20,6 +20,7 @@ public record OrderCreateRequest(
         String paymentStatus,
         BigDecimal tip,
         BigDecimal vat,
+        String promotionId,
         BigDecimal discount,
         BigDecimal totalPrice,
         String note,

@@ -2,10 +2,13 @@ package com.alphawash.repository;
 
 import com.alphawash.entity.Order;
 import com.alphawash.entity.Vehicle;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -200,7 +203,20 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "    sc.id AS service_catalog_id,\n"
                     + "    sc.code AS service_catalog_code,\n"
                     + "    sc.price,\n"
-                    + "    sc.size AS service_catalog_size\n"
+                    + "    sc.size AS service_catalog_size,\n"
+                    + "\n"
+                    + "    p.id AS promo_id,\n"
+                    + "    p.promo_code,\n"
+                    + "    p.promo_name,\n"
+                    + "    p.promo_type,\n"
+                    + "    p.value AS promo_value,\n"
+                    + "    p.start_date AS promo_start_date,\n"
+                    + "    p.end_date AS promo_end_date,\n"
+                    + "\n"
+                    + "    ps.service_code AS promo_service_code,\n"
+                    + "    s2.service_name AS promo_service_name,\n"
+                    + "    ps.discount_amount AS promo_discount_amount,\n"
+                    + "    ps.discount_percent AS promo_discount_percent\n"
                     + "\n"
                     + "FROM orders o\n"
                     + "LEFT JOIN customer c ON c.id = o.customer_id\n"
@@ -211,6 +227,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
                     + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
                     + "JOIN service s ON s.code = sc.service_code\n"
+                    + "LEFT JOIN customer_promotion cp \n"
+                    + "       ON cp.order_code = o.code \n"
+                    + "      AND cp.delete_flag = false\n"
+
+                    + "LEFT JOIN promotion p \n"
+                    + "       ON p.id = cp.promotion_id \n"
+                    + "      AND p.delete_flag = false\n"
+
+                    + "LEFT JOIN promotion_service ps \n"
+                    + "       ON ps.promotion_id = p.id \n"
+                    + "      AND ps.delete_flag = false\n"
+                    + "LEFT JOIN service s2 ON s2.code = ps.service_code\n"
                     + "\n"
                     + "WHERE o.id = :id\n"
                     + "ORDER BY o.created_at DESC;",
@@ -219,4 +247,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = :date", nativeQuery = true)
     long countByDate(@Param("date") LocalDate date);
+
+    @Query(value = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM orders o
+                    WHERE o.customer_id = :customerId
+                      AND o.payment_status = 'DONE'
+                      AND o.delete_flag = false
+                      AND o.date < :cutoff
+                )
+            """, nativeQuery = true)
+    boolean isOldCustomer(@Param("customerId") UUID customerId,
+                          @Param("cutoff") LocalDateTime cutoff);
+
 }

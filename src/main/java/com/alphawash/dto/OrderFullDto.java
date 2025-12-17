@@ -1,9 +1,12 @@
 package com.alphawash.dto;
 
+import com.alphawash.constant.PromoType;
+import com.alphawash.response.AddPromotionServicesResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -34,6 +37,7 @@ public class OrderFullDto {
     private CustomerDTO customer;
     private Boolean deleteFlag;
     private List<OrderDetailDTO> orderDetails;
+    private PromotionDTO promotion;
 
     @Getter
     @Setter
@@ -108,5 +112,20 @@ public class OrderFullDto {
         private String code;
         private BigDecimal listedPrice;
         private String size;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PromotionDTO {
+        private UUID promoId;
+        private String promoCode;
+        private String promoName;
+        private PromoType promoType;
+        private BigDecimal value;
+        private List<AddPromotionServicesResponse> services;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
     }
 }

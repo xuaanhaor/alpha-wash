@@ -1,11 +1,14 @@
 package com.alphawash.converter;
 
-import com.alphawash.dto.*;
+import com.alphawash.constant.PromoType;
+import com.alphawash.dto.OrderFullDto;
 import com.alphawash.entity.Employee;
 import com.alphawash.repository.EmployeeRepository;
+import com.alphawash.response.AddPromotionServicesResponse;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -17,28 +20,43 @@ public class OrderConverter {
     public OrderConverter() {}
 
     public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
-        Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
-        Set<Long> allEmployeeIds = new HashSet<>();
+        if (rows == null || rows.isEmpty()) return List.of();
 
-        // Bước 1: gom tất cả employee ID
+        // orderId -> OrderFullDto
+        Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
+
+        // orderId -> (detailCode -> OrderDetailDTO)
+        Map<UUID, Map<String, OrderFullDto.OrderDetailDTO>> detailMapByOrder = new HashMap<>();
+
+        // detailCode -> set(serviceCatalogCode) để chống trùng service trong 1 detail
+        Map<String, Set<String>> serviceKeySetByDetail = new HashMap<>();
+
+        // orderId -> promoServiceCode -> promoServiceResponse (distinct)
+        Map<UUID, Map<String, AddPromotionServicesResponse>> promoServicesByOrder = new HashMap<>();
+
+        // ====== Step 1: gom employee IDs ======
+        Set<Long> allEmployeeIds = new HashSet<>();
         for (Object[] row : rows) {
-            String empStr = (String) row[19]; // chú ý index, tùy query
-            if (empStr != null && !empStr.isBlank()) {
-                for (String idStr : empStr.split(",")) {
+            String employeeStr = extractEmployeeStr(row);
+            if (employeeStr != null && !employeeStr.isBlank()) {
+                for (String idStr : employeeStr.split(",")) {
                     try {
                         allEmployeeIds.add(Long.parseLong(idStr.trim()));
-                    } catch (NumberFormatException ignored) {
-                    }
+                    } catch (NumberFormatException ignored) {}
                 }
             }
         }
 
-        // Bước 2: lấy map nhân viên
-        Map<Long, Employee> employeeMap = employeeRepository.findAllById(allEmployeeIds).stream()
-                .collect(Collectors.toMap(Employee::getId, Function.identity()));
+        Map<Long, Employee> employeeMap = allEmployeeIds.isEmpty()
+                ? Map.of()
+                : employeeRepository.findAllById(allEmployeeIds).stream()
+                .collect(Collectors.toMap(Employee::getId, Function.identity(), (a, b) -> a));
 
+        // ====== Step 2: map dữ liệu ======
         for (Object[] row : rows) {
             int i = 0;
+
+            // ===== ORDER =====
             UUID orderId = (UUID) row[i++];
             String orderCode = (String) row[i++];
             Timestamp date = (Timestamp) row[i++];
@@ -53,46 +71,82 @@ public class OrderConverter {
             String orderNote = (String) row[i++];
             Boolean deleteFlag = (Boolean) row[i++];
 
+            // ===== CUSTOMER =====
             UUID customerId = (UUID) row[i++];
             String customerName = (String) row[i++];
             String customerPhone = (String) row[i++];
 
+            // ===== ORDER DETAIL =====
             String detailCode = (String) row[i++];
-            String status = (String) row[i++];
+            String detailStatus = (String) row[i++];
             String detailNote = (String) row[i++];
             String employeeStr = (String) row[i++];
 
+            // ===== VEHICLE =====
             UUID vehicleId = (UUID) row[i++];
             String licensePlate = (String) row[i++];
             String imageUrl = (String) row[i++];
-            Long brandId = row[i] != null ? ((Number) row[i]).longValue() : null;
-            i++;
+
+            // brand
+            Long brandId = toLong(row[i++]);
             String brandName = (String) row[i++];
             String brandCode = (String) row[i++];
-            Long modelId = row[i] != null ? ((Number) row[i]).longValue() : null;
-            i++;
+
+            // model
+            Long modelId = toLong(row[i++]);
             String modelName = (String) row[i++];
             String modelCode = (String) row[i++];
             String size = (String) row[i++];
 
-            Long serviceId = row[i] != null ? ((Number) row[i]).longValue() : null;
-            i++;
+            // ===== SERVICE =====
+            Long serviceId = toLong(row[i++]);
             String serviceCode = (String) row[i++];
             String serviceName = (String) row[i++];
             String serviceTypeCode = (String) row[i++];
 
-            // Các cột mới từ order_service_dtl
+            // ===== ORDER_SERVICE_DTL =====
             BigDecimal adjustedPrice = (BigDecimal) row[i++];
             Boolean adjustedPriceFlag = (Boolean) row[i++];
             String adjustedPriceReason = (String) row[i++];
 
-            Long scId = row[i] != null ? ((Number) row[i]).longValue() : null;
-            i++;
+            // ===== SERVICE CATALOG =====
+            Long scId = toLong(row[i++]);
             String scCode = (String) row[i++];
             BigDecimal scPrice = (BigDecimal) row[i++];
             String scSize = (String) row[i++];
 
-            // === ORDER ===
+            // ===== PROMOTION (nếu có thêm ở cuối query) =====
+            // Nếu query hiện tại của bạn CHƯA thêm promotion thì đoạn dưới sẽ bị out of range.
+            // Mình check an toàn:
+            UUID promoId = null;
+            String promoCode = null;
+            String promoName = null;
+            String promoTypeStr = null;
+            BigDecimal promoValue = null;
+            Timestamp promoStartTs = null;
+            Timestamp promoEndTs = null;
+
+            String promoSvcCode = null;
+            String promoSvcName = null;
+            BigDecimal promoSvcDiscountAmount = null;
+            BigDecimal promoSvcDiscountPercent = null;
+
+            if (i < row.length) {
+                promoId = (UUID) safeGet(row, i++);
+                promoCode = (String) safeGet(row, i++);
+                promoName = (String) safeGet(row, i++);
+                promoTypeStr = (String) safeGet(row, i++);
+                promoValue = (BigDecimal) safeGet(row, i++);
+                promoStartTs = (Timestamp) safeGet(row, i++);
+                promoEndTs = (Timestamp) safeGet(row, i++);
+
+                promoSvcCode = (String) safeGet(row, i++);
+                promoSvcName = (String) safeGet(row, i++);
+                promoSvcDiscountAmount = (BigDecimal) safeGet(row, i++);
+                promoSvcDiscountPercent = (BigDecimal) safeGet(row, i++);
+            }
+
+            // ===== build/get ORDER =====
             OrderFullDto order = orderMap.computeIfAbsent(orderId, id -> {
                 OrderFullDto dto = new OrderFullDto();
                 dto.setId(id);
@@ -108,84 +162,179 @@ public class OrderConverter {
                 dto.setTotalPrice(totalPrice);
                 dto.setNote(orderNote);
                 dto.setDeleteFlag(deleteFlag);
-                OrderFullDto.CustomerDTO c = new OrderFullDto.CustomerDTO();
-                c.setId(customerId);
-                c.setName(customerName);
-                c.setPhone(customerPhone);
-                dto.setCustomer(c);
+
+                if (customerId != null) {
+                    dto.setCustomer(new OrderFullDto.CustomerDTO(customerId, customerName, customerPhone));
+                }
+
                 dto.setOrderDetails(new ArrayList<>());
+                // promotion sẽ set sau (nếu có)
                 return dto;
             });
 
-            // === ORDER DETAIL ===
-            OrderFullDto.OrderDetailDTO detail = order.getOrderDetails().stream()
-                    .filter(d -> d.getCode().equals(detailCode))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        OrderFullDto.OrderDetailDTO d = new OrderFullDto.OrderDetailDTO();
-                        d.setCode(detailCode);
-                        d.setStatus(status);
-                        d.setNote(detailNote);
+            Map<String, OrderFullDto.OrderDetailDTO> detailMap =
+                    detailMapByOrder.computeIfAbsent(orderId, k -> new LinkedHashMap<>());
 
-                        OrderFullDto.VehicleDTO vehicle = new OrderFullDto.VehicleDTO();
-                        vehicle.setId(vehicleId);
-                        vehicle.setLicensePlate(licensePlate);
-                        vehicle.setImageUrl(imageUrl);
-                        vehicle.setBrandId(brandId);
-                        vehicle.setBrandCode(brandCode);
-                        vehicle.setBrandName(brandName);
-                        vehicle.setModelId(modelId);
-                        vehicle.setModelCode(modelCode);
-                        vehicle.setModelName(modelName);
-                        vehicle.setSize(size);
-                        d.setVehicle(vehicle);
+            OrderFullDto.OrderDetailDTO detail = detailMap.get(detailCode);
+            if (detail == null) {
+                detail = new OrderFullDto.OrderDetailDTO();
+                detail.setCode(detailCode);
+                detail.setStatus(detailStatus);
+                detail.setNote(detailNote);
 
-                        d.setEmployees(new ArrayList<>());
-                        d.setService(new ArrayList<>());
-                        order.getOrderDetails().add(d);
-                        return d;
-                    });
+                OrderFullDto.VehicleDTO vehicle = new OrderFullDto.VehicleDTO();
+                vehicle.setId(vehicleId);
+                vehicle.setLicensePlate(licensePlate);
+                vehicle.setImageUrl(imageUrl);
+                vehicle.setBrandId(brandId);
+                vehicle.setBrandName(brandName);
+                vehicle.setBrandCode(brandCode);
+                vehicle.setModelId(modelId);
+                vehicle.setModelName(modelName);
+                vehicle.setModelCode(modelCode);
+                vehicle.setSize(size);
+                detail.setVehicle(vehicle);
 
-            // === EMPLOYEES ===
+                detail.setEmployees(new ArrayList<>());
+                detail.setService(new ArrayList<>());
+
+                detailMap.put(detailCode, detail);
+                order.getOrderDetails().add(detail);
+
+                serviceKeySetByDetail.put(detailCode, new HashSet<>());
+            }
+
+            // ===== EMPLOYEES =====
             if (employeeStr != null && !employeeStr.isBlank()) {
+                Set<Long> existingEmpIds = detail.getEmployees().stream()
+                        .map(OrderFullDto.EmployeeDTO::getId)
+                        .collect(Collectors.toSet());
+
                 for (String empIdStr : employeeStr.split(",")) {
                     try {
                         Long empId = Long.parseLong(empIdStr.trim());
-                        if (detail.getEmployees().stream()
-                                .noneMatch(e -> e.getId().equals(empId))) {
-                            Employee emp = employeeMap.get(empId);
-                            if (emp != null) {
-                                OrderFullDto.EmployeeDTO dto = new OrderFullDto.EmployeeDTO();
-                                dto.setId(emp.getId());
-                                dto.setName(emp.getName());
-                                detail.getEmployees().add(dto);
-                            }
+                        if (existingEmpIds.contains(empId)) continue;
+
+                        Employee emp = employeeMap.get(empId);
+                        if (emp != null) {
+                            OrderFullDto.EmployeeDTO e = new OrderFullDto.EmployeeDTO(emp.getId(), emp.getName());
+                            detail.getEmployees().add(e);
+                            existingEmpIds.add(empId);
                         }
-                    } catch (NumberFormatException ignored) {
-                    }
+                    } catch (NumberFormatException ignored) {}
                 }
             }
 
-            // === SERVICE ===
-            OrderFullDto.ServiceDTO service = new OrderFullDto.ServiceDTO();
-            service.setId(serviceId);
-            service.setServiceCode(serviceCode);
-            service.setServiceName(serviceName);
-            service.setServiceTypeCode(serviceTypeCode);
-            service.setAdjustedPrice(adjustedPrice);
-            service.setAdjustedPriceFlag(adjustedPriceFlag);
-            service.setAdjustedPriceReason(adjustedPriceReason);
+            // ===== SERVICES (chống trùng theo scCode) =====
+            if (scCode != null) {
+                Set<String> serviceKeys = serviceKeySetByDetail.get(detailCode);
+                if (serviceKeys.add(scCode)) {
+                    OrderFullDto.ServiceDTO svc = new OrderFullDto.ServiceDTO();
+                    svc.setId(serviceId);
+                    svc.setServiceCode(serviceCode);
+                    svc.setServiceName(serviceName);
+                    svc.setServiceTypeCode(serviceTypeCode);
+                    svc.setAdjustedPrice(adjustedPrice);
+                    svc.setAdjustedPriceFlag(adjustedPriceFlag);
+                    svc.setAdjustedPriceReason(adjustedPriceReason);
 
-            OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
-            sc.setId(scId);
-            sc.setCode(scCode);
-            sc.setListedPrice(scPrice);
-            sc.setSize(scSize);
-            service.setServiceCatalog(sc);
+                    OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
+                    sc.setId(scId);
+                    sc.setCode(scCode);
+                    sc.setListedPrice(scPrice);
+                    sc.setSize(scSize);
+                    svc.setServiceCatalog(sc);
 
-            detail.getService().add(service);
+                    detail.getService().add(svc);
+                }
+            }
+
+            // ===== PROMOTION (set 1 lần / order) + gom promotion_service =====
+            if (promoId != null) {
+                if (order.getPromotion() == null) {
+                    OrderFullDto.PromotionDTO promo = new OrderFullDto.PromotionDTO();
+                    promo.setPromoId(promoId);
+                    promo.setPromoCode(promoCode);
+                    promo.setPromoName(promoName);
+                    promo.setValue(promoValue);
+                    promo.setStartDate(toLocalDateTime(promoStartTs));
+                    promo.setEndDate(toLocalDateTime(promoEndTs));
+
+                    if (promoTypeStr != null) {
+                        try {
+                            promo.setPromoType(PromoType.valueOf(promoTypeStr));
+                        } catch (Exception ignored) {
+                            // nếu DB lưu khác enum name, bạn tự map tại đây
+                        }
+                    }
+
+                    promo.setServices(new ArrayList<>());
+                    order.setPromotion(promo);
+                }
+
+                // gom promo services distinct theo serviceCode
+                if (promoSvcCode != null && !promoSvcCode.isBlank()) {
+                    Map<String, AddPromotionServicesResponse> promoSvcMap =
+                            promoServicesByOrder.computeIfAbsent(orderId, k -> new LinkedHashMap<>());
+
+                    promoSvcMap.putIfAbsent(promoSvcCode,
+                            AddPromotionServicesResponse.builder()
+                                    .serviceCode(promoSvcCode)
+                                    .serviceName(promoSvcName)
+                                    .discountAmount(promoSvcDiscountAmount)
+                                    .discountPercent(promoSvcDiscountPercent)
+                                    .build()
+                    );
+                }
+            }
+        }
+
+        // ===== final: gắn promotion.services vào promotion =====
+        for (Map.Entry<UUID, OrderFullDto> e : orderMap.entrySet()) {
+            UUID orderId = e.getKey();
+            OrderFullDto order = e.getValue();
+
+            if (order.getPromotion() != null) {
+                Map<String, AddPromotionServicesResponse> promoSvcMap = promoServicesByOrder.get(orderId);
+                if (promoSvcMap != null) {
+                    order.getPromotion().setServices(new ArrayList<>(promoSvcMap.values()));
+                }
+            }
         }
 
         return new ArrayList<>(orderMap.values());
+    }
+
+    // ========== helpers ==========
+
+    private static Object safeGet(Object[] row, int idx) {
+        return (idx >= 0 && idx < row.length) ? row[idx] : null;
+    }
+
+    private static Long toLong(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number n) return n.longValue();
+        try {
+            return Long.parseLong(o.toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static LocalDateTime toLocalDateTime(Timestamp ts) {
+        return ts == null ? null : ts.toLocalDateTime();
+    }
+
+    /**
+     * Lấy employeeStr từ row để gom ID trước khi map.
+     * Dựa theo query hiện tại của bạn: employeeStr nằm sau (order_detail_note)
+     * => index 19 nếu đúng thứ tự bạn đang parse (tương ứng row[i++] ở phần OrderDetail).
+     */
+    private static String extractEmployeeStr(Object[] row) {
+        // Với parse của bạn: employeeStr nằm vị trí:
+        // 0..12 order, 13..15 customer, 16 detailCode, 17 status, 18 detailNote, 19 employeeStr
+        if (row == null || row.length <= 19) return null;
+        Object v = row[19];
+        return v == null ? null : v.toString();
     }
 }

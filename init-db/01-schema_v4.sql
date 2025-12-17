@@ -259,3 +259,70 @@ CREATE TABLE service_sequence_code
     max_value     INT NOT NULL,
     PRIMARY KEY (code)
 );
+
+
+CREATE TABLE promotion (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    promo_code      VARCHAR(50) UNIQUE NOT NULL,
+    promo_name      VARCHAR(255) NOT NULL,
+    promo_type      VARCHAR(30) NOT NULL,
+    value           NUMERIC(10,2) NOT NULL,
+    usage_limit     INT DEFAULT 1,
+    start_date      TIMESTAMP NOT NULL,
+    end_date        TIMESTAMP NULL,
+    description     TEXT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    promotion_method    VARCHAR(50),
+    campaign_link       VARCHAR(255),
+    target_audience     VARCHAR(100),
+    active_weekdays VARCHAR(50);
+
+    delete_flag     SMALLINT DEFAULT 0,
+    created_by      VARCHAR(50),
+    updated_by      VARCHAR(50),
+    created_at      TIMESTAMP DEFAULT NOW(),
+    updated_at      TIMESTAMP DEFAULT NOW(),
+    exclusive_key   VARCHAR(50)
+);
+
+CREATE TABLE promotion_service (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    promotion_id    UUID NOT NULL,
+    service_code    VARCHAR(20) NOT NULL,
+    discount_amount     NUMERIC(10,2),
+    discount_percent    NUMERIC(5,2),
+
+    delete_flag     BOOLEAN DEFAULT FALSE,
+    created_by      VARCHAR(50),
+    updated_by      VARCHAR(50),
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key   INT DEFAULT 0,
+
+    CONSTRAINT fk_ps_promotion FOREIGN KEY (promotion_id) REFERENCES promotion(id),
+    CONSTRAINT fk_ps_service FOREIGN KEY (service_code) REFERENCES service(code)
+);
+
+CREATE TABLE customer_promotion (
+    id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    customer_id      UUID        NOT NULL,
+    promotion_id     UUID        NOT NULL,
+    order_code       VARCHAR(20) NOT NULL,
+    used_at          TIMESTAMP   NOT NULL,
+    discount_amount  NUMERIC(10,2) NOT NULL DEFAULT 0,
+    discount_percent NUMERIC(5,2),
+
+    delete_flag      BOOLEAN     DEFAULT FALSE,
+    created_by       VARCHAR(50),
+    updated_by       VARCHAR(50),
+    created_at       TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key    INT         DEFAULT 0,
+
+    CONSTRAINT fk_cp_customer  FOREIGN KEY (customer_id)  REFERENCES customer(id),
+    CONSTRAINT fk_cp_promotion FOREIGN KEY (promotion_id) REFERENCES promotion(id),
+    CONSTRAINT fk_cp_order     FOREIGN KEY (order_code)   REFERENCES orders(code)
+);
