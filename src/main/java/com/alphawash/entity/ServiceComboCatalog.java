@@ -2,9 +2,12 @@ package com.alphawash.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
@@ -19,8 +22,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "service_combo")
-public class ServiceCombo extends BaseEntity {
+@Table(name = "service_combo_catalog")
+public class ServiceComboCatalog extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,18 +32,15 @@ public class ServiceCombo extends BaseEntity {
     @Column(length = 50, nullable = false, unique = true)
     private String code;
 
-    @Column(name = "combo_name", length = 255, nullable = false)
-    private String comboName;
+    @Column(name = "combo_code", length = 50, nullable = false)
+    private String comboCode;
 
-    @Column(name = "base_price", precision = 12, scale = 2)
-    private BigDecimal basePrice;
+    @Column(name = "combo_size", length = 30)
+    private String comboSize;
 
-    @Column(columnDefinition = "text")
-    private String note;
+    @Column(precision = 12, scale = 2, nullable = false)
+    private BigDecimal price;
 
-    @Column(name = "duration_days", nullable = false)
-    private Integer durationDays;
-
-    @Column(length = 20)
-    private String status;
+    @Column(name = "price_include_tax")
+    private Boolean priceIncludeTax;
 }

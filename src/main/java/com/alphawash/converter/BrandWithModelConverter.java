@@ -10,21 +10,20 @@ public class BrandWithModelConverter {
 
     public static BrandWithModelDto map(List<Object[]> rows) {
         if (rows == null || rows.isEmpty()) {
-            return null; // Hoặc ném ngoại lệ nếu cần
+            return null;
         }
 
-        // Tất cả các hàng đều có cùng brandId và brandName
         Object[] firstRow = rows.get(0);
-        String brandCode = (String) firstRow[3];
-        String brandName = (String) firstRow[4];
+        String brandCode = (String) firstRow[0];
+        String brandName = (String) firstRow[1];
 
         List<BrandWithModelDto.Model> models = new ArrayList<>();
 
         for (Object[] row : rows) {
             BrandWithModelDto.Model model = BrandWithModelDto.Model.builder()
-                    .code((String) row[0])
-                    .modelName((String) row[1])
-                    .size((String) row[2])
+                    .code((String) row[2])
+                    .modelName((String) row[3])
+                    .size((String) row[4])
                     .build();
             models.add(model);
         }
@@ -40,14 +39,14 @@ public class BrandWithModelConverter {
         Map<String, BrandWithModelDto> brandMap = new LinkedHashMap<>();
 
         for (Object[] row : rows) {
-            String brandCode = (String) row[3];
-            String brandName = (String) row[4];
+            String brandCode = (String) row[0];
+            String brandName = (String) row[1];
 
             // Tạo model
             BrandWithModelDto.Model model = BrandWithModelDto.Model.builder()
-                    .code((String) row[0]) // model_id
-                    .modelName((String) row[1])
-                    .size((String) row[2])
+                    .code((String) row[2])
+                    .modelName((String) row[3])
+                    .size((String) row[4])
                     .build();
 
             // Nếu brand chưa tồn tại trong map → tạo mới

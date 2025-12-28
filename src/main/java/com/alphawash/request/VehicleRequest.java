@@ -1,13 +1,15 @@
 package com.alphawash.request;
 
-import com.alphawash.dto.*;
+import com.alphawash.dto.BrandDto;
+import com.alphawash.dto.ModelDto;
+
 import java.util.UUID;
 
 public record VehicleRequest(
-        UUID id,
-        CustomerDto customer,
+        UUID vehicleId,
+        UUID customerId,
         String licensePlate,
         BrandDto brand,
-        ModelFromEntityDto model,
+        ModelDto model,
         String imageUrl,
         String note) {}

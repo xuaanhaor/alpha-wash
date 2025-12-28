@@ -1,9 +1,11 @@
 package com.alphawash.repository;
 
 import com.alphawash.entity.Vehicle;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,11 +15,42 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
     List<Vehicle> findByCustomerId(UUID customerId);
 
-    Optional<Vehicle> findByLicensePlate(String licensePlate);
+    @Query(value = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM vehicle
+                    WHERE license_plate = :licensePlate
+                      AND delete_flag = false
+                )
+            """, nativeQuery = true)
+    boolean existsByLicensePlate(@Param("licensePlate") String licensePlate);
+
+    @Query("""
+                SELECT v
+                FROM Vehicle v
+                WHERE v.licensePlate = :licensePlate
+                  AND v.deleteFlag = false
+            """)
+    Optional<Vehicle> findByLicensePlate(@Param("licensePlate") String licensePlate);
 
     @Query(
-            value =
-                    """
+            value = """
+                        SELECT EXISTS (
+                            SELECT 1
+                            FROM vehicle
+                            WHERE license_plate = :licensePlate
+                              AND id <> :id
+                              AND delete_flag = false
+                        )
+                    """,
+            nativeQuery = true
+    )
+    boolean existsByLicensePlateAndIdNot(
+            @Param("licensePlate") String licensePlate,
+            @Param("id") UUID id
+    );
+
+    @Query(value = """
             select
                 b.code as brand_code,
                 m.code as model_code,
@@ -26,8 +59,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
                 m.size,
                 m.note
             from model m
-            join brands b on m.brand_code = b.code""",
-            nativeQuery = true)
+            join brands b on m.brand_code = b.code""", nativeQuery = true)
     List<Object[]> findCar();
 
     @Query(value = "select * from get_customer_vehicle_services_used()", nativeQuery = true)

@@ -36,6 +36,9 @@ public class OrderServiceDtl {
     @Column(name = "service_catalog_code", nullable = false)
     private String serviceCatalogCode;
 
+    @Column(name = "service_combo_catalog_code")
+    private String serviceComboCatalogCode;
+
     @Column(name = "adjusted_price_reason")
     private String adjustedPriceReason;
 

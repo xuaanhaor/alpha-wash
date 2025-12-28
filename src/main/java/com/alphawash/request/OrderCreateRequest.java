@@ -26,10 +26,15 @@ public record OrderCreateRequest(
         String note,
         List<OrderDetailRequest> orderDetails) {
     public record OrderDetailRequest(
-            List<Long> employeeIds, List<ServiceCreateRequest> services, String status, String note) {}
+            List<Long> employeeIds,
+            String status,
+            String note,
+            String orderType,
+            List<ServiceCreateRequest> services) {}
 
     public record ServiceCreateRequest(
             String serviceCatalogCode,
+            String serviceComboCatalogCode,
             BigDecimal adjustedPrice,
             Boolean adjustedPriceFlag,
             String adjustedPriceReason) {}

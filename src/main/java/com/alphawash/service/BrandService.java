@@ -7,13 +7,9 @@ import java.util.List;
 public interface BrandService {
     List<BrandDto> getAll();
 
-    BrandDto getById(Long id);
+    BrandDto upsert(BrandDto dto);
 
-    BrandDto create(BrandDto dto);
-
-    BrandDto update(Long id, BrandDto dto);
-
-    void delete(Long id);
+    boolean delete(String code);
 
     List<BrandWithModelDto> getBrandWithModel();
 

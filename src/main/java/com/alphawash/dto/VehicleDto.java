@@ -1,8 +1,12 @@
 package com.alphawash.dto;
 
-import com.alphawash.entity.Customer;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.UUID;
-import lombok.*;
 
 @Getter
 @Setter
@@ -10,11 +14,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class VehicleDto {
-    private UUID id;
-    private Customer customer;
+    private UUID vehicleId;
+    private UUID customerId;
     private String licensePlate;
     private BrandDto brand;
-    private ModelFromEntityDto model;
+    private ModelDto model;
     private String imageUrl;
     private String note;
 }

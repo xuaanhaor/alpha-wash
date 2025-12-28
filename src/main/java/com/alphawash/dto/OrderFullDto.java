@@ -3,12 +3,14 @@ package com.alphawash.dto;
 import com.alphawash.constant.PromoType;
 import com.alphawash.response.AddPromotionServicesResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,6 +60,7 @@ public class OrderFullDto {
         private List<EmployeeDTO> employees;
         private VehicleDTO vehicle;
         private List<ServiceDTO> service;
+        private String orderType;
         private String status;
         private String note;
     }
@@ -101,6 +104,7 @@ public class OrderFullDto {
         private BigDecimal adjustedPrice;
         private Boolean adjustedPriceFlag;
         private ServiceCatalogDTO serviceCatalog;
+        private ComboCatalogDTO serviceComboCatalog;
     }
 
     @Getter
@@ -127,5 +131,28 @@ public class OrderFullDto {
         private List<AddPromotionServicesResponse> services;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class ComboCatalogDTO {
+        private String catalogCode;
+        private String comboName;
+        private String size;
+        private BigDecimal price;
+        private Boolean priceIncludeTax;
+        private List<ComboServiceDTO> services;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class ComboServiceDTO {
+        private String serviceCatalogCode;
+        private String serviceName;
+        private Integer quantity;
     }
 }

@@ -14,13 +14,14 @@ public record OrderUpdateRequest(
         String modelCode,
         String imageUrl,
         String vehicleNote,
-        String paymentStatus,
-        String paymentType,
+        LocalDateTime date,
         LocalTime checkInTime,
         LocalTime checkOutTime,
-        LocalDateTime date,
-        BigDecimal vat,
+        String paymentType,
+        String paymentStatus,
         BigDecimal tip,
+        BigDecimal vat,
+        String promotionId,
         BigDecimal discount,
         BigDecimal totalPrice,
         String note,
@@ -34,6 +35,7 @@ public record OrderUpdateRequest(
 
     public record ServiceUpdateRequest(
             String serviceCatalogCode,
+            String serviceComboCatalogCode,
             BigDecimal adjustedPrice,
             Boolean adjustedPriceFlag,
             String adjustedPriceReason) {}

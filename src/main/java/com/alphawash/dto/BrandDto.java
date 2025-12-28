@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class BrandDto {
-    private Long id;
-    private String code;
+    private Long brandId;
+    private String brandCode;
     private String brandName;
 }

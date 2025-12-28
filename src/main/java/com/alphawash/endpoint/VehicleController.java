@@ -1,6 +1,7 @@
 package com.alphawash.endpoint;
 
 import com.alphawash.constant.Constant;
+import com.alphawash.converter.VehicleConverter;
 import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
@@ -32,15 +33,17 @@ public class VehicleController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping(Constant.INSERT_ENDPOINT)
+    @PostMapping(Constant.CREATE_ENDPOINT)
     public ResponseEntity<VehicleDto> insert(@RequestBody VehicleRequest request) {
-        var result = vehicleService.insert(request);
+        VehicleDto dto = VehicleConverter.fromRequest(request);
+        var result = vehicleService.create(dto);
         return ResponseEntity.ok(result);
     }
 
     @PatchMapping(Constant.UPDATE_WITH_PATH_PARAMETER)
     public ResponseEntity<Void> update(@RequestBody VehicleRequest request) {
-        vehicleService.update(request);
+        VehicleDto dto = VehicleConverter.fromRequest(request);
+        vehicleService.update(dto);
         return ResponseEntity.noContent().build();
     }
 

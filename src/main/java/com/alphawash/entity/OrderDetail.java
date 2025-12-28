@@ -1,7 +1,10 @@
 package com.alphawash.entity;
 
+import com.alphawash.constant.OrderType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -45,4 +48,8 @@ public class OrderDetail extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_type", length = 20, nullable = false)
+    private OrderType orderType;
 }

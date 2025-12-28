@@ -7,10 +7,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ModelDto {
-    private Long id;
-    private String code;
+    private Long modelId;
+    private String modelCode;
     private String modelName;
     private String size;
-    private Long brandId;
+    private String brandCode;
+    private String brandName;
     private String note;
 }

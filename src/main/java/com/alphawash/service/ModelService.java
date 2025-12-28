@@ -5,15 +5,12 @@ import com.alphawash.dto.ModelWithoutBrandDto;
 import java.util.List;
 
 public interface ModelService {
-    List<ModelDto> getAll();
-
-    ModelDto getById(Long id);
-
     ModelDto create(ModelDto dto);
 
-    ModelDto update(Long id, ModelDto dto);
+    ModelDto update(ModelDto dto);
 
-    void delete(Long id);
+    boolean delete(String code);
 
+    //Dành cho tạo mới hóa đơn
     List<ModelWithoutBrandDto> findByBrandCode(String brandCode);
 }
