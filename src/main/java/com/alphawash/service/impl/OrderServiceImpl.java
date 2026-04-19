@@ -87,42 +87,7 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
         }
 
-        // ===== 2. Kiểm tra hoặc tạo mới xe =====
-        if (request.licensePlate() == null || request.licensePlate().isBlank()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
-        }
-        Vehicle vehicle =
-                vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
-
-        if (vehicle == null) {
-            // Nếu xe mới thì bắt buộc phải có brandCode + modelCode
-            if (request.brandCode() == null || request.modelCode() == null) {
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng xe hoặc dòng xe");
-            }
-
-            Brand brand = brandRepository
-                    .findByCode(request.brandCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + request.brandCode()));
-
-            Model model = modelRepository
-                    .findByCode(request.modelCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + request.modelCode()));
-
-            vehicle = Vehicle.builder()
-                    .licensePlate(request.licensePlate())
-                    .brand(brand)
-                    .model(model)
-                    .customer(customer)
-                    .imageUrl(request.imageUrl())
-                    .note(request.vehicleNote())
-                    .build();
-
-            vehicleRepository.save(vehicle);
-        }
-
-        // ===== 3. Tạo đơn hàng =====
+        // ===== 2. Tạo đơn hàng =====
         Order order = new Order();
         order.setCode(generateOrderCode());
         order.setCustomer(customer);
@@ -137,10 +102,49 @@ public class OrderServiceImpl implements OrderService {
         order.setNote(request.note());
         orderRepository.save(order);
 
-        // ===== 4. Xử lý từng chi tiết đơn hàng =====
+        // ===== 3. Xử lý từng chi tiết đơn hàng (mỗi detail = 1 xe) =====
         BigDecimal totalServicePrice = BigDecimal.ZERO;
 
         for (OrderCreateRequest.OrderDetailRequest detailReq : request.orderDetails()) {
+            // ===== 3.1 Kiểm tra hoặc tạo mới xe cho từng detail =====
+            if (detailReq.licensePlate() == null || detailReq.licensePlate().isBlank()) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
+            }
+            
+            Vehicle vehicle = vehicleRepository
+                    .findByLicensePlate(detailReq.licensePlate())
+                    .orElse(null);
+
+            if (vehicle == null) {
+                // Nếu xe mới thì bắt buộc phải có brandCode + modelCode
+                if (detailReq.brandCode() == null || detailReq.modelCode() == null) {
+                    throw new BusinessException(HttpStatus.BAD_REQUEST, 
+                        "Thiếu thông tin hãng xe hoặc dòng xe cho biển số: " + detailReq.licensePlate());
+                }
+
+                Brand brand = brandRepository
+                        .findByCode(detailReq.brandCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + detailReq.brandCode()));
+
+                Model model = modelRepository
+                        .findByCode(detailReq.modelCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + detailReq.modelCode()));
+
+                vehicle = Vehicle.builder()
+                        .licensePlate(detailReq.licensePlate())
+                        .brand(brand)
+                        .model(model)
+                        .customer(customer)
+                        .imageUrl(detailReq.imageUrl())
+                        .note(detailReq.vehicleNote())
+                        .build();
+
+                vehicleRepository.save(vehicle);
+            }
+
+            // ===== 3.2 Tạo order detail =====
             OrderDetail detail = new OrderDetail();
             detail.setCode(generateOrderDetailCode());
             detail.setOrder(order);
@@ -181,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        // ===== 6. Lưu tổng tiền đã được tính trên Fe =====
+        // ===== 4. Lưu tổng tiền đã được tính trên Fe =====
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
         return order.getId();

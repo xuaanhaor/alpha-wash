@@ -25,7 +25,15 @@ public record OrderCreateRequest(
         String note,
         List<OrderDetailRequest> orderDetails) {
     public record OrderDetailRequest(
-            List<Long> employeeIds, List<ServiceCreateRequest> services, String status, String note) {}
+            List<Long> employeeIds, 
+            List<ServiceCreateRequest> services, 
+            String status, 
+            String note,
+            String licensePlate,
+            String brandCode,
+            String modelCode,
+            String imageUrl,
+            String vehicleNote) {}
 
     public record ServiceCreateRequest(
             String serviceCatalogCode,
