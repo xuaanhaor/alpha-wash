@@ -217,6 +217,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             nativeQuery = true)
     List<Object[]> findFullById(@Param("id") UUID id);
 
+    List<Order> findByIdIn(List<UUID> ids);
+
     @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = :date", nativeQuery = true)
     long countByDate(@Param("date") LocalDate date);
 }
