@@ -2,6 +2,7 @@ package com.alphawash.endpoint;
 
 import com.alphawash.constant.Constant;
 import com.alphawash.dto.OrderFullDto;
+import com.alphawash.request.BulkPaymentRequest;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.service.OrderService;
@@ -69,6 +70,13 @@ public class OrderController {
         orderService.updateOrder(request);
         return ResponseEntity.ok().build();
     }
+    @PatchMapping("/bulk-payment")
+    @Operation(summary = "Bulk update payment status", description = "Update payment status for multiple orders at once")
+    public ResponseEntity<Integer> bulkUpdatePayment(@RequestBody BulkPaymentRequest request) {
+        int updatedCount = orderService.bulkUpdatePaymentStatus(request);
+        return ResponseEntity.ok(updatedCount);
+    }
+
     //
     @PatchMapping(Constant.CANCEL_ENDPOINT + Constant.ID_PATH_PARAMETER)
     public ResponseEntity<Void> cancelOrder(@PathVariable("id") UUID id) {

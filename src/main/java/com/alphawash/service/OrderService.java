@@ -1,6 +1,7 @@
 package com.alphawash.service;
 
 import com.alphawash.dto.OrderFullDto;
+import com.alphawash.request.BulkPaymentRequest;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
 import java.util.List;
@@ -18,4 +19,6 @@ public interface OrderService {
     void updateOrder(OrderUpdateRequest request);
 
     void cancelOrderById(UUID orderId);
+
+    int bulkUpdatePaymentStatus(BulkPaymentRequest request);
 }

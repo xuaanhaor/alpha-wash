@@ -20,6 +20,7 @@ import com.alphawash.repository.OrderRepository;
 import com.alphawash.repository.OrderServiceDtlRepository;
 import com.alphawash.repository.ServiceCatalogRepository;
 import com.alphawash.repository.VehicleRepository;
+import com.alphawash.request.BulkPaymentRequest;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.service.OrderService;
@@ -344,6 +345,29 @@ public class OrderServiceImpl implements OrderService {
 
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public int bulkUpdatePaymentStatus(BulkPaymentRequest request) {
+        if (request.orderIds() == null || request.orderIds().isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Danh sách đơn hàng không được để trống");
+        }
+        if (StringUtils.isNullOrBlank(request.paymentStatus())) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Trạng thái thanh toán không được để trống");
+        }
+
+        List<Order> orders = orderRepository.findByIdIn(request.orderIds());
+        if (orders.isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Không tìm thấy đơn hàng nào");
+        }
+
+        for (Order order : orders) {
+            order.setPaymentStatus(request.paymentStatus());
+        }
+        orderRepository.saveAll(orders);
+
+        return orders.size();
     }
 
     @Override
