@@ -172,16 +172,16 @@ public class OrderServiceImpl implements OrderService {
                 osd.setOrderDetail(detail);
                 osd.setServiceCatalogCode(serviceReq.serviceCatalogCode());
                 if (Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())) {
-                    // Có giá điều chỉnh
                     osd.setAdjustedPrice(serviceReq.adjustedPrice());
                     osd.setAdjustedPriceFlag(true);
                     osd.setAdjustedPriceReason(serviceReq.adjustedPriceReason());
                 } else {
-                    // Mặc định lấy giá gốc
                     osd.setAdjustedPrice(serviceReq.adjustedPrice());
                     osd.setAdjustedPriceFlag(false);
                     osd.setAdjustedPriceReason(null);
                 }
+                osd.setQuantity(serviceReq.quantity() != null && serviceReq.quantity() >= 1
+                        ? serviceReq.quantity() : 1);
                 orderServiceDtlRepository.save(osd);
             }
         }
@@ -332,6 +332,8 @@ public class OrderServiceImpl implements OrderService {
                             Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())
                                     ? serviceReq.adjustedPriceReason()
                                     : null);
+                    osd.setQuantity(serviceReq.quantity() != null && serviceReq.quantity() >= 1
+                            ? serviceReq.quantity() : 1);
 
                     orderServiceDtlRepository.save(osd);
 

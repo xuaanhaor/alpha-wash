@@ -85,6 +85,7 @@ public class OrderConverter {
             BigDecimal adjustedPrice = (BigDecimal) row[i++];
             Boolean adjustedPriceFlag = (Boolean) row[i++];
             String adjustedPriceReason = (String) row[i++];
+            Integer quantity = row[i] != null ? ((Number) row[i]).intValue() : 1; i++;
 
             Long scId = row[i] != null ? ((Number) row[i]).longValue() : null;
             i++;
@@ -175,6 +176,7 @@ public class OrderConverter {
             service.setAdjustedPrice(adjustedPrice);
             service.setAdjustedPriceFlag(adjustedPriceFlag);
             service.setAdjustedPriceReason(adjustedPriceReason);
+            service.setQuantity(quantity);
 
             OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
             sc.setId(scId);

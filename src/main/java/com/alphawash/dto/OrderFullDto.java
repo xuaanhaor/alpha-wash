@@ -96,6 +96,7 @@ public class OrderFullDto {
         private String adjustedPriceReason;
         private BigDecimal adjustedPrice;
         private Boolean adjustedPriceFlag;
+        private Integer quantity;
         private ServiceCatalogDTO serviceCatalog;
     }
 
