@@ -44,4 +44,8 @@ public class OrderServiceDtl {
 
     @Column(name = "adjusted_price_flag")
     private Boolean adjustedPriceFlag;
+
+    @Column(name = "quantity", nullable = false)
+    @Builder.Default
+    private Integer quantity = 1;
 }

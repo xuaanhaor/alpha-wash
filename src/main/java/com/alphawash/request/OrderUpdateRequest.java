@@ -36,5 +36,6 @@ public record OrderUpdateRequest(
             String serviceCatalogCode,
             BigDecimal adjustedPrice,
             Boolean adjustedPriceFlag,
-            String adjustedPriceReason) {}
+            String adjustedPriceReason,
+            Integer quantity) {}
 }

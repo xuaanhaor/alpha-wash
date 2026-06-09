@@ -211,7 +211,8 @@ CREATE TABLE order_service_dtl
 ALTER TABLE order_service_dtl
     ADD COLUMN adjusted_price_reason VARCHAR(255),
     ADD COLUMN adjusted_price NUMERIC(18,2),
-    ADD COLUMN adjusted_price_flag BOOLEAN DEFAULT FALSE;
+    ADD COLUMN adjusted_price_flag BOOLEAN DEFAULT FALSE,
+    ADD COLUMN quantity INT DEFAULT 1 NOT NULL;
 
 CREATE TABLE service_combo
 (
