@@ -18,6 +18,7 @@ public class Constant {
     public static final String API_BRANDS = API + "/brands";
     public static final String API_MODEL = API + "/model";
     public static final String API_ORDERS = API + "/orders";
+    public static final String API_SERVICE_COMBO = API + "/combo";
     public static final String API_ORDER_DETAIL = API + "/order-detail";
     public static final String API_SERVICE = API + "/service";
     public static final String API_SERVICE_CATALOG = API + "/service-catalog";
@@ -28,4 +29,6 @@ public class Constant {
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
     public static final String API_BRAND_WITH_MODELS = "/brands/with-models";
     public static final String API_CREATE_ORDER = "/create-order";
+    public static final String ADMINISTRATOR = "admin";
+    public static final int ZERO = 0;
 }

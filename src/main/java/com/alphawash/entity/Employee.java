@@ -1,8 +1,17 @@
 package com.alphawash.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "employee")
@@ -29,13 +38,13 @@ public class Employee extends BaseEntity {
     private String bankAccount;
 
     @Column(name = "date_of_birth")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name = "identity_number")
     private String identityNumber;
 
     @Column(name = "join_date")
-    private LocalDateTime joinDate;
+    private LocalDate joinDate;
 
     @Column(name = "work_status")
     private String workStatus;

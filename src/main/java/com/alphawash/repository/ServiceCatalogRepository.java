@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, Long> {
@@ -38,4 +39,23 @@ public interface ServiceCatalogRepository extends JpaRepository<ServiceCatalog, 
     List<ServiceCatalog> findByService_Id(Long serviceId);
 
     Optional<ServiceCatalog> findByCode(String code);
+
+    @Query(
+            value = "SELECT * FROM service_catalog sc " + "WHERE sc.service_code = :serviceCode "
+                    + "AND sc.size = :size "
+                    + "AND sc.delete_flag = false",
+            nativeQuery = true)
+    Optional<ServiceCatalog> findByServiceCodeAndSize(
+            @Param("serviceCode") String serviceCode, @Param("size") String size);
+
+    @Query(
+            value =
+                    """
+        SELECT *
+        FROM service_catalog sc
+        WHERE sc.service_code = :serviceCode
+          AND sc.delete_flag = false
+    """,
+            nativeQuery = true)
+    List<ServiceCatalog> findByServiceCode(@Param("serviceCode") String serviceCode);
 }

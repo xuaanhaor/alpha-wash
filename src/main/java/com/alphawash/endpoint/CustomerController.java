@@ -83,15 +83,15 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/phone")
-    public ResponseEntity<CustomerVehicleResponse> findByPhone(@RequestParam(name = "number") String number) {
-        var result = customerService.findByPhone(number);
-        return ResponseEntity.ok(result);
-    }
+    //    @GetMapping("/phone")
+    //    public ResponseEntity<CustomerVehicleResponse> findByPhone(@RequestParam(name = "number") String number) {
+    //        var result = customerService.findByPhone(number);
+    //        return ResponseEntity.ok(result);
+    //    }
 
     @GetMapping("/by-phone-or-plate")
-    public ResponseEntity<CustomerVehicleResponse> findCustomerVehicleByPhone(@RequestParam String phone) {
-        CustomerVehicleResponse result = customerService.findCustomerVehicleByPhoneOrLicensePlate(phone);
+    public ResponseEntity<List<CustomerVehicleResponse>> findCustomerVehicleByPhone(@RequestParam String phone) {
+        var result = customerService.findCustomerVehicleByPhoneOrLicensePlate(phone);
         return ResponseEntity.ok(result);
     }
 }

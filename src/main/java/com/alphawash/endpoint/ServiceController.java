@@ -9,6 +9,7 @@ import com.alphawash.request.ServiceRequest;
 import com.alphawash.request.UpdateBasicServiceRequest;
 import com.alphawash.response.BasicServiceResponse;
 import com.alphawash.response.ServiceResponse;
+import com.alphawash.response.UpdateServiceResponse;
 import com.alphawash.service.ServiceService;
 import com.alphawash.util.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -119,7 +120,7 @@ public class ServiceController {
     }
 
     @PostMapping(UPDATE_ENDPOINT)
-    public ResponseEntity<BasicServiceResponse> updateBasicService(@RequestBody UpdateBasicServiceRequest request) {
+    public ResponseEntity<UpdateServiceResponse> updateBasicService(@RequestBody UpdateBasicServiceRequest request) {
         var response = serviceService.updateBasicService(request);
         return ResponseEntity.ok(response);
     }

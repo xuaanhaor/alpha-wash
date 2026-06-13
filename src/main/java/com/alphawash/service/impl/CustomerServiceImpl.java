@@ -14,9 +14,13 @@ import com.alphawash.service.CustomerService;
 import com.alphawash.util.CollectionUtils;
 import com.alphawash.util.ObjectUtils;
 import com.alphawash.util.PatchHelper;
+import com.alphawash.util.StringUtils;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -43,13 +47,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto create(CustomerRequest request) {
-        // Kiểm tra xem tên khách hàng có tồn tại hay không
-        if (customerRepository
-                .findByCustomerNameAndDeleteFlagFalse(request.customerName())
-                .isPresent()) {
-            throw new BusinessException(
-                    HttpStatus.CONFLICT, "Tên khách hàng đã tồn tại trong hệ thống: " + request.customerName());
-        }
         // Kiểm tra xem khách hàng đã tồn tại hay chưa
         if (customerRepository.findByPhone(request.phone()).isPresent()) {
             throw new BusinessException(
@@ -118,42 +115,86 @@ public class CustomerServiceImpl implements CustomerService {
                         });
     }
 
-    @Override
-    public CustomerVehicleResponse findByPhone(String phone) {
-        Optional<Customer> result = customerRepository.findByPhone(phone);
-        return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
-    }
+    //    @Override
+    //    public CustomerVehicleResponse findByPhone(String phone) {
+    //        Optional<Customer> result = customerRepository.findByPhone(phone);
+    //        return result.map(CustomerConverter.INSTANCE::toCustomerVehicleResp).orElse(null);
+    //    }
 
     @Override
-    public CustomerVehicleResponse findCustomerVehicleByPhoneOrLicensePlate(String phoneOrLicensePlate) {
-        List<CustomerVehicleFlatDto> flatList = null;
-        if (phoneOrLicensePlate.matches(RegexConstant.PHONE_REGEX)) {
-            flatList = customerRepository.findCustomerWithVehicleByPhone(phoneOrLicensePlate);
+    public List<CustomerVehicleResponse> findCustomerVehicleByPhoneOrLicensePlate(String phoneOrLicensePlate) {
+        if (StringUtils.isNullOrBlank(phoneOrLicensePlate)) {
+            return Collections.emptyList();
         }
 
-        if (phoneOrLicensePlate.matches(RegexConstant.LICENSE_PLATE_REGEX)) {
-            flatList = customerRepository.findCustomerWithVehicleByLicensePlate(phoneOrLicensePlate);
+        // Trim and normalize input
+        String searchTerm = phoneOrLicensePlate.trim().toUpperCase();
+        List<CustomerVehicleFlatDto> flatList = new ArrayList<>();
+
+        // Determine search type and execute appropriate search
+        if (searchTerm.matches(RegexConstant.PHONE_REGEX)) {
+            // Exact phone search
+            flatList = customerRepository.findCustomerWithVehicleByPhone(searchTerm);
+        } else if (searchTerm.matches(RegexConstant.LICENSE_PLATE_REGEX)) {
+            // Exact license plate search
+            flatList = customerRepository.findCustomerWithVehicleByLicensePlate(searchTerm);
+        } else {
+            // Fuzzy search for partial matches
+            if (searchTerm.startsWith("0") && searchTerm.matches("^0\\d*$")) {
+                // Partial phone number (starts with 0, only digits)
+                flatList = customerRepository.findCustomerWithVehicleByPhoneLike(searchTerm);
+            } else if (searchTerm.matches("^\\d.*[A-Z].*") || searchTerm.matches("^\\d{1,2}[A-Z].*")) {
+                // Partial license plate (starts with digits, contains letters)
+                flatList = customerRepository.findCustomerWithVehicleByLicensePlateLike(searchTerm + "%");
+            } else {
+                // Fallback: search both phone and license plate with LIKE
+                List<CustomerVehicleFlatDto> phoneResults =
+                        customerRepository.findCustomerWithVehicleByPhoneLike(searchTerm + "%");
+                List<CustomerVehicleFlatDto> plateResults =
+                        customerRepository.findCustomerWithVehicleByLicensePlateLike(searchTerm + "%");
+
+                flatList = new ArrayList<>();
+                flatList.addAll(phoneResults);
+                flatList.addAll(plateResults);
+                flatList = new ArrayList<>(flatList.stream()
+                        .collect(Collectors.toMap(
+                                dto -> dto.getId() + "_" + dto.getLicensePlate(),
+                                dto -> dto,
+                                (existing, replacement) -> existing))
+                        .values());
+            }
         }
 
-        if (CollectionUtils.isNotEmpty(flatList)) {
-            var first = flatList.get(0);
-            List<CustomerVehicleDto> vehicles = flatList.stream()
-                    .filter(item -> ObjectUtils.isNotNull(item.getLicensePlate()))
-                    .map(flat -> new CustomerVehicleDto(
-                            flat.getBrandCode(),
-                            flat.getBrandName(),
-                            flat.getModelCode(),
-                            flat.getModelName(),
-                            flat.getLicensePlate()))
-                    .toList();
-            return CustomerVehicleResponse.builder()
-                    .id(first.getId())
-                    .name(first.getCustomerName())
-                    .phone(first.getPhone())
-                    .vehicles(vehicles)
-                    .build();
+        if (CollectionUtils.isEmpty(flatList)) {
+            return Collections.emptyList();
         }
 
-        return null;
+        // Group by customer ID and build response list
+        Map<UUID, List<CustomerVehicleFlatDto>> groupedByCustomer =
+                flatList.stream().collect(Collectors.groupingBy(CustomerVehicleFlatDto::getId));
+
+        return groupedByCustomer.values().stream()
+                .map(customerData -> {
+                    CustomerVehicleFlatDto first = customerData.get(0);
+
+                    List<CustomerVehicleDto> vehicles = customerData.stream()
+                            .filter(item -> ObjectUtils.isNotNull(item.getLicensePlate()))
+                            .map(flat -> new CustomerVehicleDto(
+                                    flat.getBrandCode(),
+                                    flat.getBrandName(),
+                                    flat.getModelCode(),
+                                    flat.getModelName(),
+                                    flat.getLicensePlate()))
+                            .distinct()
+                            .collect(Collectors.toList());
+
+                    return CustomerVehicleResponse.builder()
+                            .id(first.getId())
+                            .name(first.getCustomerName())
+                            .phone(first.getPhone())
+                            .vehicles(vehicles)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

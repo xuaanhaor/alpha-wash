@@ -1,6 +1,7 @@
 package com.alphawash.configuration;
 
 import com.alphawash.exception.BusinessException;
+import com.alphawash.exception.InvalidArgumentException;
 import com.alphawash.response.ApiResponse;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,10 @@ public class GlobalExceptionHandler {
      * @param ex Ngoại lệ xảy ra
      * @return ResponseEntity chứa ApiResponse với thông tin lỗi
      */
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(InvalidArgumentException.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
         ex.printStackTrace(); // debug, sau này log bằng logger
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Internal server error: " + ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(ex.getMessage()));
     }
 
     /**

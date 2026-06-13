@@ -66,7 +66,7 @@ spotless {
 	java {
 		target 'src/**/*.java'
 		indentWithSpaces(4)
-		palantirJavaFormat()
+		palantirJavaFormat('2.28.0')
 		importOrder()
 		removeUnusedImports()
 		trimTrailingWhitespace()

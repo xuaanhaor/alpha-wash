@@ -1,21 +1,44 @@
 package com.alphawash.service.impl;
 
+import com.alphawash.constant.Size;
 import com.alphawash.converter.VehicleConverter;
+import com.alphawash.dto.BasicVehicleServiceUsedDto;
+import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
+import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
+import com.alphawash.dto.VehicleServicesDto;
+import com.alphawash.entity.Customer;
+import com.alphawash.entity.Model;
+import com.alphawash.entity.Vehicle;
+import com.alphawash.exception.BusinessException;
+import com.alphawash.repository.CustomerRepository;
+import com.alphawash.repository.ModelRepository;
+import com.alphawash.repository.OrderDetailRepository;
 import com.alphawash.repository.VehicleRepository;
+import com.alphawash.request.BasicCarSizeRequest;
 import com.alphawash.request.VehicleRequest;
+import com.alphawash.response.BasicCustomerVehicleDetailResponse;
 import com.alphawash.service.VehicleService;
+import com.alphawash.util.ObjectUtils;
+import com.alphawash.util.StringUtils;
 import jakarta.transaction.Transactional;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
 public class VehicleServiceImpl implements VehicleService {
 
     private final VehicleRepository repository;
+    private final ModelRepository modelRepository;
+    private final CustomerRepository customerRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Override
     public List<VehicleDto> search() {
@@ -63,5 +86,110 @@ public class VehicleServiceImpl implements VehicleService {
         } else {
             throw new IllegalArgumentException("Vehicle not found with license plate: " + licensePlate);
         }
+    }
+
+    @Override
+    public List<CarSizeDto> getCarSizes() {
+        return repository.findCar().stream()
+                .map(row -> {
+                    CarSizeDto dto = new CarSizeDto();
+                    dto.setBrandCode((String) row[0]);
+                    dto.setModelCode((String) row[1]);
+                    dto.setBrandName((String) row[2]);
+                    dto.setModelName((String) row[3]);
+                    dto.setSize(Size.valueOf((String) row[4]));
+                    dto.setNote((String) row[5]);
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public CarSizeDto updateCarSize(BasicCarSizeRequest request) {
+        String modelCode = request.modelCode();
+        Model model;
+
+        if (StringUtils.isNullOrBlank(request.modelCode())) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Mã model không được để rỗng!");
+        } else {
+            model = modelRepository
+                    .findByCode(modelCode)
+                    .orElseThrow(() ->
+                            new BusinessException(HttpStatus.NOT_FOUND, "Model xe không tồn tại với mã: " + modelCode));
+        }
+
+        Size size = Size.fromString(request.size());
+        model.setSize(size);
+        ObjectUtils.setIfNotNull(request.note(), model::setNote);
+        modelRepository.save(model);
+        return CarSizeDto.builder()
+                .brandCode(model.getBrand().getCode())
+                .modelCode(model.getCode())
+                .brandName(model.getBrand().getBrandName())
+                .modelName(model.getModelName())
+                .size(size)
+                .note(model.getNote())
+                .build();
+    }
+
+    @Override
+    public List<BasicVehicleServiceUsedSearchDto> searchVehicleServiceUsage() {
+        return repository.searchVehicleServiceUsage().stream()
+                .map(row -> {
+                    BasicVehicleServiceUsedSearchDto dto = BasicVehicleServiceUsedSearchDto.builder()
+                            .id((Integer) row[0])
+                            .licensePlate((String) row[1])
+                            .vehicleName((String) row[2])
+                            .customerName((String) row[3])
+                            .customerId((UUID) row[4])
+                            .phone((String) row[5])
+                            .serviceUsage((Integer) row[6])
+                            .note((String) row[7])
+                            .build();
+                    return dto;
+                })
+                .toList();
+    }
+
+    @Override
+    public BasicCustomerVehicleDetailResponse searchVehicleServiceUsageDetail(UUID customerId) {
+        Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() ->
+                        new BusinessException(HttpStatus.NOT_FOUND, "Khách hàng không tồn tại với id: " + customerId));
+        List<Vehicle> vehicle = repository.findByCustomerId(customerId);
+        if (!CollectionUtils.isEmpty(vehicle)) {
+            List<BasicVehicleServiceUsedDto> vehicles = new ArrayList<>();
+            vehicle.forEach(v -> {
+                List<VehicleServicesDto> services =
+                        repository.searchVehicleServiceUsageDetail(v.getLicensePlate()).stream()
+                                .map(row -> VehicleServicesDto.builder()
+                                        .id((Integer) row[0])
+                                        .serviceName((String) row[1])
+                                        .checkinTime(((Timestamp) row[2])
+                                                .toLocalDateTime()
+                                                .toLocalDate())
+                                        .build())
+                                .toList();
+                vehicles.add(BasicVehicleServiceUsedDto.builder()
+                        .licensePlate(v.getLicensePlate())
+                        .vehicleName(getVehicleName(v))
+                        .services(services)
+                        .build());
+            });
+            return BasicCustomerVehicleDetailResponse.builder()
+                    .customerId(customer.getId())
+                    .customerName(customer.getCustomerName())
+                    .phone(customer.getPhone())
+                    .vehicles(vehicles)
+                    .build();
+        }
+        return null;
+    }
+
+    private String getVehicleName(Vehicle vehicle) {
+        var brand = vehicle.getModel().getBrand().getBrandName();
+        var model = vehicle.getModel().getModelName();
+        return brand + " " + model;
     }
 }

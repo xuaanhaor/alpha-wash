@@ -4,6 +4,7 @@ import com.alphawash.dto.ServiceDto;
 import com.alphawash.request.CreateBasicServiceRequest;
 import com.alphawash.request.UpdateBasicServiceRequest;
 import com.alphawash.response.BasicServiceResponse;
+import com.alphawash.response.UpdateServiceResponse;
 import java.util.List;
 
 public interface ServiceService {
@@ -21,5 +22,5 @@ public interface ServiceService {
 
     BasicServiceResponse createBasicService(CreateBasicServiceRequest request);
 
-    BasicServiceResponse updateBasicService(UpdateBasicServiceRequest request);
+    UpdateServiceResponse updateBasicService(UpdateBasicServiceRequest request);
 }

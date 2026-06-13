@@ -1,8 +1,16 @@
 package com.alphawash.entity;
 
-import jakarta.persistence.*;
+import com.alphawash.constant.Constant;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Hạn chế sửa đổi các trường trong BaseEntity
@@ -35,13 +43,15 @@ public class BaseEntity {
 
     @PrePersist
     protected void onCreate() {
+        this.createdBy = Constant.ADMINISTRATOR;
         this.createdAt = LocalDateTime.now();
         this.deleteFlag = false;
-        this.exclusiveKey = 0;
+        this.exclusiveKey = Constant.ZERO;
     }
 
     @PreUpdate
     protected void onUpdate() {
+        this.updatedBy = Constant.ADMINISTRATOR;
         this.exclusiveKey++;
         this.updatedAt = LocalDateTime.now();
     }

@@ -1,19 +1,27 @@
 package com.alphawash.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderFullDto {
     private UUID id;
     private String code;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX", timezone = "Asia/Ho_Chi_Minh")
     private Timestamp date;
+
     private Time checkIn;
     private Time checkOut;
     private String paymentStatus;
@@ -27,7 +35,10 @@ public class OrderFullDto {
     private Boolean deleteFlag;
     private List<OrderDetailDTO> orderDetails;
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CustomerDTO {
         private UUID id;
         private String name;
@@ -36,7 +47,8 @@ public class OrderFullDto {
 
     @Getter
     @Setter
-    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class OrderDetailDTO {
         private String code;
         private List<EmployeeDTO> employees;
@@ -46,13 +58,19 @@ public class OrderFullDto {
         private String note;
     }
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EmployeeDTO {
         private Long id;
         private String name;
     }
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class VehicleDTO {
         private UUID id;
         private String licensePlate;
@@ -66,20 +84,29 @@ public class OrderFullDto {
         private String imageUrl;
     }
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ServiceDTO {
         private Long id;
         private String serviceCode;
         private String serviceName;
         private String serviceTypeCode;
+        private String adjustedPriceReason;
+        private BigDecimal adjustedPrice;
+        private Boolean adjustedPriceFlag;
         private ServiceCatalogDTO serviceCatalog;
     }
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ServiceCatalogDTO {
         private Long id;
         private String code;
-        private BigDecimal price;
+        private BigDecimal listedPrice;
         private String size;
     }
 }

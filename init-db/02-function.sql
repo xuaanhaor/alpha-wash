@@ -245,7 +245,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE c.phone = p_customer_phone
+        WHERE c.phone ILIKE '%' || REPLACE(REPLACE(p_customer_phone, '%', '\%'), '_', '\_') || '%'
           AND c.delete_flag = false;
 END;
 $$ LANGUAGE plpgsql;
@@ -280,7 +280,7 @@ BEGIN
                  LEFT JOIN vehicle v ON c.id = v.customer_id AND v.delete_flag = false
                  LEFT JOIN brands b ON v.brand_code = b.code
                  LEFT JOIN model m ON v.model_code = m.code
-        WHERE v.license_plate = p_customer_license_plate
+        WHERE v.license_plate ILIKE '%' || REPLACE(REPLACE(p_customer_license_plate, '%', '\%'), '_', '\_') || '%'
           AND v.delete_flag = false
           AND c.delete_flag = false;
 END;
@@ -418,7 +418,7 @@ BEGIN
                v.updated_at,
                v.exclusive_key
         FROM orders o
-                 JOIN order_detail od ON o.id = od.order_id
+                 JOIN order_detail od ON o.code = od.order_code
                  JOIN vehicle v ON od.vehicle_id = v.id
         WHERE o.id = p_order_id
           AND o.delete_flag = false;
@@ -673,5 +673,69 @@ BEGIN
           AND st.delete_flag = false
           AND sc.delete_flag = false
         ORDER BY st.code, s.code;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used()
+RETURNS TABLE
+(
+    id            INT,
+    license_plate VARCHAR,
+    vehicle_name  VARCHAR,
+    customer_name VARCHAR,
+    customer_id   UUID,
+    phone	      VARCHAR,
+    service_usage INT,
+    note	      TEXT
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    select
+        ROW_NUMBER() OVER (ORDER BY v.license_plate)::INT AS id,
+		v.license_plate,
+		CONCAT(b.brand_name, ' ', m.model_name)::VARCHAR as vehicle_name,
+		COALESCE(c.customer_name , 'Chưa cập nhật')::VARCHAR AS customer_name,
+        c.id AS customer_id,
+		COALESCE(c.phone , 'Chưa cập nhật')::VARCHAR AS phone,
+		COUNT(od.id)::INT as service_usage,
+		v.note
+	from vehicle v
+	join order_detail od on od.vehicle_id = v.id
+	join orders o on od.order_code = o.code
+	left join customer c on c.id = o.customer_id
+	join model m on v.model_code = m.code
+	join brands b on m.brand_code = b.code 
+	group by v.license_plate, c.customer_name, c.id, c.phone, m.model_name, b.brand_name, v.note;
+END;
+$$ LANGUAGE plpgsql;
+
+--
+
+CREATE OR REPLACE FUNCTION get_customer_vehicle_services_used_detail(p_license_plate VARCHAR)
+RETURNS TABLE
+(
+    id   INT,
+    service_name VARCHAR,
+    date  		 TIMESTAMP
+)
+AS
+$$
+BEGIN
+    RETURN QUERY
+    select
+        ROW_NUMBER() OVER (ORDER BY o.date)::INT AS id,
+        s.service_name,
+        o.date 
+    from orders o
+	join order_detail od on od.order_code = o.code
+	join vehicle v on od.vehicle_id = v.id
+	join order_service_dtl osd on od.code = osd.order_detail_code
+	join service_catalog sc on osd.service_catalog_code  = sc.code
+	join service s on sc.service_code = s.code
+	where v.license_plate = p_license_plate;
 END;
 $$ LANGUAGE plpgsql;

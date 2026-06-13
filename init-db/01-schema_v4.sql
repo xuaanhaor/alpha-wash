@@ -4,7 +4,7 @@ CREATE DATABASE alphawash_db_v4;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TYPE size AS ENUM ('S', 'M', 'L');
+CREATE TYPE size AS ENUM ('S', 'M', 'L', 'XL');
 
 CREATE TABLE service_type
 (
@@ -122,8 +122,9 @@ CREATE TABLE model
     id            SERIAL,
     code          VARCHAR(20) UNIQUE NOT NULL,
     model_name    VARCHAR(50)        NOT NULL,
-    size          VARCHAR(5)         NOT NULL,
+    size          SIZE               NOT NULL,
     brand_code    VARCHAR(20) REFERENCES brands (code),
+    note          TEXT,
     delete_flag   BOOLEAN   DEFAULT FALSE,
     created_by    VARCHAR(50),
     updated_by    VARCHAR(50),
@@ -205,6 +206,43 @@ CREATE TABLE order_service_dtl
     updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     exclusive_key        INT       DEFAULT 0,
     UNIQUE (order_detail_code, service_catalog_code)
+);
+
+ALTER TABLE order_service_dtl
+    ADD COLUMN adjusted_price_reason VARCHAR(255),
+    ADD COLUMN adjusted_price NUMERIC(18,2),
+    ADD COLUMN adjusted_price_flag BOOLEAN DEFAULT FALSE;
+
+CREATE TABLE service_combo
+(
+    id            SERIAL,
+    code          VARCHAR(20) NOT NULL,
+    combo_name    VARCHAR(200),
+    price         NUMERIC,
+    note          TEXT,
+    delete_flag   BOOLEAN   DEFAULT FALSE,
+    created_by    VARCHAR(50),
+    updated_by    VARCHAR(50),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key INT       DEFAULT 0,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE service_combo_dtl
+(
+    id                   SERIAL,
+    code                 varchar(20) UNIQUE NOT NULL,
+    combo_code           VARCHAR(20)        NOT NULL,
+    service_catalog_code VARCHAR(20)        NOT NULL,
+    delete_flag          BOOLEAN   DEFAULT FALSE,
+    created_by           VARCHAR(50),
+    updated_by           VARCHAR(50),
+    created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    exclusive_key        INT       DEFAULT 0,
+    PRIMARY KEY (code),
+    UNIQUE (combo_code, service_catalog_code)
 );
 
 CREATE TABLE IF NOT EXISTS daily_sequence

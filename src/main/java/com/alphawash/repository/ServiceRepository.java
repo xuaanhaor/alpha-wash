@@ -14,6 +14,30 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     @Query(value = "SELECT * FROM get_basic_services()", nativeQuery = true)
     List<BasicServiceResponse> getBasicServices();
 
-    @Query(value = "SELECT * FROM get_basic_service_by_code(:p_service_code)", nativeQuery = true)
-    Optional<BasicServiceResponse> getBasicServiceByServiceCode(@Param("p_service_code") String serviceCode);
+    @Query(
+            value =
+                    """
+    SELECT sc.id                AS service_id,
+           st.code              AS service_type_code,
+           st.service_type_name AS service_type_name,
+           s.code               AS service_code,
+           s.service_name       AS service_name,
+           sc.code              AS service_catalog_code,
+           sc.price,
+           s.duration,
+           sc.size,
+           s.note::text
+    FROM service s
+             JOIN service_type st ON s.service_type_code = st.code
+             JOIN service_catalog sc ON s.code = sc.service_code
+    WHERE s.code = :p_service_code
+      AND sc.size = :p_size
+      AND s.delete_flag = false
+      AND st.delete_flag = false
+      AND sc.delete_flag = false
+    ORDER BY st.code, s.code
+    """,
+            nativeQuery = true)
+    Optional<BasicServiceResponse> getBasicServiceByServiceCode(
+            @Param("p_service_code") String serviceCode, @Param("p_size") String size);
 }

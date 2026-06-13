@@ -12,4 +12,5 @@ public class ModelDto {
     private String modelName;
     private String size;
     private Long brandId;
+    private String note;
 }

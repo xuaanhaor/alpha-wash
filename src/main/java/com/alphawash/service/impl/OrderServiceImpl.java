@@ -2,9 +2,24 @@ package com.alphawash.service.impl;
 
 import com.alphawash.converter.OrderConverter;
 import com.alphawash.dto.OrderFullDto;
-import com.alphawash.entity.*;
+import com.alphawash.entity.Brand;
+import com.alphawash.entity.Customer;
+import com.alphawash.entity.Model;
+import com.alphawash.entity.Order;
+import com.alphawash.entity.OrderDetail;
+import com.alphawash.entity.OrderServiceDtl;
+import com.alphawash.entity.ServiceCatalog;
+import com.alphawash.entity.Vehicle;
 import com.alphawash.exception.BusinessException;
-import com.alphawash.repository.*;
+import com.alphawash.repository.BrandRepository;
+import com.alphawash.repository.CustomerRepository;
+import com.alphawash.repository.EmployeeRepository;
+import com.alphawash.repository.ModelRepository;
+import com.alphawash.repository.OrderDetailRepository;
+import com.alphawash.repository.OrderRepository;
+import com.alphawash.repository.OrderServiceDtlRepository;
+import com.alphawash.repository.ServiceCatalogRepository;
+import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.service.OrderService;
@@ -15,7 +30,12 @@ import com.alphawash.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -67,42 +87,7 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Khách hàng không tồn tại"));
         }
 
-        // ===== 2. Kiểm tra hoặc tạo mới xe =====
-        if (request.licensePlate() == null || request.licensePlate().isBlank()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
-        }
-        Vehicle vehicle =
-                vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
-
-        if (vehicle == null) {
-            // Nếu xe mới thì bắt buộc phải có brandCode + modelCode
-            if (request.brandCode() == null || request.modelCode() == null) {
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng xe hoặc dòng xe");
-            }
-
-            Brand brand = brandRepository
-                    .findByCode(request.brandCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + request.brandCode()));
-
-            Model model = modelRepository
-                    .findByCode(request.modelCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + request.modelCode()));
-
-            vehicle = Vehicle.builder()
-                    .licensePlate(request.licensePlate())
-                    .brand(brand)
-                    .model(model)
-                    .customer(customer)
-                    .imageUrl(request.imageUrl())
-                    .note(request.vehicleNote())
-                    .build();
-
-            vehicleRepository.save(vehicle);
-        }
-
-        // ===== 3. Tạo đơn hàng =====
+        // ===== 2. Tạo đơn hàng =====
         Order order = new Order();
         order.setCode(generateOrderCode());
         order.setCustomer(customer);
@@ -117,10 +102,49 @@ public class OrderServiceImpl implements OrderService {
         order.setNote(request.note());
         orderRepository.save(order);
 
-        // ===== 4. Xử lý từng chi tiết đơn hàng =====
+        // ===== 3. Xử lý từng chi tiết đơn hàng (mỗi detail = 1 xe) =====
         BigDecimal totalServicePrice = BigDecimal.ZERO;
 
         for (OrderCreateRequest.OrderDetailRequest detailReq : request.orderDetails()) {
+            // ===== 3.1 Kiểm tra hoặc tạo mới xe cho từng detail =====
+            if (detailReq.licensePlate() == null || detailReq.licensePlate().isBlank()) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
+            }
+            
+            Vehicle vehicle = vehicleRepository
+                    .findByLicensePlate(detailReq.licensePlate())
+                    .orElse(null);
+
+            if (vehicle == null) {
+                // Nếu xe mới thì bắt buộc phải có brandCode + modelCode
+                if (detailReq.brandCode() == null || detailReq.modelCode() == null) {
+                    throw new BusinessException(HttpStatus.BAD_REQUEST, 
+                        "Thiếu thông tin hãng xe hoặc dòng xe cho biển số: " + detailReq.licensePlate());
+                }
+
+                Brand brand = brandRepository
+                        .findByCode(detailReq.brandCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + detailReq.brandCode()));
+
+                Model model = modelRepository
+                        .findByCode(detailReq.modelCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + detailReq.modelCode()));
+
+                vehicle = Vehicle.builder()
+                        .licensePlate(detailReq.licensePlate())
+                        .brand(brand)
+                        .model(model)
+                        .customer(customer)
+                        .imageUrl(detailReq.imageUrl())
+                        .note(detailReq.vehicleNote())
+                        .build();
+
+                vehicleRepository.save(vehicle);
+            }
+
+            // ===== 3.2 Tạo order detail =====
             OrderDetail detail = new OrderDetail();
             detail.setCode(generateOrderDetailCode());
             detail.setOrder(order);
@@ -135,23 +159,33 @@ public class OrderServiceImpl implements OrderService {
             orderDetailRepository.save(detail);
 
             // ===== 5. Gán các dịch vụ cho từng chi tiết =====
-            for (String scCode : detailReq.serviceCatalogCodes()) {
+            for (OrderCreateRequest.ServiceCreateRequest serviceReq : detailReq.services()) {
                 ServiceCatalog sc = serviceCatalogRepository
-                        .findByCode(scCode)
-                        .orElseThrow(() ->
-                                new BusinessException(HttpStatus.BAD_REQUEST, "Gói dịch vụ không tồn tại: " + scCode));
+                        .findByCode(serviceReq.serviceCatalogCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST,
+                                "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
 
                 OrderServiceDtl osd = new OrderServiceDtl();
                 osd.setCode(generateOrderServiceDtlCode());
                 osd.setOrderDetail(detail);
-                osd.setServiceCatalogCode(scCode);
+                osd.setServiceCatalogCode(serviceReq.serviceCatalogCode());
+                if (Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())) {
+                    // Có giá điều chỉnh
+                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                    osd.setAdjustedPriceFlag(true);
+                    osd.setAdjustedPriceReason(serviceReq.adjustedPriceReason());
+                } else {
+                    // Mặc định lấy giá gốc
+                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                    osd.setAdjustedPriceFlag(false);
+                    osd.setAdjustedPriceReason(null);
+                }
                 orderServiceDtlRepository.save(osd);
-
-                totalServicePrice = totalServicePrice.add(sc.getPrice());
             }
         }
 
-        // ===== 6. Tính lại tổng tiền và xác minh =====
+        // ===== 4. Lưu tổng tiền đã được tính trên Fe =====
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
         return order.getId();
@@ -227,6 +261,7 @@ public class OrderServiceImpl implements OrderService {
         ObjectUtils.setIfNotNull(request.paymentType(), order::setPaymentType);
         ObjectUtils.setIfNotNull(request.checkInTime(), order::setCheckinTime);
         ObjectUtils.setIfNotNull(request.checkOutTime(), order::setCheckoutTime);
+        ObjectUtils.setIfNotNull(request.date(), order::setDate);
         ObjectUtils.setIfNotNull(request.vat(), order::setVat);
         ObjectUtils.setIfNotNull(request.tip(), order::setTip);
         ObjectUtils.setIfNotNull(request.discount(), order::setDiscount);
@@ -257,43 +292,52 @@ public class OrderServiceImpl implements OrderService {
             orderDetailRepository.save(detail);
 
             // 6. Cập nhật dịch vụ
-            if (CollectionUtils.isNotEmpty(detailReq.serviceCatalogCodes())) {
+            if (CollectionUtils.isNotEmpty(detailReq.services())) {
                 List<OrderServiceDtl> existingServices =
                         orderServiceDtlRepository.findByOrderDetailCode(detail.getCode());
 
-                Set<String> existingScCodes = existingServices.stream()
-                        .map(OrderServiceDtl::getServiceCatalogCode)
+                Map<String, OrderServiceDtl> existingMap = existingServices.stream()
+                        .collect(Collectors.toMap(OrderServiceDtl::getServiceCatalogCode, s -> s));
+
+                Set<String> requestScCodes = detailReq.services().stream()
+                        .map(OrderUpdateRequest.ServiceUpdateRequest::serviceCatalogCode)
                         .collect(Collectors.toSet());
 
-                Set<String> requestScCodes = new HashSet<>(detailReq.serviceCatalogCodes());
-
-                // 1. Xoá cái không còn
-                Set<String> codesToRemove = new HashSet<>(existingScCodes);
+                // 1. Xoá service không còn trong request
+                Set<String> codesToRemove = new HashSet<>(existingMap.keySet());
                 codesToRemove.removeAll(requestScCodes);
-
                 if (!codesToRemove.isEmpty()) {
                     orderServiceDtlRepository.deleteByOrderDetailCodeAndServiceCatalogCodes(
                             detail.getCode(), codesToRemove);
                 }
 
-                // 2. Thêm cái mới
-                Set<String> codesToAdd = new HashSet<>(requestScCodes);
-                codesToAdd.removeAll(existingScCodes);
+                // 2. Thêm hoặc cập nhật service trong request
+                for (OrderUpdateRequest.ServiceUpdateRequest serviceReq : detailReq.services()) {
+                    OrderServiceDtl osd = existingMap.get(serviceReq.serviceCatalogCode());
 
-                for (String scCode : codesToAdd) {
-                    ServiceCatalog sc = serviceCatalogRepository
-                            .findByCode(scCode)
-                            .orElseThrow(() -> new BusinessException(
-                                    HttpStatus.BAD_REQUEST, "Gói dịch vụ không tồn tại: " + scCode));
+                    if (osd == null) {
+                        // Thêm mới
+                        osd = OrderServiceDtl.builder()
+                                .code(generateOrderServiceDtlCode())
+                                .orderDetail(detail)
+                                .serviceCatalogCode(serviceReq.serviceCatalogCode())
+                                .build();
+                    }
 
-                    OrderServiceDtl osd = OrderServiceDtl.builder()
-                            .code(generateOrderServiceDtlCode())
-                            .orderDetail(detail)
-                            .serviceCatalogCode(scCode)
-                            .build();
+                    // Cập nhật thông tin giá
+                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                    osd.setAdjustedPriceFlag(Boolean.TRUE.equals(serviceReq.adjustedPriceFlag()));
+                    osd.setAdjustedPriceReason(
+                            Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())
+                                    ? serviceReq.adjustedPriceReason()
+                                    : null);
 
                     orderServiceDtlRepository.save(osd);
-                    totalServicePrice = totalServicePrice.add(sc.getPrice());
+
+                    // Luôn cộng adjustedPrice (FE đã gửi giá gốc hoặc giá điều chỉnh)
+                    if (serviceReq.adjustedPrice() != null) {
+                        totalServicePrice = totalServicePrice.add(serviceReq.adjustedPrice());
+                    }
                 }
             }
         }

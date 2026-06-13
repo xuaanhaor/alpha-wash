@@ -37,6 +37,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public EmployeeDto create(EmployeeRequest request) {
         try {
+            if (request.phone() != null) {
+                boolean exists = employeeRepository.existsByPhone(request.phone());
+                if (exists) {
+                    throw new BusinessException(HttpStatus.CONFLICT, "Số điện thoại đã tồn tại");
+                }
+            }
+
+            // Check trùng CCCD
+            if (request.identityNumber() != null) {
+                boolean exists = employeeRepository.existsByIdentityNumber(request.identityNumber());
+                if (exists) {
+                    throw new BusinessException(HttpStatus.CONFLICT, "Số căn cước công dân đã tồn tại");
+                }
+            }
             Employee saved = employeeRepository.save(Employee.builder()
                     .name(request.name())
                     .phone(request.phone())
@@ -50,17 +64,33 @@ public class EmployeeServiceImpl implements EmployeeService {
                     .build());
             return employeeConverter.toDto(saved);
         } catch (Exception e) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to create new employee: " + e.getMessage());
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Tạo mới nhân viên thất bại: " + e.getMessage());
         }
     }
 
     @Override
     @Transactional
     public EmployeeDto update(Long id, EmployeeRequest request) {
-        var employeeOptional = employeeRepository
+        var employee = employeeRepository
                 .findById(id)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, ErrorConst.E004.formatted(id)));
-        var result = updateEmployee(request, employeeOptional);
+
+        // Check trùng phone
+        if (request.phone() != null) {
+            boolean exists = employeeRepository.existsDuplicatePhone(request.phone(), id);
+            if (exists) {
+                throw new BusinessException(HttpStatus.CONFLICT, "Số điện thoại đã tồn tại");
+            }
+        }
+
+        // Check trùng CCCD
+        if (request.identityNumber() != null) {
+            boolean exists = employeeRepository.existsByIdentityNumberAndIdNot(request.identityNumber(), id);
+            if (exists) {
+                throw new BusinessException(HttpStatus.CONFLICT, "Số căn cước công dân đã tồn tại");
+            }
+        }
+        var result = updateEmployee(request, employee);
         return employeeConverter.toDto(result);
     }
 
@@ -77,7 +107,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             ObjectUtils.setIfNotNull(request.note(), employee::setNote);
             return employeeRepository.save(employee);
         } catch (Exception e) {
-            throw new BusinessException(HttpStatus.CONFLICT, "Failed to update employee: " + e.getMessage());
+            throw new BusinessException(HttpStatus.CONFLICT, "Cập nhật nhân viên thất bại: " + e.getMessage());
         }
     }
 
