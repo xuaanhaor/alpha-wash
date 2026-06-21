@@ -19,6 +19,7 @@ RUN ./gradlew bootJar --no-daemon -x test
 FROM eclipse-temurin:17-jre-alpine
 
 ENV TZ=Asia/Ho_Chi_Minh
+ENV SPRING_PROFILES_ACTIVE=prod
 
 RUN apk add --no-cache postgresql-client && \
     apk add --no-cache bash && \
