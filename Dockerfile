@@ -34,4 +34,6 @@ RUN dos2unix /data-healthcheck.sh && \
     chmod +x /data-healthcheck.sh
 
 EXPOSE 8080
-ENTRYPOINT ["/bin/bash", "-c", "/data-healthcheck.sh && java $JAVA_OPTS -jar /app/app.jar"]
+# Khong chay healthcheck vi tren Railway khong co container db noi bo
+# Neon PostgreSQL luon san sang, khong can cho
+ENTRYPOINT ["/bin/bash", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
