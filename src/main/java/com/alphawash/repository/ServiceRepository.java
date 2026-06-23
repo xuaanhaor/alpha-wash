@@ -40,4 +40,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
             nativeQuery = true)
     Optional<BasicServiceResponse> getBasicServiceByServiceCode(
             @Param("p_service_code") String serviceCode, @Param("p_size") String size);
+
+    @Query(value = "SELECT * FROM service s WHERE s.delete_flag = false", nativeQuery = true)
+    List<Service> getServicesAvailable();
 }
