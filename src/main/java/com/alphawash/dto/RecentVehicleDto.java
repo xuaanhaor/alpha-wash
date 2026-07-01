@@ -1,6 +1,6 @@
 package com.alphawash.dto;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,16 +12,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CustomerVehicleFlatDto {
-    private UUID id;
-    private String phone;
+public class RecentVehicleDto {
+    private String vehicleId;
+    private String licensePlate;
+    private String imageUrl;
+    private String customerId;
     private String customerName;
+    private String customerPhone;
     private String brandCode;
     private String brandName;
     private String modelCode;
     private String modelName;
-    private String licensePlate;
-    private UUID vehicleId;
-    private String imageUrl;
-    private String size;
+    private String vehicleSize;
+    private LocalDateTime lastOrderDate;
 }

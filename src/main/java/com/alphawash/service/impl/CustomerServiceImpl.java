@@ -184,7 +184,11 @@ public class CustomerServiceImpl implements CustomerService {
                                     flat.getBrandName(),
                                     flat.getModelCode(),
                                     flat.getModelName(),
-                                    flat.getLicensePlate()))
+                                    flat.getLicensePlate(),
+                                    flat.getVehicleId(),
+                                    flat.getSize(),
+                                    flat.getImageUrl(),
+                                    first.getId()))
                             .distinct()
                             .collect(Collectors.toList());
 

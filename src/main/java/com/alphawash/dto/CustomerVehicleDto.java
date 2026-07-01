@@ -1,5 +1,6 @@
 package com.alphawash.dto;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,8 @@ public class CustomerVehicleDto {
     private String modelCode;
     private String modelName;
     private String licensePlate;
+    private UUID id;
+    private String size;
+    private String imageUrl;
+    private UUID customerId;
 }
