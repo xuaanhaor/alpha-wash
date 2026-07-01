@@ -29,6 +29,7 @@ public class Constant {
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
     public static final String API_BRAND_WITH_MODELS = "/brands/with-models";
     public static final String API_CREATE_ORDER = "/create-order";
+    public static final String API_QUICK_INVOICE = API + "/quick-invoice";
     public static final String API_AUTH = API + "/auth";
     public static final String LOGIN_ENDPOINT = "/login";
     public static final String ADMINISTRATOR = "admin";

@@ -27,7 +27,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query("SELECT new com.alphawash.dto.CustomerVehicleFlatDto("
             + "c.id, c.phone, c.customerName, v.brand.code, b.brandName, "
-            + "v.model.code, m.modelName, v.licensePlate) "
+            + "v.model.code, m.modelName, v.licensePlate, v.id, v.imageUrl, str(m.size)) "
             + "FROM Customer c "
             + "LEFT JOIN Vehicle v ON c.id = v.customer.id AND v.deleteFlag = false "
             + "LEFT JOIN Brand b ON v.brand.code = b.code "
@@ -37,7 +37,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query("SELECT new com.alphawash.dto.CustomerVehicleFlatDto("
             + "c.id, c.phone, c.customerName, v.brand.code, b.brandName, "
-            + "v.model.code, m.modelName, v.licensePlate) "
+            + "v.model.code, m.modelName, v.licensePlate, v.id, v.imageUrl, str(m.size)) "
             + "FROM Customer c "
             + "LEFT JOIN Vehicle v ON c.id = v.customer.id AND v.deleteFlag = false "
             + "LEFT JOIN Brand b ON v.brand.code = b.code "
