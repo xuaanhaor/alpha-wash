@@ -32,6 +32,12 @@ public class Constant {
     public static final String API_QUICK_INVOICE = API + "/quick-invoice";
     public static final String API_AUTH = API + "/auth";
     public static final String LOGIN_ENDPOINT = "/login";
+    public static final String API_PRODUCT_CATEGORIES = API + "/product-categories";
+    public static final String API_SUPPLIERS = API + "/suppliers";
+    public static final String API_PRODUCTS = API + "/products";
+    public static final String API_INVENTORY = API + "/inventory";
+    public static final String API_PURCHASE_ORDERS = API + "/purchase-orders";
+    public static final String RECEIVE_ENDPOINT = "/receive";
     public static final String ADMINISTRATOR = "admin";
     public static final int ZERO = 0;
 }
