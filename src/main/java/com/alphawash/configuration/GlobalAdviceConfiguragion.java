@@ -4,6 +4,7 @@ import com.alphawash.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -33,6 +34,9 @@ public class GlobalAdviceConfiguragion implements ResponseBodyAdvice<Object> {
         }
 
         if (body instanceof ApiResponse) {
+            return body;
+        }
+        if (body instanceof Resource) {
             return body;
         }
         if (body instanceof String) {
