@@ -59,10 +59,10 @@ public class Product extends BaseEntity {
     private BigDecimal suggestedPrice;
 
     @Column(name = "current_stock")
-    private Integer currentStock;
+    private Integer currentStock = 0;
 
     @Column(name = "min_stock")
-    private Integer minStock;
+    private Integer minStock = 0;
 
     @Column(name = "unit")
     private String unit;
@@ -71,7 +71,7 @@ public class Product extends BaseEntity {
     private String location;
 
     @Column(name = "track_inventory")
-    private Boolean trackInventory;
+    private Boolean trackInventory = true;
 
     @ManyToOne
     @JoinColumn(name = "supplier_code", referencedColumnName = "code")
@@ -81,5 +81,5 @@ public class Product extends BaseEntity {
     private String supplierSku;
 
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true;
 }
