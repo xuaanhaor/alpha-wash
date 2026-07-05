@@ -21,4 +21,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
     @Query(value = "SELECT * FROM order_detail WHERE code = :code AND delete_flag = false", nativeQuery = true)
     Optional<OrderDetail> findByCode(@Param("code") String code);
+
+    List<OrderDetail> findByOrder_Code(String orderCode);
 }

@@ -2,19 +2,23 @@ package com.alphawash.converter;
 
 import com.alphawash.dto.*;
 import com.alphawash.entity.Employee;
+import com.alphawash.entity.OrderProductDtl;
 import com.alphawash.repository.EmployeeRepository;
+import com.alphawash.repository.OrderProductDtlRepository;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class OrderConverter {
 
-    public OrderConverter() {}
+    private final OrderProductDtlRepository orderProductDtlRepository;
 
     public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
         Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
@@ -143,6 +147,7 @@ public class OrderConverter {
 
                         d.setEmployees(new ArrayList<>());
                         d.setService(new ArrayList<>());
+                        d.setProducts(new ArrayList<>());
                         order.getOrderDetails().add(d);
                         return d;
                     });
@@ -167,25 +172,53 @@ public class OrderConverter {
                 }
             }
 
-            // === SERVICE ===
-            OrderFullDto.ServiceDTO service = new OrderFullDto.ServiceDTO();
-            service.setId(serviceId);
-            service.setServiceCode(serviceCode);
-            service.setServiceName(serviceName);
-            service.setServiceTypeCode(serviceTypeCode);
-            service.setAdjustedPrice(adjustedPrice);
-            service.setAdjustedPriceFlag(adjustedPriceFlag);
-            service.setAdjustedPriceReason(adjustedPriceReason);
-            service.setQuantity(quantity);
+            // === SERVICE (may be null from LEFT JOIN) ===
+            if (serviceId != null) {
+                OrderFullDto.ServiceDTO service = new OrderFullDto.ServiceDTO();
+                service.setId(serviceId);
+                service.setServiceCode(serviceCode);
+                service.setServiceName(serviceName);
+                service.setServiceTypeCode(serviceTypeCode);
+                service.setAdjustedPrice(adjustedPrice);
+                service.setAdjustedPriceFlag(adjustedPriceFlag);
+                service.setAdjustedPriceReason(adjustedPriceReason);
+                service.setQuantity(quantity);
 
-            OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
-            sc.setId(scId);
-            sc.setCode(scCode);
-            sc.setListedPrice(scPrice);
-            sc.setSize(scSize);
-            service.setServiceCatalog(sc);
+                OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
+                sc.setId(scId);
+                sc.setCode(scCode);
+                sc.setListedPrice(scPrice);
+                sc.setSize(scSize);
+                service.setServiceCatalog(sc);
 
-            detail.getService().add(service);
+                detail.getService().add(service);
+            }
+        }
+
+        // === PRODUCTS — load separately to avoid cartesian product ===
+        for (OrderFullDto dto : orderMap.values()) {
+            for (OrderFullDto.OrderDetailDTO detail : dto.getOrderDetails()) {
+                List<OrderProductDtl> productItems =
+                        orderProductDtlRepository.findByOrderDetail_CodeAndDeleteFlagFalse(detail.getCode());
+                List<OrderFullDto.ProductItemDTO> productDtos = new ArrayList<>();
+                for (OrderProductDtl opd : productItems) {
+                    OrderFullDto.ProductItemDTO p = new OrderFullDto.ProductItemDTO();
+                    p.setId(opd.getId());
+                    p.setProductCode(opd.getProduct() != null ? opd.getProduct().getCode() : null);
+                    p.setProductName(opd.getProduct() != null ? opd.getProduct().getProductName() : null);
+                    p.setUnitPrice(opd.getUnitPrice());
+                    p.setQuantity(opd.getQuantity());
+                    p.setAdjustedPrice(opd.getAdjustedPrice());
+                    p.setAdjustedPriceFlag(opd.getAdjustedPriceFlag());
+                    p.setAdjustedPriceReason(opd.getAdjustedPriceReason());
+                    p.setDiscount(opd.getDiscount());
+                    p.setNote(opd.getNote());
+                    p.setCurrentStock(opd.getProduct() != null ? opd.getProduct().getCurrentStock() : null);
+                    p.setUnit(opd.getProduct() != null ? opd.getProduct().getUnit() : null);
+                    productDtos.add(p);
+                }
+                detail.setProducts(productDtos);
+            }
         }
 
         return new ArrayList<>(orderMap.values());

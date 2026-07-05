@@ -76,9 +76,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "JOIN vehicle v ON v.id = od.vehicle_id\n"
                     + "JOIN brands b ON b.code = v.brand_code\n"
                     + "JOIN model m ON m.code = v.model_code\n"
-                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
-                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
-                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "LEFT JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "LEFT JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "LEFT JOIN service s ON s.code = sc.service_code\n"
                     + "\n"
                     + "ORDER BY o.created_at DESC;",
             nativeQuery = true)
@@ -143,9 +143,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "JOIN vehicle v ON v.id = od.vehicle_id\n"
                     + "JOIN brands b ON b.code = v.brand_code\n"
                     + "JOIN model m ON m.code = v.model_code\n"
-                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
-                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
-                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "LEFT JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "LEFT JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "LEFT JOIN service s ON s.code = sc.service_code\n"
                     + "\n"
                     + "WHERE o.code = :code\n"
                     + "ORDER BY o.created_at DESC;",
@@ -211,9 +211,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     + "JOIN vehicle v ON v.id = od.vehicle_id\n"
                     + "JOIN brands b ON b.code = v.brand_code\n"
                     + "JOIN model m ON m.code = v.model_code\n"
-                    + "JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
-                    + "JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
-                    + "JOIN service s ON s.code = sc.service_code\n"
+                    + "LEFT JOIN order_service_dtl osd ON osd.order_detail_code = od.code\n"
+                    + "LEFT JOIN service_catalog sc ON sc.code = osd.service_catalog_code\n"
+                    + "LEFT JOIN service s ON s.code = sc.service_code\n"
                     + "\n"
                     + "WHERE o.id = :id\n"
                     + "ORDER BY o.created_at DESC;",

@@ -7,7 +7,9 @@ import com.alphawash.entity.Customer;
 import com.alphawash.entity.Model;
 import com.alphawash.entity.Order;
 import com.alphawash.entity.OrderDetail;
+import com.alphawash.entity.OrderProductDtl;
 import com.alphawash.entity.OrderServiceDtl;
+import com.alphawash.entity.Product;
 import com.alphawash.entity.ServiceCatalog;
 import com.alphawash.entity.Vehicle;
 import com.alphawash.exception.BusinessException;
@@ -16,13 +18,17 @@ import com.alphawash.repository.CustomerRepository;
 import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.repository.ModelRepository;
 import com.alphawash.repository.OrderDetailRepository;
+import com.alphawash.repository.OrderProductDtlRepository;
 import com.alphawash.repository.OrderRepository;
 import com.alphawash.repository.OrderServiceDtlRepository;
+import com.alphawash.repository.ProductRepository;
 import com.alphawash.repository.ServiceCatalogRepository;
 import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.BulkPaymentRequest;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
+import com.alphawash.request.ProductOrderItemRequest;
+import com.alphawash.service.InventoryService;
 import com.alphawash.service.OrderService;
 import com.alphawash.util.CollectionUtils;
 import com.alphawash.util.DateTimeUtils;
@@ -56,6 +62,9 @@ public class OrderServiceImpl implements OrderService {
     private final VehicleRepository vehicleRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final OrderServiceDtlRepository orderServiceDtlRepository;
+    private final OrderProductDtlRepository orderProductDtlRepository;
+    private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
     private final OrderConverter orderConverter;
 
     @Override
@@ -160,29 +169,64 @@ public class OrderServiceImpl implements OrderService {
             orderDetailRepository.save(detail);
 
             // ===== 5. Gán các dịch vụ cho từng chi tiết =====
-            for (OrderCreateRequest.ServiceCreateRequest serviceReq : detailReq.services()) {
-                ServiceCatalog sc = serviceCatalogRepository
-                        .findByCode(serviceReq.serviceCatalogCode())
-                        .orElseThrow(() -> new BusinessException(
-                                HttpStatus.BAD_REQUEST,
-                                "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
+            if (CollectionUtils.isNotEmpty(detailReq.services())) {
+                for (OrderCreateRequest.ServiceCreateRequest serviceReq : detailReq.services()) {
+                    ServiceCatalog sc = serviceCatalogRepository
+                            .findByCode(serviceReq.serviceCatalogCode())
+                            .orElseThrow(() -> new BusinessException(
+                                    HttpStatus.BAD_REQUEST,
+                                    "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
 
-                OrderServiceDtl osd = new OrderServiceDtl();
-                osd.setCode(generateOrderServiceDtlCode());
-                osd.setOrderDetail(detail);
-                osd.setServiceCatalogCode(serviceReq.serviceCatalogCode());
-                if (Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())) {
-                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
-                    osd.setAdjustedPriceFlag(true);
-                    osd.setAdjustedPriceReason(serviceReq.adjustedPriceReason());
-                } else {
-                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
-                    osd.setAdjustedPriceFlag(false);
-                    osd.setAdjustedPriceReason(null);
+                    OrderServiceDtl osd = new OrderServiceDtl();
+                    osd.setCode(generateOrderServiceDtlCode());
+                    osd.setOrderDetail(detail);
+                    osd.setServiceCatalogCode(serviceReq.serviceCatalogCode());
+                    if (Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())) {
+                        osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                        osd.setAdjustedPriceFlag(true);
+                        osd.setAdjustedPriceReason(serviceReq.adjustedPriceReason());
+                    } else {
+                        osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                        osd.setAdjustedPriceFlag(false);
+                        osd.setAdjustedPriceReason(null);
+                    }
+                    osd.setQuantity(serviceReq.quantity() != null && serviceReq.quantity() >= 1
+                            ? serviceReq.quantity() : 1);
+                    orderServiceDtlRepository.save(osd);
                 }
-                osd.setQuantity(serviceReq.quantity() != null && serviceReq.quantity() >= 1
-                        ? serviceReq.quantity() : 1);
-                orderServiceDtlRepository.save(osd);
+            }
+
+            // ===== 6. Gán các sản phẩm cho từng chi tiết =====
+            if (CollectionUtils.isNotEmpty(detailReq.products())) {
+                for (ProductOrderItemRequest productReq : detailReq.products()) {
+                    Product product = productRepository
+                            .findByCode(productReq.getProductCode())
+                            .orElseThrow(() -> new BusinessException(
+                                    HttpStatus.BAD_REQUEST,
+                                    "Sản phẩm không tồn tại: " + productReq.getProductCode()));
+
+                    OrderProductDtl opd = new OrderProductDtl();
+                    opd.setCode(generateOrderProductDtlCode());
+                    opd.setOrderDetail(detail);
+                    opd.setProduct(product);
+                    opd.setQuantity(productReq.getQuantity() != null && productReq.getQuantity() >= 1
+                            ? productReq.getQuantity() : 1);
+                    opd.setUnitPrice(productReq.getUnitPrice() != null
+                            ? productReq.getUnitPrice() : product.getSellingPrice());
+                    opd.setAdjustedPrice(productReq.getAdjustedPrice());
+                    opd.setAdjustedPriceFlag(Boolean.TRUE.equals(productReq.getAdjustedPriceFlag()));
+                    opd.setAdjustedPriceReason(
+                            Boolean.TRUE.equals(productReq.getAdjustedPriceFlag())
+                                    ? productReq.getAdjustedPriceReason() : null);
+                    opd.setDiscount(productReq.getDiscount());
+                    opd.setNote(productReq.getNote());
+                    orderProductDtlRepository.save(opd);
+
+                    if (Boolean.TRUE.equals(product.getTrackInventory())) {
+                        inventoryService.deductStock(
+                                product.getCode(), opd.getQuantity(), order.getCode());
+                    }
+                }
             }
         }
 
@@ -206,6 +250,12 @@ public class OrderServiceImpl implements OrderService {
 
     public String generateOrderServiceDtlCode() {
         return orderServiceDtlRepository.generateOrderServiceDtlSequenceCode();
+    }
+
+    public String generateOrderProductDtlCode() {
+        String datePrefix = "OPD" + LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        long count = orderProductDtlRepository.countByCodeStartingWith(datePrefix);
+        return String.format("%s-%04d", datePrefix, count + 1);
     }
 
     @Override
@@ -343,6 +393,80 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
+
+            // 7. Cập nhật sản phẩm
+            if (detailReq.products() != null) {
+                List<OrderProductDtl> existingProducts =
+                        orderProductDtlRepository.findByOrderDetail_Code(detail.getCode());
+
+                Map<String, OrderProductDtl> existingProductMap = existingProducts.stream()
+                        .collect(Collectors.toMap(
+                                opd -> opd.getProduct().getCode(), opd -> opd));
+
+                Set<String> requestProductCodes = detailReq.products().stream()
+                        .map(ProductOrderItemRequest::getProductCode)
+                        .collect(Collectors.toSet());
+
+                // Remove products no longer in request — restore inventory
+                for (OrderProductDtl existing : existingProducts) {
+                    if (!requestProductCodes.contains(existing.getProduct().getCode())) {
+                        if (Boolean.TRUE.equals(existing.getProduct().getTrackInventory())) {
+                            inventoryService.addStock(
+                                    existing.getProduct().getCode(),
+                                    existing.getQuantity(),
+                                    order.getCode());
+                        }
+                        existing.setDeleteFlag(true);
+                        orderProductDtlRepository.save(existing);
+                    }
+                }
+
+                // Add or update products
+                for (ProductOrderItemRequest productReq : detailReq.products()) {
+                    Product product = productRepository
+                            .findByCode(productReq.getProductCode())
+                            .orElseThrow(() -> new BusinessException(
+                                    HttpStatus.BAD_REQUEST,
+                                    "Sản phẩm không tồn tại: " + productReq.getProductCode()));
+
+                    OrderProductDtl opd = existingProductMap.get(productReq.getProductCode());
+                    int oldQty = 0;
+
+                    if (opd == null) {
+                        opd = new OrderProductDtl();
+                        opd.setCode(generateOrderProductDtlCode());
+                        opd.setOrderDetail(detail);
+                        opd.setProduct(product);
+                    } else {
+                        oldQty = opd.getQuantity() != null ? opd.getQuantity() : 0;
+                    }
+
+                    int newQty = productReq.getQuantity() != null && productReq.getQuantity() >= 1
+                            ? productReq.getQuantity() : 1;
+
+                    opd.setQuantity(newQty);
+                    opd.setUnitPrice(productReq.getUnitPrice() != null
+                            ? productReq.getUnitPrice() : product.getSellingPrice());
+                    opd.setAdjustedPrice(productReq.getAdjustedPrice());
+                    opd.setAdjustedPriceFlag(Boolean.TRUE.equals(productReq.getAdjustedPriceFlag()));
+                    opd.setAdjustedPriceReason(
+                            Boolean.TRUE.equals(productReq.getAdjustedPriceFlag())
+                                    ? productReq.getAdjustedPriceReason() : null);
+                    opd.setDiscount(productReq.getDiscount());
+                    opd.setNote(productReq.getNote());
+                    orderProductDtlRepository.save(opd);
+
+                    // Adjust inventory for quantity changes
+                    if (Boolean.TRUE.equals(product.getTrackInventory())) {
+                        int diff = newQty - oldQty;
+                        if (diff > 0) {
+                            inventoryService.deductStock(product.getCode(), diff, order.getCode());
+                        } else if (diff < 0) {
+                            inventoryService.addStock(product.getCode(), -diff, order.getCode());
+                        }
+                    }
+                }
+            }
         }
 
         order.setTotalPrice(request.totalPrice());
@@ -380,6 +504,20 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(HttpStatus.NOT_FOUND, "Order not found with ID: " + orderId);
         }
         Order order = optionalOrder.get();
+
+        // Restore inventory for all product items
+        List<OrderDetail> details = orderDetailRepository.findByOrder_Code(order.getCode());
+        for (OrderDetail detail : details) {
+            List<OrderProductDtl> productItems =
+                    orderProductDtlRepository.findByOrderDetail_CodeAndDeleteFlagFalse(detail.getCode());
+            for (OrderProductDtl opd : productItems) {
+                if (opd.getProduct() != null && Boolean.TRUE.equals(opd.getProduct().getTrackInventory())) {
+                    inventoryService.addStock(
+                            opd.getProduct().getCode(), opd.getQuantity(), order.getCode());
+                }
+            }
+        }
+
         order.setDeleteFlag(true);
         order.setUpdatedAt(DateTimeUtils.getCurrentDate());
         orderRepository.save(order);
