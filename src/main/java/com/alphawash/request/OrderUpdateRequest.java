@@ -30,7 +30,8 @@ public record OrderUpdateRequest(
             String status,
             String note,
             List<Long> employeeIds,
-            List<ServiceUpdateRequest> services) {}
+            List<ServiceUpdateRequest> services,
+            List<ProductOrderItemRequest> products) {}
 
     public record ServiceUpdateRequest(
             String serviceCatalogCode,

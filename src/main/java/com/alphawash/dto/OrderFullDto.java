@@ -54,6 +54,7 @@ public class OrderFullDto {
         private List<EmployeeDTO> employees;
         private VehicleDTO vehicle;
         private List<ServiceDTO> service;
+        private List<ProductItemDTO> products;
         private String status;
         private String note;
     }
@@ -109,5 +110,24 @@ public class OrderFullDto {
         private String code;
         private BigDecimal listedPrice;
         private String size;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProductItemDTO {
+        private Long id;
+        private String productCode;
+        private String productName;
+        private BigDecimal unitPrice;
+        private Integer quantity;
+        private BigDecimal adjustedPrice;
+        private Boolean adjustedPriceFlag;
+        private String adjustedPriceReason;
+        private BigDecimal discount;
+        private String note;
+        private Integer currentStock;
+        private String unit;
     }
 }
