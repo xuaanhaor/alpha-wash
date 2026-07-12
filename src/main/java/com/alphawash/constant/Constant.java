@@ -38,6 +38,7 @@ public class Constant {
     public static final String API_INVENTORY = API + "/inventory";
     public static final String API_PURCHASE_ORDERS = API + "/purchase-orders";
     public static final String RECEIVE_ENDPOINT = "/receive";
+    public static final String API_DASHBOARD = API + "/dashboard";
     public static final String ADMINISTRATOR = "admin";
     public static final int ZERO = 0;
 }
