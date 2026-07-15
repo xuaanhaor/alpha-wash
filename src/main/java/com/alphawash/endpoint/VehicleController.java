@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +89,8 @@ public class VehicleController {
 
     @PostMapping("/services-used/detail")
     public ResponseEntity<BasicCustomerVehicleDetailResponse> getVehicleServiceUsedDetail(
-            @RequestBody UUID customerId) {
+            @RequestBody Map<String, String> request) {
+        UUID customerId = UUID.fromString(request.get("customerId"));
         return ResponseEntity.ok(vehicleService.searchVehicleServiceUsageDetail(customerId));
     }
 }
