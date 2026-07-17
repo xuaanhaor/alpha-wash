@@ -33,6 +33,9 @@ public class Vehicle extends BaseEntity {
     @Column(name = "license_plate", unique = true, nullable = false)
     private String licensePlate;
 
+    @Column(name = "normalized_license_plate")
+    private String normalizedLicensePlate;
+
     @ManyToOne
     @JoinColumn(name = "brand_code", referencedColumnName = "code")
     private Brand brand;

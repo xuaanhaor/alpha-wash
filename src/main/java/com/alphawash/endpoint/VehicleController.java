@@ -5,8 +5,10 @@ import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.request.BasicCarSizeRequest;
+import com.alphawash.request.TransferOwnershipRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.response.BasicCustomerVehicleDetailResponse;
+import com.alphawash.response.VehiclePlateCheckResponse;
 import com.alphawash.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,5 +94,24 @@ public class VehicleController {
             @RequestBody Map<String, String> request) {
         UUID customerId = UUID.fromString(request.get("customerId"));
         return ResponseEntity.ok(vehicleService.searchVehicleServiceUsageDetail(customerId));
+    }
+
+    @Operation(summary = "Check if a license plate already exists")
+    @GetMapping(Constant.CHECK_PLATE_ENDPOINT)
+    public ResponseEntity<VehiclePlateCheckResponse> checkPlate(@RequestParam String plate) {
+        return ResponseEntity.ok(vehicleService.checkPlate(plate));
+    }
+
+    @Operation(summary = "Link an unowned vehicle to a customer")
+    @PostMapping(Constant.LINK_CUSTOMER_ENDPOINT)
+    public ResponseEntity<VehicleDto> linkCustomer(@PathVariable UUID vehicleId, @PathVariable UUID customerId) {
+        return ResponseEntity.ok(vehicleService.linkCustomer(vehicleId, customerId));
+    }
+
+    @Operation(summary = "Transfer vehicle ownership to another customer")
+    @PostMapping(Constant.TRANSFER_OWNERSHIP_ENDPOINT)
+    public ResponseEntity<VehicleDto> transferOwnership(
+            @PathVariable UUID vehicleId, @RequestBody TransferOwnershipRequest request) {
+        return ResponseEntity.ok(vehicleService.transferOwnership(vehicleId, request.newCustomerId()));
     }
 }

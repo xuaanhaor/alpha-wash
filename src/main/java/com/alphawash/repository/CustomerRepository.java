@@ -23,8 +23,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     Optional<Object> findByIdAndDeleteFlagFalse(UUID id);
 
-    Optional<Customer> findByCustomerNameAndDeleteFlagFalse(String customerName);
-
     @Query("SELECT new com.alphawash.dto.CustomerVehicleFlatDto("
             + "c.id, c.phone, c.customerName, v.brand.code, b.brandName, "
             + "v.model.code, m.modelName, v.licensePlate, v.id, v.imageUrl, str(m.size)) "

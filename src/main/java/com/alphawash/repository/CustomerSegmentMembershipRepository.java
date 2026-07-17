@@ -11,6 +11,8 @@ public interface CustomerSegmentMembershipRepository extends JpaRepository<Custo
 
     List<CustomerSegmentMembership> findByCustomerId(UUID customerId);
 
+    List<CustomerSegmentMembership> findByCustomerIdIn(List<UUID> customerIds);
+
     List<CustomerSegmentMembership> findBySegmentCode(String segmentCode);
 
     @Query("SELECT m.customerId FROM CustomerSegmentMembership m WHERE m.segmentCode = :segmentCode")
