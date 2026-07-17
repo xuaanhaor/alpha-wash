@@ -1,5 +1,6 @@
 package com.alphawash.configuration;
 
+import static com.alphawash.constant.Constant.API_ADMIN;
 import static com.alphawash.constant.Constant.API_AUTH;
 
 import com.alphawash.util.JwtUtil;
@@ -50,6 +51,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml")
                         .permitAll()
+                        .requestMatchers("/api/vehicles/check-plate")
+                        .permitAll()
+                        .requestMatchers(API_ADMIN + "/**")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

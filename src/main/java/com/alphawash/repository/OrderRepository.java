@@ -6,11 +6,33 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    Page<Order> findByCustomer_IdAndDeleteFlagFalseOrderByDateDesc(UUID customerId, Pageable pageable);
+
+    /**
+     * Migrate tất cả orders gắn với duplicate vehicle (qua order_detail) sang primary customer.
+     * Dùng native SQL để tránh entity-state issues (detached entities) và xử lý đúng cả
+     * orders có customer_id = NULL.
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+            value = "UPDATE orders SET customer_id = :primaryCustomerId "
+                    + "WHERE code IN ("
+                    + "  SELECT order_code FROM order_detail "
+                    + "  WHERE vehicle_id = :duplicateVehicleId AND delete_flag = false"
+                    + ") AND delete_flag = false",
+            nativeQuery = true)
+    int reassignCustomerByVehicle(
+            @Param("duplicateVehicleId") UUID duplicateVehicleId,
+            @Param("primaryCustomerId") UUID primaryCustomerId);
 
     @Query(value = "SELECT * FROM get_vehicle_by_order_id(:p_order_id)", nativeQuery = true)
     Optional<Vehicle> findVehicleByOrderId(@Param("p_order_id") UUID orderId);

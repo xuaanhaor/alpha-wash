@@ -13,7 +13,26 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
     List<Vehicle> findByCustomerId(UUID customerId);
 
+    List<Vehicle> findByCustomerIdAndDeleteFlagFalse(UUID customerId);
+
+    List<Vehicle> findByCustomerIdInAndDeleteFlagFalse(List<UUID> customerIds);
+
     Optional<Vehicle> findByLicensePlate(String licensePlate);
+
+    Optional<Vehicle> findByNormalizedLicensePlateAndDeleteFlagFalse(String normalizedLicensePlate);
+
+    List<Vehicle> findAllByNormalizedLicensePlateAndDeleteFlagFalse(String normalizedLicensePlate);
+
+    @Query(
+            value =
+                    """
+            select normalized_license_plate
+            from vehicle
+            where delete_flag = false and normalized_license_plate is not null
+            group by normalized_license_plate
+            having count(*) > 1""",
+            nativeQuery = true)
+    List<String> findDuplicateNormalizedPlates();
 
     @Query(
             value =

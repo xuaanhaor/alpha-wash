@@ -24,7 +24,7 @@ public class Constant {
     public static final String API_SERVICE_CATALOG = API + "/service-catalog";
     public static final String API_SERVICE_TYPE = API + "/service-type";
     public static final String API_SERVICE_CATEGORY = "/by-service-id";
-    public static final String API_VEHICLE = API + "/vehicle";
+    public static final String API_VEHICLE = API + "/vehicles";
     public static final String API_REVENUE = API + "/revenue";
     public static final String API_EMPLOYEE_SKILL = API + "/employee-skill";
     public static final String API_BRAND_WITH_MODELS = "/brands/with-models";
@@ -40,6 +40,22 @@ public class Constant {
     public static final String RECEIVE_ENDPOINT = "/receive";
     public static final String API_DASHBOARD = API + "/dashboard";
     public static final String API_CUSTOMER_SEGMENTS = API + "/customer-segments";
+    public static final String API_ADMIN = API + "/admin";
+    public static final String API_DUPLICATE_VEHICLES = API_ADMIN + "/duplicate-vehicles";
+    public static final String API_AUTO_LINK = API_ADMIN + "/auto-link";
+    public static final String EXECUTE_ENDPOINT = "/execute";
+    public static final String CHECK_PLATE_ENDPOINT = "/check-plate";
+    public static final String LINK_CUSTOMER_ENDPOINT = "/{vehicleId}/link-customer/{customerId}";
+    public static final String TRANSFER_OWNERSHIP_ENDPOINT = "/{vehicleId}/transfer-ownership";
+    public static final String MERGE_ENDPOINT = "/merge";
+    public static final String PREVIEW_MERGE_ENDPOINT = "/preview";
+    public static final String LOGS_ENDPOINT = "/logs";
     public static final String ADMINISTRATOR = "admin";
     public static final int ZERO = 0;
+    public static final String LIST_ENDPOINT = "/list";
+    public static final String EXPORT_ENDPOINT = "/export";
+    public static final String INVOICES_ENDPOINT = "/invoices";
+    public static final String VEHICLES_ENDPOINT = "/vehicles";
+    public static final String VEHICLE_ID_PATH_PARAMETER = "/{vehicleId}";
+    public static final String RECALCULATE_STATS_ENDPOINT = "/recalculate-stats";
 }

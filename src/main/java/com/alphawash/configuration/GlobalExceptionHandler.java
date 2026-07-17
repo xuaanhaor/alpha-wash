@@ -1,6 +1,7 @@
 package com.alphawash.configuration;
 
 import com.alphawash.exception.BusinessException;
+import com.alphawash.exception.DuplicateVehicleException;
 import com.alphawash.exception.InvalidArgumentException;
 import com.alphawash.response.ApiResponse;
 import java.util.stream.Collectors;
@@ -50,8 +51,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Object>> handleException(BusinessException ex) {
         log.debug("Business Exception occurred: {}", ex.getMessage());
-        ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(ex.getMessage()));
+        return ResponseEntity.status(ex.getStatus()).body(ApiResponse.error(ex.getMessage()));
+    }
+
+    /**
+     * Xử lý ngoại lệ khi phát hiện xe trùng biển số, trả kèm thông tin xe đã tồn tại.
+     * @param ex Ngoại lệ xảy ra
+     * @return ResponseEntity chứa ApiResponse với xe đã tồn tại trong data
+     */
+    @ExceptionHandler(DuplicateVehicleException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateVehicle(DuplicateVehicleException ex) {
+        log.debug("Duplicate vehicle detected: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage(), ex.getExistingVehicle()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
