@@ -5,7 +5,6 @@ import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.request.BasicCarSizeRequest;
-import com.alphawash.request.TransferOwnershipRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.response.BasicCustomerVehicleDetailResponse;
 import com.alphawash.response.VehiclePlateCheckResponse;
@@ -111,7 +110,7 @@ public class VehicleController {
     @Operation(summary = "Transfer vehicle ownership to another customer")
     @PostMapping(Constant.TRANSFER_OWNERSHIP_ENDPOINT)
     public ResponseEntity<VehicleDto> transferOwnership(
-            @PathVariable UUID vehicleId, @RequestBody TransferOwnershipRequest request) {
-        return ResponseEntity.ok(vehicleService.transferOwnership(vehicleId, request.newCustomerId()));
+            @PathVariable UUID vehicleId, @PathVariable UUID newCustomerId) {
+        return ResponseEntity.ok(vehicleService.transferOwnership(vehicleId, newCustomerId));
     }
 }
