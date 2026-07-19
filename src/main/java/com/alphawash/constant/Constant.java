@@ -46,7 +46,7 @@ public class Constant {
     public static final String EXECUTE_ENDPOINT = "/execute";
     public static final String CHECK_PLATE_ENDPOINT = "/check-plate";
     public static final String LINK_CUSTOMER_ENDPOINT = "/{vehicleId}/link-customer/{customerId}";
-    public static final String TRANSFER_OWNERSHIP_ENDPOINT = "/{vehicleId}/transfer-ownership";
+    public static final String TRANSFER_OWNERSHIP_ENDPOINT = "/{vehicleId}/transfer-ownership/{newCustomerId}";
     public static final String MERGE_ENDPOINT = "/merge";
     public static final String PREVIEW_MERGE_ENDPOINT = "/preview";
     public static final String LOGS_ENDPOINT = "/logs";
