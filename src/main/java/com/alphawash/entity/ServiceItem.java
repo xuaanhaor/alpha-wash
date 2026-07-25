@@ -36,6 +36,13 @@ public class ServiceItem extends BaseEntity {
     @Column(name = "category", nullable = false)
     private ServiceCategory category;
 
+    /**
+     * Code danh mục động (liên kết với service_category.code).
+     * Giữ backward-compat với enum category — có thể null với bản ghi cũ.
+     */
+    @Column(name = "category_code")
+    private String categoryCode;
+
     /** Thương hiệu: STEK, 3M, null */
     @Column(name = "brand")
     private String brand;
