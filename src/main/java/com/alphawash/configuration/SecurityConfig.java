@@ -2,6 +2,7 @@ package com.alphawash.configuration;
 
 import static com.alphawash.constant.Constant.API_ADMIN;
 import static com.alphawash.constant.Constant.API_AUTH;
+import static com.alphawash.constant.Constant.API_SERVICE_CATEGORIES;
 
 import com.alphawash.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,6 +54,8 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml")
                         .permitAll()
                         .requestMatchers("/api/vehicles/check-plate")
+                        .permitAll()
+                        .requestMatchers("GET", API_SERVICE_CATEGORIES + "/**")
                         .permitAll()
                         .requestMatchers(API_ADMIN + "/**")
                         .hasRole("ADMIN")

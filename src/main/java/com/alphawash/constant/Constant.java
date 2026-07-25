@@ -42,6 +42,7 @@ public class Constant {
     public static final String API_CUSTOMER_SEGMENTS = API + "/customer-segments";
     public static final String API_ADMIN = API + "/admin";
     public static final String API_SERVICES = API + "/services";
+    public static final String API_SERVICE_CATEGORIES = API + "/service-categories";
     public static final String API_QUOTES = API + "/quotes";
     public static final String API_DUPLICATE_VEHICLES = API_ADMIN + "/duplicate-vehicles";
     public static final String API_AUTO_LINK = API_ADMIN + "/auto-link";
