@@ -5,12 +5,11 @@ import com.alphawash.dto.OrderFullDto;
 import com.alphawash.request.BulkPaymentRequest;
 import com.alphawash.request.OrderCreateRequest;
 import com.alphawash.request.OrderUpdateRequest;
+import com.alphawash.response.ApiResponse;
+import com.alphawash.response.PageResponse;
 import com.alphawash.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +25,12 @@ public class OrderController {
 
     @GetMapping(Constant.ROOT)
     @Operation(
-            summary = "Get all orders",
-            description = "Returns a list of all orders including customer, vehicle, service, and employee details")
-    @ApiResponses(
-            value = {
-                @ApiResponse(responseCode = "200", description = "Successfully retrieved orders"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
-            })
-    public ResponseEntity<List<OrderFullDto>> getOrders() {
-        List<OrderFullDto> orders = orderService.getAllOrders();
-        return ResponseEntity.ok(orders);
+            summary = "Get all orders with pagination",
+            description = "Returns a paginated list of orders including customer, vehicle, service, and employee details")
+    public ResponseEntity<ApiResponse<PageResponse<OrderFullDto>>> getOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.success(orderService.getOrdersPaged(page, size)));
     }
 
     @GetMapping(Constant.CODE_PATH_PARAMETER)
