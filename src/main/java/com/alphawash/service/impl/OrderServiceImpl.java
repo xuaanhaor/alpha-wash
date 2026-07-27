@@ -30,6 +30,7 @@ import com.alphawash.request.OrderUpdateRequest;
 import com.alphawash.request.ProductOrderItemRequest;
 import com.alphawash.service.InventoryService;
 import com.alphawash.service.OrderService;
+import com.alphawash.response.PageResponse;
 import com.alphawash.util.CollectionUtils;
 import com.alphawash.util.DateTimeUtils;
 import com.alphawash.util.ObjectUtils;
@@ -71,6 +72,22 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderFullDto> getAllOrders() {
         List<Object[]> rawData = orderRepository.getAllOrderRaw();
         return orderConverter.mapToOrderFullDto(rawData, employeeRepository);
+    }
+
+    @Override
+    public PageResponse<OrderFullDto> getOrdersPaged(int page, int size) {
+        int offset = page * size;
+        List<Object[]> rawData = orderRepository.getAllOrderRawPaged(size, offset);
+        List<OrderFullDto> orders = orderConverter.mapToOrderFullDto(rawData, employeeRepository);
+        long totalElements = orderRepository.countAllOrdersForPaging();
+        int totalPages = size == 0 ? 0 : (int) Math.ceil((double) totalElements / size);
+        return PageResponse.<OrderFullDto>builder()
+                .content(orders)
+                .page(page)
+                .size(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .build();
     }
 
     public OrderFullDto getOrderByCode(String code) {
