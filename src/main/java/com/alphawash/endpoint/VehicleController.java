@@ -5,6 +5,7 @@ import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.request.BasicCarSizeRequest;
+import com.alphawash.request.CarSizeCreateRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.response.BasicCustomerVehicleDetailResponse;
 import com.alphawash.response.VehiclePlateCheckResponse;
@@ -12,6 +13,7 @@ import com.alphawash.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +83,21 @@ public class VehicleController {
     @PostMapping("/size/update")
     public ResponseEntity<CarSizeDto> updateCarSize(@RequestBody BasicCarSizeRequest request) {
         return ResponseEntity.ok(vehicleService.updateCarSize(request));
+    }
+
+    @Operation(summary = "Create car size")
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Vehicle found"),
+                @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+                @ApiResponse(responseCode = "400", description = "Invalid request data"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
+    @PostMapping("/size/create")
+    public ResponseEntity<CarSizeDto> createCarSize(@RequestBody CarSizeCreateRequest request) {
+        return ResponseEntity.ok(vehicleService.createCarSize(request));
+
     }
 
     @GetMapping("/services-used")

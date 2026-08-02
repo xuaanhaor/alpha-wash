@@ -31,6 +31,8 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public BrandDto create(BrandDto dto) {
+        String brandCode = brandRepository.generateBrandCode();
+        dto.setCode(brandCode);
         Brand saved = brandRepository.save(converter.toEntity(dto));
         return converter.toDto(saved);
     }

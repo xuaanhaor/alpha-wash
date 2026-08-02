@@ -1,5 +1,3 @@
 package com.alphawash.request;
 
-import lombok.*;
-
-public record BrandRequest(String code, String brandName) {}
+public record BrandRequest(Long id, String code, String brandName) {}
