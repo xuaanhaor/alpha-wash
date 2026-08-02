@@ -6,9 +6,11 @@ import com.alphawash.converter.CustomerConverter;
 import com.alphawash.converter.VehicleConverter;
 import com.alphawash.dto.BasicVehicleServiceUsedDto;
 import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
+import com.alphawash.dto.BrandDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.dto.VehicleServicesDto;
+import com.alphawash.entity.Brand;
 import com.alphawash.entity.Customer;
 import com.alphawash.entity.MergeVehicleLog;
 import com.alphawash.entity.Model;
@@ -17,6 +19,7 @@ import com.alphawash.entity.OrderDetail;
 import com.alphawash.entity.Vehicle;
 import com.alphawash.exception.BusinessException;
 import com.alphawash.exception.DuplicateVehicleException;
+import com.alphawash.repository.BrandRepository;
 import com.alphawash.repository.CustomerRepository;
 import com.alphawash.repository.MergeVehicleLogRepository;
 import com.alphawash.repository.ModelRepository;
@@ -24,6 +27,7 @@ import com.alphawash.repository.OrderDetailRepository;
 import com.alphawash.repository.OrderRepository;
 import com.alphawash.repository.VehicleRepository;
 import com.alphawash.request.BasicCarSizeRequest;
+import com.alphawash.request.CarSizeCreateRequest;
 import com.alphawash.request.MergeVehiclesRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.response.BasicCustomerVehicleDetailResponse;
@@ -34,6 +38,7 @@ import com.alphawash.response.VehicleMergePreviewItemResponse;
 import com.alphawash.response.VehicleMergePreviewResponse;
 import com.alphawash.response.VehicleMergeResponse;
 import com.alphawash.response.VehiclePlateCheckResponse;
+import com.alphawash.service.BrandService;
 import com.alphawash.service.VehicleService;
 import com.alphawash.util.LicensePlateUtil;
 import com.alphawash.util.ObjectUtils;
@@ -67,6 +72,9 @@ public class VehicleServiceImpl implements VehicleService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderRepository orderRepository;
     private final MergeVehicleLogRepository mergeVehicleLogRepository;
+
+    private final BrandService brandService;
+    private final BrandRepository brandRepository;
 
     @Override
     public List<VehicleDto> search() {
@@ -149,30 +157,39 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public CarSizeDto updateCarSize(BasicCarSizeRequest request) {
-        String modelCode = request.modelCode();
-        Model model;
-
-        if (StringUtils.isNullOrBlank(request.modelCode())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Mã model không được để rỗng!");
-        } else {
-            model = modelRepository
-                    .findByCode(modelCode)
-                    .orElseThrow(() ->
-                            new BusinessException(HttpStatus.NOT_FOUND, "Model xe không tồn tại với mã: " + modelCode));
+        try {
+            String modelCode = request.modelCode();
+            Model model;
+            if (StringUtils.isNullOrBlank(modelCode)) {
+                throw new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "Mã model không được để rỗng!"
+                );
+            } else {
+                model = modelRepository
+                        .findByCode(modelCode)
+                        .orElseThrow(() ->
+                                new BusinessException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Model xe không tồn tại với mã: " + modelCode
+                                ));
+            }
+            Size size = Size.fromString(request.size());
+            model.setSize(size);
+            ObjectUtils.setIfNotNull(request.note(), model::setNote);
+            modelRepository.save(model);
+            return CarSizeDto.builder()
+                    .brandCode(model.getBrand().getCode())
+                    .modelCode(model.getCode())
+                    .brandName(model.getBrand().getBrandName())
+                    .modelName(model.getModelName())
+                    .size(size)
+                    .note(model.getNote())
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi cập nhật size xe: " + e.getMessage(), e);
         }
-
-        Size size = Size.fromString(request.size());
-        model.setSize(size);
-        ObjectUtils.setIfNotNull(request.note(), model::setNote);
-        modelRepository.save(model);
-        return CarSizeDto.builder()
-                .brandCode(model.getBrand().getCode())
-                .modelCode(model.getCode())
-                .brandName(model.getBrand().getBrandName())
-                .modelName(model.getModelName())
-                .size(size)
-                .note(model.getNote())
-                .build();
     }
 
     @Override
@@ -502,6 +519,75 @@ public class VehicleServiceImpl implements VehicleService {
                         .status(log.getStatus())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CarSizeDto createCarSize(CarSizeCreateRequest request) {
+        try {
+            validateRequest(request);
+            Brand brand;
+            if (StringUtils.isNullOrBlank(request.brandCode())) {
+                BrandDto createdBrand = brandService.create(new BrandDto(null, null, request.brandName()));
+                brand = brandRepository.findById(createdBrand.getId())
+                        .orElseThrow(() ->
+                                new BusinessException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Không tìm thấy brand vừa tạo"
+                                )
+                        );
+            } else {
+                brand = brandRepository.findByCode(request.brandCode())
+                        .orElseThrow(() ->
+                                new BusinessException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Thương hiệu không tồn tại với mã: "
+                                                + request.brandCode()
+                                )
+                        );
+            }
+            Model model = new Model();
+            model.setBrand(brand);
+            model.setCode(modelRepository.generateModelCode());
+            model.setModelName(request.modelName());
+            model.setSize(Size.fromString(request.size()));
+            model.setNote(request.note());
+            Model savedModel = modelRepository.save(model);
+            return CarSizeDto.builder()
+                    .brandCode(brand.getCode())
+                    .modelCode(savedModel.getCode())
+                    .brandName(brand.getBrandName())
+                    .modelName(savedModel.getModelName())
+                    .size(savedModel.getSize())
+                    .note(savedModel.getNote())
+                    .build();
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi tạo size xe: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateRequest(CarSizeCreateRequest request) {
+        if (StringUtils.isNullOrBlank(request.modelName())) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Tên model không được để rỗng!"
+            );
+        }
+        if (StringUtils.isNullOrBlank(request.size())) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Kích thước xe không được để rỗng!"
+            );
+        }
+        if (StringUtils.isNullOrBlank(request.brandCode())
+                && StringUtils.isNullOrBlank(request.brandName())) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Phải có thương hiệu!"
+            );
+        }
     }
 
     private String currentUsername() {

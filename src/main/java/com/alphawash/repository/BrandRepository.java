@@ -15,4 +15,10 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
     List<Object[]> findModelsByBrandId(@Param("brandCode") String brandCode);
 
     Optional<Brand> findByCode(String code);
+
+    @Query(value = """
+        SELECT 'B' || LPAD((COALESCE(MAX(SUBSTRING(code, 2)::INT), 0) + 1)::TEXT, 4, '0')
+        FROM brands
+        """, nativeQuery = true)
+    String generateBrandCode();
 }

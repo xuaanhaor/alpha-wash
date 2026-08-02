@@ -4,6 +4,7 @@ import com.alphawash.dto.BasicVehicleServiceUsedSearchDto;
 import com.alphawash.dto.CarSizeDto;
 import com.alphawash.dto.VehicleDto;
 import com.alphawash.request.BasicCarSizeRequest;
+import com.alphawash.request.CarSizeCreateRequest;
 import com.alphawash.request.MergeVehiclesRequest;
 import com.alphawash.request.VehicleRequest;
 import com.alphawash.response.BasicCustomerVehicleDetailResponse;
@@ -47,4 +48,6 @@ public interface VehicleService {
     VehicleMergePreviewResponse previewMerge(List<UUID> vehicleIds);
 
     List<MergeVehicleLogResponse> getMergeLogs();
+
+    CarSizeDto createCarSize(CarSizeCreateRequest request);
 }
