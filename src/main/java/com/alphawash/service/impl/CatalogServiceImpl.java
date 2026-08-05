@@ -102,9 +102,27 @@ public class CatalogServiceImpl implements CatalogService {
 
     // ── helpers ─────────────────────────────────────────────────────────────
 
+    /**
+     * Parse category string → enum với fallback OTHER.
+     * Luôn set categoryCode để giữ nguyên code gốc (kể cả custom code).
+     */
+    private void applyCategory(ServiceItem item, String categoryStr) {
+        if (categoryStr == null) return;
+        String code = categoryStr.trim().toUpperCase();
+        ServiceCategory enumCat;
+        try {
+            enumCat = ServiceCategory.valueOf(code);
+        } catch (IllegalArgumentException e) {
+            // Custom dynamic category không có trong enum → lưu vào OTHER + categoryCode
+            enumCat = ServiceCategory.OTHER;
+        }
+        item.setCategory(enumCat);
+        item.setCategoryCode(code);
+    }
+
     private ServiceItem buildFromRequest(ServiceItem item, ServiceItemRequest req) {
         if (req.name() != null) item.setName(req.name());
-        if (req.category() != null) item.setCategory(req.category());
+        if (req.category() != null) applyCategory(item, req.category());
         if (req.brand() != null) item.setBrand(req.brand());
         if (req.typeDetail() != null) item.setTypeDetail(req.typeDetail());
         if (req.warranty() != null) item.setWarranty(req.warranty());
@@ -122,10 +140,15 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     private ServiceItemResponse toResponse(ServiceItem s) {
+        // Ưu tiên categoryCode (dynamic string), fallback về enum name
+        String categoryStr = s.getCategoryCode() != null
+                ? s.getCategoryCode()
+                : (s.getCategory() != null ? s.getCategory().name() : null);
         return ServiceItemResponse.builder()
                 .id(s.getId())
                 .name(s.getName())
-                .category(s.getCategory())
+                .category(categoryStr)
+                .categoryCode(s.getCategoryCode())
                 .brand(s.getBrand())
                 .typeDetail(s.getTypeDetail())
                 .warranty(s.getWarranty())

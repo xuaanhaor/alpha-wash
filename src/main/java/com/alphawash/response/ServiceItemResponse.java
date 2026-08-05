@@ -1,6 +1,5 @@
 package com.alphawash.response;
 
-import com.alphawash.constant.ServiceCategory;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,9 @@ import lombok.Setter;
 public class ServiceItemResponse {
     private UUID id;
     private String name;
-    private ServiceCategory category;
+    /** Code danh mục: ưu tiên categoryCode (dynamic), fallback về enum name */
+    private String category;
+    private String categoryCode;
     private String brand;
     private String typeDetail;
     private String warranty;
