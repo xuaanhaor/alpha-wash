@@ -293,38 +293,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setCustomer(customer);
 
-        // 3. Lấy hoặc tạo mới xe
-        if (StringUtils.isNullOrBlank(request.licensePlate())) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
-        }
-        Vehicle vehicle =
-                vehicleRepository.findByLicensePlate(request.licensePlate()).orElse(null);
-        if (ObjectUtils.isNull(vehicle)) {
-            if (StringUtils.isNullOrBlank(request.brandCode()) || StringUtils.isNullOrBlank(request.modelCode())) {
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Thiếu thông tin hãng hoặc dòng xe khi tạo mới xe");
-            }
-
-            Brand brand = brandRepository
-                    .findByCode(request.brandCode())
-                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại"));
-            Model model = modelRepository
-                    .findByCode(request.modelCode())
-                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại"));
-
-            vehicle = Vehicle.builder()
-                    .licensePlate(request.licensePlate())
-                    .brand(brand)
-                    .model(model)
-                    .customer(customer)
-                    .build();
-        }
-
-        // Nếu là xe cũ và người dùng muốn cập nhật thêm thông tin xe
-        ObjectUtils.setIfNotNull(request.imageUrl(), vehicle::setImageUrl);
-        ObjectUtils.setIfNotNull(request.vehicleNote(), vehicle::setNote);
-        vehicleRepository.save(vehicle);
-
-        // 4. Cập nhật order
+        // 3. Cập nhật order
         ObjectUtils.setIfNotNull(request.paymentStatus(), order::setPaymentStatus);
         ObjectUtils.setIfNotNull(request.paymentType(), order::setPaymentType);
         ObjectUtils.setIfNotNull(request.checkInTime(), order::setCheckinTime);
@@ -339,16 +308,75 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal totalServicePrice = BigDecimal.ZERO;
 
-        // 5. Duyệt từng order detail
+        // 4. Duyệt từng order detail — hỗ trợ cả detail cũ (update) và detail mới (tạo thêm xe)
         for (OrderUpdateRequest.OrderDetailUpdateRequest detailReq : request.orderDetails()) {
-            OrderDetail detail = orderDetailRepository
-                    .findByCode(detailReq.orderDetailCode())
-                    .orElseThrow(() -> new BusinessException(
-                            HttpStatus.BAD_REQUEST, "Chi tiết đơn hàng không tồn tại: " + detailReq.orderDetailCode()));
 
-            detail.setVehicle(vehicle); // Cập nhật lại xe
+            // 4a. Xác định vehicle cho detail này
+            String plateSrc = detailReq.licensePlate() != null && !detailReq.licensePlate().isBlank()
+                    ? detailReq.licensePlate()
+                    : request.licensePlate(); // fallback về top-level nếu FE cũ không gửi per-detail
 
-            ObjectUtils.setIfNotNull(detailReq.status(), detail::setStatus);
+            if (StringUtils.isNullOrBlank(plateSrc)) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "Biển số xe không được để trống");
+            }
+
+            Vehicle detailVehicle = vehicleRepository.findByLicensePlate(plateSrc).orElse(null);
+
+            if (detailVehicle == null) {
+                // Xe chưa tồn tại → tạo mới
+                String brandSrc = detailReq.brandCode() != null ? detailReq.brandCode() : request.brandCode();
+                String modelSrc = detailReq.modelCode() != null ? detailReq.modelCode() : request.modelCode();
+
+                if (StringUtils.isNullOrBlank(brandSrc) || StringUtils.isNullOrBlank(modelSrc)) {
+                    throw new BusinessException(HttpStatus.BAD_REQUEST,
+                            "Thiếu thông tin hãng hoặc dòng xe cho biển số: " + plateSrc);
+                }
+
+                Brand brand = brandRepository
+                        .findByCode(brandSrc)
+                        .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Hãng xe không tồn tại: " + brandSrc));
+                Model model = modelRepository
+                        .findByCode(modelSrc)
+                        .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST, "Dòng xe không tồn tại: " + modelSrc));
+
+                detailVehicle = Vehicle.builder()
+                        .licensePlate(plateSrc)
+                        .brand(brand)
+                        .model(model)
+                        .customer(customer)
+                        .imageUrl(detailReq.imageUrl() != null ? detailReq.imageUrl() : request.imageUrl())
+                        .note(detailReq.vehicleNote() != null ? detailReq.vehicleNote() : request.vehicleNote())
+                        .build();
+                vehicleRepository.save(detailVehicle);
+            } else {
+                // Xe đã tồn tại → cập nhật thêm thông tin nếu có
+                String imgSrc = detailReq.imageUrl() != null ? detailReq.imageUrl() : request.imageUrl();
+                String noteSrc = detailReq.vehicleNote() != null ? detailReq.vehicleNote() : request.vehicleNote();
+                ObjectUtils.setIfNotNull(imgSrc, detailVehicle::setImageUrl);
+                ObjectUtils.setIfNotNull(noteSrc, detailVehicle::setNote);
+                vehicleRepository.save(detailVehicle);
+            }
+
+            // 4b. Tìm hoặc tạo mới OrderDetail
+            OrderDetail detail;
+            boolean isNewDetail = detailReq.orderDetailCode() == null || detailReq.orderDetailCode().isBlank();
+
+            if (isNewDetail) {
+                // Detail mới — tạo mới (xe thêm vào trong mode edit)
+                detail = new OrderDetail();
+                detail.setCode(generateOrderDetailCode());
+                detail.setOrder(order);
+                detail.setStatus(detailReq.status() != null ? detailReq.status() : "PENDING");
+            } else {
+                detail = orderDetailRepository
+                        .findByCode(detailReq.orderDetailCode())
+                        .orElseThrow(() -> new BusinessException(
+                                HttpStatus.BAD_REQUEST, "Chi tiết đơn hàng không tồn tại: " + detailReq.orderDetailCode()));
+                ObjectUtils.setIfNotNull(detailReq.status(), detail::setStatus);
+            }
+
+            detail.setVehicle(detailVehicle);
+
             ObjectUtils.setIfNotNull(detailReq.note(), detail::setNote);
 
             if (detailReq.employeeIds() != null && !detailReq.employeeIds().isEmpty()) {

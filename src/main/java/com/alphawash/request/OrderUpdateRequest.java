@@ -26,7 +26,12 @@ public record OrderUpdateRequest(
         String note,
         List<OrderDetailUpdateRequest> orderDetails) {
     public record OrderDetailUpdateRequest(
-            String orderDetailCode,
+            String orderDetailCode,   // rỗng hoặc null → tạo mới detail
+            String licensePlate,      // vehicle riêng cho detail này
+            String brandCode,
+            String modelCode,
+            String imageUrl,
+            String vehicleNote,
             String status,
             String note,
             List<Long> employeeIds,
