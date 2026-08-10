@@ -81,4 +81,12 @@ public class ServiceItemController {
         catalogService.delete(id);
         return ResponseEntity.ok(ApiResponse.<Void>success("Đã xóa dịch vụ", null));
     }
+
+    @Operation(summary = "Backfill category_code cho services cũ thiếu (ADMIN)")
+    @PostMapping("/backfill-category-code")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> backfillCategoryCode() {
+        int count = catalogService.backfillCategoryCode();
+        return ResponseEntity.ok(ApiResponse.success("Đã cập nhật " + count + " dịch vụ"));
+    }
 }

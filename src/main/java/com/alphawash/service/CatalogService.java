@@ -25,4 +25,12 @@ public interface CatalogService {
 
     /** Soft delete (toggle active = false + deleteFlag = true) */
     void delete(UUID id);
+
+    /**
+     * Backfill category_code cho các service cũ có categoryCode = null.
+     * Với service có category == OTHER → dùng category.name() làm code tạm thời.
+     * Với service có category != null → set categoryCode = category.name().
+     * Trả về số bản ghi đã cập nhật.
+     */
+    int backfillCategoryCode();
 }
