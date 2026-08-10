@@ -100,6 +100,27 @@ public class CatalogServiceImpl implements CatalogService {
         serviceItemRepository.save(item);
     }
 
+    @Override
+    @Transactional
+    public int backfillCategoryCode() {
+        List<ServiceItem> needsBackfill = serviceItemRepository
+                .findByDeleteFlagFalseOrderByCategoryAscSortOrderAsc()
+                .stream()
+                .filter(s -> s.getCategoryCode() == null || s.getCategoryCode().isBlank())
+                .toList();
+
+        for (ServiceItem item : needsBackfill) {
+            // Use the stored enum name as the category code so toResponse stays consistent
+            if (item.getCategory() != null) {
+                item.setCategoryCode(item.getCategory().name());
+            }
+        }
+        if (!needsBackfill.isEmpty()) {
+            serviceItemRepository.saveAll(needsBackfill);
+        }
+        return needsBackfill.size();
+    }
+
     // ── helpers ─────────────────────────────────────────────────────────────
 
     /**
