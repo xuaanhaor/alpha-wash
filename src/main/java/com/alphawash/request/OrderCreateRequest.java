@@ -38,6 +38,7 @@ public record OrderCreateRequest(
 
     public record ServiceCreateRequest(
             String serviceCatalogCode,
+            String serviceItemId,          // ID từ GET /services — dùng khi serviceCatalogCode null
             BigDecimal adjustedPrice,
             Boolean adjustedPriceFlag,
             String adjustedPriceReason,

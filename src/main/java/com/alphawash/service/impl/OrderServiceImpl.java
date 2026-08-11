@@ -188,25 +188,38 @@ public class OrderServiceImpl implements OrderService {
             // ===== 5. Gán các dịch vụ cho từng chi tiết =====
             if (CollectionUtils.isNotEmpty(detailReq.services())) {
                 for (OrderCreateRequest.ServiceCreateRequest serviceReq : detailReq.services()) {
-                    ServiceCatalog sc = serviceCatalogRepository
-                            .findByCode(serviceReq.serviceCatalogCode())
-                            .orElseThrow(() -> new BusinessException(
-                                    HttpStatus.BAD_REQUEST,
-                                    "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
+                    // Xác định catalog code sẽ lưu vào DB
+                    String resolvedCatalogCode;
+                    if (serviceReq.serviceCatalogCode() != null && !serviceReq.serviceCatalogCode().isBlank()) {
+                        // Old-system service: validate catalog tồn tại trong DB
+                        serviceCatalogRepository
+                                .findByCode(serviceReq.serviceCatalogCode())
+                                .orElseThrow(() -> new BusinessException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Gói dịch vụ không tồn tại: " + serviceReq.serviceCatalogCode()));
+                        resolvedCatalogCode = serviceReq.serviceCatalogCode();
+                    } else if (serviceReq.serviceItemId() != null && !serviceReq.serviceItemId().isBlank()) {
+                        // New-system service (từ GET /services): không có catalog entry trong old system.
+                        // Dùng prefix "SI_" + serviceItemId làm stable key để lưu vào DB.
+                        // Giá bắt buộc phải được cung cấp qua adjustedPrice.
+                        if (serviceReq.adjustedPrice() == null || serviceReq.adjustedPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                            throw new BusinessException(HttpStatus.BAD_REQUEST,
+                                    "Dịch vụ '" + serviceReq.serviceItemId() + "' phải có giá (adjustedPrice > 0)");
+                        }
+                        resolvedCatalogCode = "SI_" + serviceReq.serviceItemId();
+                    } else {
+                        throw new BusinessException(HttpStatus.BAD_REQUEST,
+                                "Phải cung cấp serviceCatalogCode hoặc serviceItemId cho mỗi dịch vụ");
+                    }
 
                     OrderServiceDtl osd = new OrderServiceDtl();
                     osd.setCode(generateOrderServiceDtlCode());
                     osd.setOrderDetail(detail);
-                    osd.setServiceCatalogCode(serviceReq.serviceCatalogCode());
-                    if (Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())) {
-                        osd.setAdjustedPrice(serviceReq.adjustedPrice());
-                        osd.setAdjustedPriceFlag(true);
-                        osd.setAdjustedPriceReason(serviceReq.adjustedPriceReason());
-                    } else {
-                        osd.setAdjustedPrice(serviceReq.adjustedPrice());
-                        osd.setAdjustedPriceFlag(false);
-                        osd.setAdjustedPriceReason(null);
-                    }
+                    osd.setServiceCatalogCode(resolvedCatalogCode);
+                    osd.setAdjustedPrice(serviceReq.adjustedPrice());
+                    osd.setAdjustedPriceFlag(Boolean.TRUE.equals(serviceReq.adjustedPriceFlag()));
+                    osd.setAdjustedPriceReason(Boolean.TRUE.equals(serviceReq.adjustedPriceFlag())
+                            ? serviceReq.adjustedPriceReason() : null);
                     osd.setQuantity(serviceReq.quantity() != null && serviceReq.quantity() >= 1
                             ? serviceReq.quantity() : 1);
                     orderServiceDtlRepository.save(osd);
@@ -251,6 +264,22 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(request.totalPrice());
         orderRepository.save(order);
         return order.getId();
+    }
+
+    /**
+     * Resolve catalog code cho update flow:
+     * - Old-system service: dùng serviceCatalogCode trực tiếp
+     * - New-system service (serviceItemId != null): dùng "SI_" + serviceItemId làm stable key
+     */
+    private String resolveUpdateCatalogCode(OrderUpdateRequest.ServiceUpdateRequest serviceReq) {
+        if (serviceReq.serviceCatalogCode() != null && !serviceReq.serviceCatalogCode().isBlank()) {
+            return serviceReq.serviceCatalogCode();
+        }
+        if (serviceReq.serviceItemId() != null && !serviceReq.serviceItemId().isBlank()) {
+            return "SI_" + serviceReq.serviceItemId();
+        }
+        throw new BusinessException(HttpStatus.BAD_REQUEST,
+                "Phải cung cấp serviceCatalogCode hoặc serviceItemId cho mỗi dịch vụ");
     }
 
     public String generateOrderCode() {
@@ -395,8 +424,9 @@ public class OrderServiceImpl implements OrderService {
                 Map<String, OrderServiceDtl> existingMap = existingServices.stream()
                         .collect(Collectors.toMap(OrderServiceDtl::getServiceCatalogCode, s -> s));
 
+                // Resolve catalog code cho từng service request (kể cả new-system services)
                 Set<String> requestScCodes = detailReq.services().stream()
-                        .map(OrderUpdateRequest.ServiceUpdateRequest::serviceCatalogCode)
+                        .map(serviceReq -> resolveUpdateCatalogCode(serviceReq))
                         .collect(Collectors.toSet());
 
                 // 1. Xoá service không còn trong request
@@ -409,14 +439,15 @@ public class OrderServiceImpl implements OrderService {
 
                 // 2. Thêm hoặc cập nhật service trong request
                 for (OrderUpdateRequest.ServiceUpdateRequest serviceReq : detailReq.services()) {
-                    OrderServiceDtl osd = existingMap.get(serviceReq.serviceCatalogCode());
+                    String resolvedCode = resolveUpdateCatalogCode(serviceReq);
+                    OrderServiceDtl osd = existingMap.get(resolvedCode);
 
                     if (osd == null) {
                         // Thêm mới
                         osd = OrderServiceDtl.builder()
                                 .code(generateOrderServiceDtlCode())
                                 .orderDetail(detail)
-                                .serviceCatalogCode(serviceReq.serviceCatalogCode())
+                                .serviceCatalogCode(resolvedCode)
                                 .build();
                     }
 

@@ -3,8 +3,10 @@ package com.alphawash.converter;
 import com.alphawash.dto.*;
 import com.alphawash.entity.Employee;
 import com.alphawash.entity.OrderProductDtl;
+import com.alphawash.entity.ServiceItem;
 import com.alphawash.repository.EmployeeRepository;
 import com.alphawash.repository.OrderProductDtlRepository;
+import com.alphawash.repository.ServiceItemRepository;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class OrderConverter {
 
     private final OrderProductDtlRepository orderProductDtlRepository;
+    private final ServiceItemRepository serviceItemRepository;
 
     public List<OrderFullDto> mapToOrderFullDto(List<Object[]> rows, EmployeeRepository employeeRepository) {
         Map<UUID, OrderFullDto> orderMap = new LinkedHashMap<>();
@@ -26,7 +29,7 @@ public class OrderConverter {
 
         // Bước 1: gom tất cả employee ID
         for (Object[] row : rows) {
-            String empStr = (String) row[19]; // chú ý index, tùy query
+            String empStr = (String) row[19];
             if (empStr != null && !empStr.isBlank()) {
                 for (String idStr : empStr.split(",")) {
                     try {
@@ -40,6 +43,21 @@ public class OrderConverter {
         // Bước 2: lấy map nhân viên
         Map<Long, Employee> employeeMap = employeeRepository.findAllById(allEmployeeIds).stream()
                 .collect(Collectors.toMap(Employee::getId, Function.identity()));
+
+        // Bước 3: batch load service_item cho new-system services (SI_<uuid> codes)
+        Set<UUID> serviceItemIds = new HashSet<>();
+        for (Object[] row : rows) {
+            // osd_catalog_code là cột mới nhất — index 42
+            String osdCatalogCode = row.length > 42 ? (String) row[42] : null;
+            if (osdCatalogCode != null && osdCatalogCode.startsWith("SI_")) {
+                try {
+                    serviceItemIds.add(UUID.fromString(osdCatalogCode.substring(3)));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+        Map<UUID, ServiceItem> serviceItemMap = serviceItemRepository.findAllById(serviceItemIds)
+                .stream().collect(Collectors.toMap(ServiceItem::getId, Function.identity()));
 
         for (Object[] row : rows) {
             int i = 0;
@@ -85,7 +103,6 @@ public class OrderConverter {
             String serviceName = (String) row[i++];
             String serviceTypeCode = (String) row[i++];
 
-            // Các cột mới từ order_service_dtl
             BigDecimal adjustedPrice = (BigDecimal) row[i++];
             Boolean adjustedPriceFlag = (Boolean) row[i++];
             String adjustedPriceReason = (String) row[i++];
@@ -96,6 +113,9 @@ public class OrderConverter {
             String scCode = (String) row[i++];
             BigDecimal scPrice = (BigDecimal) row[i++];
             String scSize = (String) row[i++];
+
+            // Cột mới: osd.service_catalog_code — index 42
+            String osdCatalogCode = row.length > 42 ? (String) row[42] : null;
 
             // === ORDER ===
             OrderFullDto order = orderMap.computeIfAbsent(orderId, id -> {
@@ -172,26 +192,60 @@ public class OrderConverter {
                 }
             }
 
-            // === SERVICE (may be null from LEFT JOIN) ===
-            if (serviceId != null) {
-                OrderFullDto.ServiceDTO service = new OrderFullDto.ServiceDTO();
-                service.setId(serviceId);
-                service.setServiceCode(serviceCode);
-                service.setServiceName(serviceName);
-                service.setServiceTypeCode(serviceTypeCode);
-                service.setAdjustedPrice(adjustedPrice);
-                service.setAdjustedPriceFlag(adjustedPriceFlag);
-                service.setAdjustedPriceReason(adjustedPriceReason);
-                service.setQuantity(quantity);
+            // === SERVICE ===
+            // Điều kiện: osd tồn tại (osdCatalogCode != null) HOẶC old-system service (serviceId != null)
+            if (serviceId != null || osdCatalogCode != null) {
+                OrderFullDto.ServiceDTO serviceDto = new OrderFullDto.ServiceDTO();
 
-                OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
-                sc.setId(scId);
-                sc.setCode(scCode);
-                sc.setListedPrice(scPrice);
-                sc.setSize(scSize);
-                service.setServiceCatalog(sc);
+                if (serviceId != null) {
+                    // Old-system service: lấy từ bảng service và service_catalog
+                    serviceDto.setId(serviceId);
+                    serviceDto.setServiceCode(serviceCode);
+                    serviceDto.setServiceName(serviceName);
+                    serviceDto.setServiceTypeCode(serviceTypeCode);
 
-                detail.getService().add(service);
+                    OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
+                    sc.setId(scId);
+                    sc.setCode(scCode);
+                    sc.setListedPrice(scPrice);
+                    sc.setSize(scSize);
+                    serviceDto.setServiceCatalog(sc);
+
+                } else {
+                    // New-system service: catalog code là "SI_<uuid>", lookup từ service_item
+                    String itemName = osdCatalogCode; // fallback nếu không tìm thấy
+                    UUID itemUuid = null;
+                    if (osdCatalogCode.startsWith("SI_")) {
+                        try {
+                            itemUuid = UUID.fromString(osdCatalogCode.substring(3));
+                            ServiceItem si = serviceItemMap.get(itemUuid);
+                            if (si != null) {
+                                itemName = si.getName();
+                            }
+                        } catch (IllegalArgumentException ignored) {
+                        }
+                    }
+
+                    serviceDto.setId(-1L); // không có integer ID trong old system
+                    serviceDto.setServiceCode(itemUuid != null ? itemUuid.toString() : osdCatalogCode);
+                    serviceDto.setServiceName(itemName);
+                    serviceDto.setServiceTypeCode(null);
+
+                    // Catalog DTO với code "SI_<uuid>" — FE dùng để nhận biết new-system service
+                    OrderFullDto.ServiceCatalogDTO sc = new OrderFullDto.ServiceCatalogDTO();
+                    sc.setId(null);
+                    sc.setCode(osdCatalogCode);         // "SI_<uuid>"
+                    sc.setListedPrice(adjustedPrice);   // giá niêm yết = giá đã thanh toán
+                    sc.setSize(null);                   // không lưu size riêng
+                    serviceDto.setServiceCatalog(sc);
+                }
+
+                serviceDto.setAdjustedPrice(adjustedPrice);
+                serviceDto.setAdjustedPriceFlag(adjustedPriceFlag);
+                serviceDto.setAdjustedPriceReason(adjustedPriceReason);
+                serviceDto.setQuantity(quantity);
+
+                detail.getService().add(serviceDto);
             }
         }
 

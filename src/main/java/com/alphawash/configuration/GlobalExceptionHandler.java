@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -63,6 +64,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleDuplicateVehicle(DuplicateVehicleException ex) {
         log.debug("Duplicate vehicle detected: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage(), ex.getExistingVehicle()));
+    }
+
+    /**
+     * Xử lý lỗi Jackson khi không parse được request body (VD: LocalTime nhận empty string).
+     * Giúp debug — trả về message cụ thể thay vì 400 mặc định của Spring.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNotReadable(HttpMessageNotReadableException ex) {
+        log.error("Request body parse error: {}", ex.getMessage());
+        String msg = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        return ResponseEntity.badRequest().body(ApiResponse.error("Request body không hợp lệ: " + msg));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
