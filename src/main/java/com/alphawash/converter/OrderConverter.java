@@ -236,7 +236,7 @@ public class OrderConverter {
                     sc.setId(null);
                     sc.setCode(osdCatalogCode);         // "SI_<uuid>"
                     sc.setListedPrice(adjustedPrice);   // giá niêm yết = giá đã thanh toán
-                    sc.setSize(null);                   // không lưu size riêng
+                    sc.setSize(size);                   // size xe (từ model) — hiển thị cột "Loại xe" trên hoá đơn
                     serviceDto.setServiceCatalog(sc);
                 }
 
